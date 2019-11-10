@@ -1,0 +1,205 @@
+version: '3'
+services:
+  plex:
+    container_name: plex
+    image: plexinc/pms-docker
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Madrid
+      - PLEX_CLAIM=<claimToken>
+    networks:
+      - common
+    volumes:
+      - ./data/plex/database:/config
+      - ./data/plex/transcode/temp>:/transcode
+      - ./data/media:/data
+  medusa:
+    image: linuxserver/medusa
+    container_name: medusa
+    networks:
+      - common
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./data/medusa:/config
+      - ./data/media/tv:/tv
+      - ./data/downloads/finished:/downloads
+    ports:
+      - 8081:8081 
+    restart: unless-stopped
+
+  radarr:
+    image: linuxserver/radarr
+    container_name: radarr
+    networks:
+      - common
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./data/radarr:/config
+      - ./data/media/movies:/movies
+      - ./data/downloads/finished:/downloads
+    ports:
+      - 7878:7878 
+    restart: unless-stopped
+  lazylibrarian:
+    image: thraxis/lazylibrarian-calibre
+    container_name: lazylibrarian
+    networks:
+      - common
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./data/lazylibrarian:/config
+      - ./data/downloads/finished:/downloads
+      - ./data/media/books:/books
+      - ./data/media/audiobooks:/audiobooks
+      - ./data/media/magazines:/magazines
+      - ./data/media/comics:/comics
+    ports:
+      - 5299:5299 
+    restart: unless-stopped
+
+  lidarr:
+    image: linuxserver/lidarr
+    container_name: lidarr
+    networks:
+      - common
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./data/lidarr:/config
+      - ./data/media/music:/music
+      - ./data/downloads/finished:/downloads
+    ports:
+      - 8686:8686 
+    restart: unless-stopped
+  jackett:
+    image: linuxserver/jackett
+    container_name: jackett
+    networks:
+      - common
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./data/jackett:/config
+      - ./data/downloads/finished:/downloads
+    ports:
+      - 9117:9117
+    restart: unless-stopped
+
+  nextcloud:
+    container_name: nextcloud 
+    image: nextcloud:fpm
+    stdin_open: true
+    tty: true
+    restart: always
+    links:
+      - db
+    expose:
+      - '80'
+      - '9000'
+    networks:
+      - common
+    volumes:
+      - nextcloud_data:/var/www/html/
+      - ./data/nextcloud/:/var/www/html/data
+  onlyoffice-document-server:
+    container_name: onlyoffice-document-server
+    image: onlyoffice/documentserver:latest
+    stdin_open: true
+    tty: true
+    restart: always
+    networks:
+      - common 
+    expose:
+      - '80'
+      - '443'
+    volumes:
+      - document_data:/var/www/onlyoffice/Data
+      - document_log:/var/log/onlyoffice
+  nginx:
+    container_name: nginx-server
+    depends_on: 
+      - onlyoffice-document-server
+    image: nginx
+    stdin_open: true
+    tty: true
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - common 
+    volumes:
+      - ./data/nginx.conf:/etc/nginx/nginx.conf
+      - ./data/nextcloud/:/var/www/html/data
+      - nextcloud_data:/var/www/html/
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+  transmission:
+    image: linuxserver/transmission
+    container_name: transmission
+    networks:
+      - common
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./data/transmission/config:/config
+      - ./data/downloads:/downloads
+    restart: unless-stopped
+  db:
+    image: mariadb
+    container_name: mariadb
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    restart: always
+    networks:
+      - common 
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+
+  certbot:
+      image: certbot/certbot
+      volumes:
+        - ./data/certbot/conf:/etc/letsencrypt
+        - ./data/certbot/www:/var/www/certbot
+      networks:
+        - common
+      entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  homeassistant: 
+      image: homeassistant/home-assistant
+      container_name: homeassistant
+      volumes:
+        - ./data/homeassistant/config:/config
+      networks:
+        - common
+
+networks:
+  common: 
+    driver: 'bridge'
+  
+volumes:
+  document_data:
+  document_log:
+  mysql_data:
+  nextcloud_data:
+  db:
