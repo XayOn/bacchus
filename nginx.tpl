@@ -18,6 +18,10 @@ http {{
       server lidarr:8686;
     }}
 
+    upstream homeassistant {{
+      server homeassistant:80;
+    }}
+
     upstream backend {{
       server nextcloud:9000;
     }}
@@ -195,6 +199,24 @@ http {{
                 proxy_set_header X-Forwarded-Proto $the_scheme;
         }}
 
+ 
+    location ~* ^/homeassistant/ {{
+        rewrite /homeassistant/(.*) /$1  break;
+                proxy_pass http://medusa; 
+                proxy_redirect     off;
+
+                client_max_body_size 100m;
+
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+
+                proxy_set_header Host $http_host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
+                proxy_set_header X-Forwarded-Proto $the_scheme;
+        }}
     
     location ~* ^/tv/ {{
         rewrite /tv/(.*) /$1  break;
