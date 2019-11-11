@@ -1,44 +1,33 @@
 version: '3'
 services:
-  plex:
-    container_name: plex
-    image: plexinc/pms-docker
-    restart: unless-stopped
-    environment:
-      - TZ=Europe/Madrid
-      - PLEX_CLAIM=<claimToken>
-    networks:
-      - common
-    volumes:
-      - ./data/plex/database:/config
-      - ./data/plex/transcode/temp>:/transcode
-      - ./data/media:/data
   medusa:
+    restart: always
     image: linuxserver/medusa
-    container_name: medusa
     networks:
       - common
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/London
     volumes:
       - ./data/medusa:/config
       - ./data/media/tv:/tv
       - ./data/downloads/finished:/downloads
+    env_file:
+      - .env_general
     ports:
       - 8081:8081 
-    restart: unless-stopped
-
+    restart: always 
+  openvpn:
+    cap_add:
+      - NET_ADMIN
+    image: kylemanna/openvpn
+    ports:
+       - "1194:1194/udp"
+    restart: always
   radarr:
+    restart: always
     image: linuxserver/radarr
-    container_name: radarr
     networks:
       - common
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/London
+    env_file:
+      - .env_general
     volumes:
       - ./data/radarr:/config
       - ./data/media/movies:/movies
@@ -48,7 +37,7 @@ services:
     restart: unless-stopped
   lazylibrarian:
     image: thraxis/lazylibrarian-calibre
-    container_name: lazylibrarian
+    restart: always
     networks:
       - common
     environment:
@@ -68,7 +57,7 @@ services:
 
   lidarr:
     image: linuxserver/lidarr
-    container_name: lidarr
+    restart: always
     networks:
       - common
     environment:
@@ -84,7 +73,7 @@ services:
     restart: unless-stopped
   jackett:
     image: linuxserver/jackett
-    container_name: jackett
+    restart: always
     networks:
       - common
     environment:
@@ -99,27 +88,25 @@ services:
     restart: unless-stopped
 
   nextcloud:
-    container_name: nextcloud 
-    image: nextcloud:fpm
-    stdin_open: true
-    tty: true
+    image: nextcloud:latest
     restart: always
-    links:
-      - db
     expose:
       - '80'
-      - '9000'
     networks:
       - common
     volumes:
-      - nextcloud_data:/var/www/html/
-      - ./data/nextcloud/:/var/www/html/data
+      - ./data/media/nextcloud/:/data/
+    env_file:
+      - .env_nextcloud
+      - .env_general
   onlyoffice-document-server:
-    container_name: onlyoffice-document-server
     image: onlyoffice/documentserver:latest
+    restart: always
     stdin_open: true
     tty: true
     restart: always
+    env_file:
+      - .env_general
     networks:
       - common 
     expose:
@@ -129,10 +116,10 @@ services:
       - document_data:/var/www/onlyoffice/Data
       - document_log:/var/log/onlyoffice
   nginx:
-    container_name: nginx-server
     depends_on: 
       - onlyoffice-document-server
     image: nginx
+    restart: always
     stdin_open: true
     tty: true
     restart: always
@@ -142,56 +129,33 @@ services:
     networks:
       - common 
     volumes:
-      - ./data/nginx.conf:/etc/nginx/nginx.conf
-      - ./data/nextcloud/:/var/www/html/data
-      - nextcloud_data:/var/www/html/
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
+      - ./data/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./data/nginx/:/etc/certs
+    env_file:
+      - .env_general
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
   transmission:
     image: linuxserver/transmission
-    container_name: transmission
+    restart: always
     networks:
       - common
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/London
+    env_file:
+      - .env_general
     volumes:
       - ./data/transmission/config:/config
       - ./data/downloads:/downloads
     restart: unless-stopped
-  db:
-    image: mariadb
-    container_name: mariadb
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
-    restart: always
-    networks:
-      - common 
-    volumes:
-      - db:/var/lib/mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_PASSWORD=root
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
 
-  certbot:
-      image: certbot/certbot
-      volumes:
-        - ./data/certbot/conf:/etc/letsencrypt
-        - ./data/certbot/www:/var/www/certbot
-      networks:
-        - common
-      entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-
-  homeassistant: 
-      image: homeassistant/home-assistant
-      container_name: homeassistant
-      volumes:
-        - ./data/homeassistant/config:/config
-      networks:
-        - common
+    #   homeassistant: 
+    #     image: homeassistant/home-assistant
+    #     restart: always
+    #     volumes:
+    #       - ./data/homeassistant/config:/config
+    #    env_file:
+    #      - .env_general
+    #     networks:
+    #       - common
 
 networks:
   common: 
@@ -202,4 +166,3 @@ volumes:
   document_log:
   mysql_data:
   nextcloud_data:
-  db:

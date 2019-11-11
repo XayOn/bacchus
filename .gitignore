@@ -1,1 +1,5 @@
 data/
+*.egg-info
+__pycache__
+docker/
+
