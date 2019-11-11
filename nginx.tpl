@@ -1,87 +1,46 @@
-{% if init %}
-{%raw%}
-user  www-data;
-worker_processes  1;
-error_log  /var/log/nginx/error.log warn;
-pid        /var/run/nginx.pid;
-events {
-    worker_connections  1024;
-}
-http {
-    include       /etc/nginx/mime.types;
-    default_type  application/octet-stream;
-    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                      '$status $body_bytes_sent "$http_referer" '
-                      '"$http_user_agent" "$http_x_forwarded_for"';
-    access_log  /var/log/nginx/access.log  main;
-    sendfile        on;
-    keepalive_timeout  65;
-    map $http_host $this_host {
-        "" $host;
-        default $http_host;
-    }
-    map $http_x_forwarded_proto $the_scheme {
-        default $http_x_forwarded_proto;
-        "" $scheme;
-    }
-    map $http_x_forwarded_host $the_host {
-       default $http_x_forwarded_host;
-       "" $this_host;
-    }
-    server {
-   	listen 80;
-        location /.well-known/acme-challenge/ {
-	    allow all;
-            root /var/www/certbot;
-        }
-    }
-}
-{%endraw%}
-{% else %}
-{%raw%}
 user  www-data;
 worker_processes  1;
 
 error_log  /var/log/nginx/error.log warn;
 pid        /var/run/nginx.pid;
 
-events {
+events {{
     worker_connections  1024;
-}
+}}
 
-http {
+http {{
 
-    upstream plex {
+    upstream plex {{
         server plex:32400;
-    }
+    }}
 
-    upstream lidarr {
-      server lidarr:8086;
-    }
+    upstream lidarr {{
+      server lidarr:8686;
+    }}
 
-    upstream backend {
+    upstream backend {{
       server nextcloud:9000;
-    }
+    }}
 
-    upstream medusa {
+    upstream medusa {{
       server medusa:8081;
-    }
+    }}
 
-    upstream lazylibrarian {
+    upstream lazylibrarian {{
       server lazylibrarian:5299;
-    }
+    }}
 
-    upstream radarr {
+    upstream radarr {{
       server radarr:7878;
-    }
+    }}
 
-    upstream jackett {
+    upstream jackett {{
       server jackett:9117;
-    }
+    }}
 
-    upstream onlyoffice-document-server {
+    upstream onlyoffice-document-server {{
       server onlyoffice-document-server; 
-    }
+    }}
 
 
 
@@ -100,23 +59,23 @@ http {
 
     keepalive_timeout  65;
 
-    map $http_host $this_host {
+    map $http_host $this_host {{
         "" $host;
         default $http_host;
-    }
+    }}
 
-    map $http_x_forwarded_proto $the_scheme {
+    map $http_x_forwarded_proto $the_scheme {{
         default $http_x_forwarded_proto;
         "" $scheme;
-    }
+    }}
 
-    map $http_x_forwarded_host $the_host {
+    map $http_x_forwarded_host $the_host {{
        default $http_x_forwarded_host;
        "" $this_host;
-    }
+    }}
 
-    server {
-    listen 80;
+    server {{
+
     listen 443 default_server ssl;
 
         # Add headers to serve security related headers
@@ -140,33 +99,30 @@ http {
         rewrite ^/.well-known/carddav /remote.php/dav/ permanent;
         rewrite ^/.well-known/caldav /remote.php/dav/ permanent;
 
-    ssl_certificate /etc/letsencrypt/live/{%endraw%}{{domain}}{%raw%}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{%endraw%}{{domain}}{%raw%}/privkey.pem;
+        ssl_certificate /etc/certs/{domain}/fullchain.pem;
+        ssl_certificate_key /etc/certs/{domain}/privkey.pem;
 
-    include /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
-
-        location = /robots.txt {
+        location = /robots.txt {{
             allow all;
             log_not_found off;
             access_log off;
-        }
+        }}
 
-        location ~ ^/(build|tests|config|lib|3rdparty|templates|data)/ {
+        location ~ ^/(build|tests|config|lib|3rdparty|templates|data)/ {{
             deny all;
-        }
+        }}
 
-        location ~ ^/(?:\.|autotest|occ|issue|indie|db_|console) {
+        location ~ ^/(?:\.|autotest|occ|issue|indie|db_|console) {{
             deny all;
-        }
+        }}
 
-        location / {
+        location / {{
             rewrite ^/remote/(.*) /remote.php last;
             rewrite ^(/core/doc/[^\/]+/)$ $1/index.html;
             try_files $uri $uri/ =404;
-        }
+        }}
 
-    location ~* ^/music/ {
+    location ~* ^/music/ {{
         rewrite /lidarr/(.*) /$1  break;
                 proxy_pass http://lidarr;
                 proxy_redirect     off;
@@ -182,9 +138,9 @@ http {
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
                 proxy_set_header X-Forwarded-Proto $the_scheme;
-        }
+        }}
     
-    location ~* ^/books/ {
+    location ~* ^/books/ {{
         rewrite /books/(.*) /$1  break;
                 proxy_pass http://lazylibrarian;
                 proxy_redirect     off;
@@ -200,10 +156,10 @@ http {
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
                 proxy_set_header X-Forwarded-Proto $the_scheme;
-        }
+        }}
 
     
-    location ~* ^/movies/ {
+    location ~* ^/movies/ {{
         rewrite /movies/(.*) /$1  break;
                 proxy_pass http://radarr;
                 proxy_redirect     off;
@@ -219,9 +175,9 @@ http {
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
                 proxy_set_header X-Forwarded-Proto $the_scheme;
-        }
+        }}
         
-    location ~* ^/trackers/ {
+    location ~* ^/trackers/ {{
         rewrite /trackers/(.*) /$1  break;
                 proxy_pass http://jackett; 
                 proxy_redirect     off;
@@ -237,10 +193,10 @@ http {
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
                 proxy_set_header X-Forwarded-Proto $the_scheme;
-        }
+        }}
 
     
-    location ~* ^/tv/ {
+    location ~* ^/tv/ {{
         rewrite /tv/(.*) /$1  break;
                 proxy_pass http://medusa; 
                 proxy_redirect     off;
@@ -256,9 +212,9 @@ http {
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
                 proxy_set_header X-Forwarded-Proto $the_scheme;
-        }
+        }}
     
-    location ~* ^/plex/ {
+    location ~* ^/plex/ {{
         rewrite /tv/(.*) /$1  break;
                 proxy_pass http://plex;
                 proxy_redirect     off;
@@ -274,9 +230,9 @@ http {
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
                 proxy_set_header X-Forwarded-Proto $the_scheme;
-        }
+        }}
 
-    location ~* ^/ds-vpath/ {
+    location ~* ^/ds-vpath/ {{
         rewrite /ds-vpath/(.*) /$1  break;
                 proxy_pass http://onlyoffice-document-server;
                 proxy_redirect     off;
@@ -292,9 +248,9 @@ http {
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
                 proxy_set_header X-Forwarded-Proto $the_scheme;
-        }
+        }}
 
-        location ~ \.php(?:$|/) {
+        location ~ \.php(?:$|/) {{
             fastcgi_split_path_info ^(.+\.php)(/.+)$;
             include fastcgi_params;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
@@ -303,11 +259,11 @@ http {
             fastcgi_param modHeadersAvailable true; #Avoid sending the security headers twice
             fastcgi_pass backend;
             fastcgi_intercept_errors on;
-        }
+        }}
 
         # Adding the cache control header for js and css files
-        # Make sure it is BELOW the location ~ \.php(?:$|/) { block
-        location ~* \.(?:css|js)$ {
+        # Make sure it is BELOW the location ~ \.php(?:$|/) {{ block
+        location ~* \.(?:css|js)$ {{
             add_header Cache-Control "public, max-age=7200";
             # Add headers to serve security related headers
             add_header Strict-Transport-Security "max-age=15768000; includeSubDomains; preload;";
@@ -319,14 +275,12 @@ http {
             add_header X-Permitted-Cross-Domain-Policies none;
             # Optional: Don't log access to assets
             access_log off;
-        }
+        }}
 
         # Optional: Don't log access to other assets
-        location ~* \.(?:jpg|jpeg|gif|bmp|ico|png|swf)$ {
+        location ~* \.(?:jpg|jpeg|gif|bmp|ico|png|swf)$ {{
             access_log off;
-        }
+        }}
 
-    }
-}
-{%endraw%}
-{%endif%}
+    }}
+}}

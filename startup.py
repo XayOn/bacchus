@@ -6,48 +6,35 @@ import os
 import shutil
 import sys
 
-import jinja2
-
-CREATE_CERT = ("certbot certonly --webroot -w /var/www/certbot --email {email}"
-               " -d {domain} {staging} --rsa-key-size 4096 --agree-tos "
-               "--force-renewal")
+CREATE_TEMP = ()
 
 
-def init_letsencrypt(path, domain, email, staging):
+def init_nginx(path, domain):
     path = Path(path)
 
     # Cleanup and recreate directories.
-    data_path = path / "data" / "certbot"
-    with suppress(Exception):
-        shutil.rmtree(data_path)
-    data_path.mkdir(parents=True, exist_ok=True)
-    (data_path / 'live' / domain).mkdir(parents=True, exist_ok=True)
+    data_path = path / "data" / "certs" / domain
+    if not data_path.exists():
+        data_path.mkdir(parents=True, exist_ok=True)
+        subprocess.check_output(
+            f"docker run -v{data_path.parent.absolute()}:/etc/certs "
+            f"frapsoft/openssl req -x509 -nodes -newkey rsa:4096 "
+            f"-days 365 -keyout "
+            f"'/etc/certs/{domain}/privkey.pem' -out "
+            f"'/etc/certs/{domain}/fullchain.pem' "
+            f"-subj '/CN=localhost'",
+            shell=True)
 
-    nginx_config = jinja2.Template((path / 'nginx.tpl').read_text())
-
-    # Request certificate
+    # Write nginx config
     (path / 'data' / 'nginx.conf').write_text(
-        nginx_config.render(init=True, domain=domain))
-    create_cert = CREATE_CERT.format(email=email,
-                                     domain=domain,
-                                     staging='--staging' if staging else '')
-
-    compose('run', 'certbot', create_cert) 
-
-    # Write nginx config with new certificates
-    (path / 'data' / 'nginx.conf').write_text(
-        nginx_config.render(init=False, domain=domain))
-
-    # Relaunch dockers.
-    compose('up', '--force-recreate', '-d', 'nginx')
-    compose('up', '-d')
+        (path / 'nginx.tpl').read_text().format(domain=domain))
 
 
 def setup_onlyoffice():
     trusted_domains = occ('config:system:get', 'trusted_domains').splitlines()
-    if not any(['nginx-server' in a for a in trusted_domains]):
+    if not any(['nginx' in a for a in trusted_domains]):
         occ('config:system:set', 'trusted_domains', len(trusted_domains),
-            '--value', 'nginx-server')
+            '--value', 'nginx')
 
         occ('app:install', 'onlyoffice')
         occ('config:system:set', 'onlyoffice', 'DocumentServerUrl',
@@ -55,7 +42,7 @@ def setup_onlyoffice():
         occ('config:system:set', 'onlyoffice', 'DocumentServerInternalUrl',
             '--value="http://onlyoffice-document-server/"')
         occ('config:system:set', 'onlyoffice', 'StorageUrl',
-            '--value="http://nginx-server/"')
+            '--value="http://nginx/"')
 
 
 def occ(*args):
@@ -71,8 +58,9 @@ def compose(command, *args):
     return subprocess.check_output(args)
 
 
-def main(path, domain, email, staging):
-    init_letsencrypt(path, domain, email, staging)
+def main(path, domain):
+    init_nginx(path, domain)
+    compose('up', '-d')
     setup_onlyoffice()
 
 
