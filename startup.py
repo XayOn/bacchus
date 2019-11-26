@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import configparser
 from contextlib import suppress
 from pathlib import Path
 import subprocess
@@ -7,6 +8,19 @@ import shutil
 import sys
 
 CREATE_TEMP = ()
+
+
+class App:
+    def __init__(self, path):
+        self.path = path
+
+
+class Medusa(App):
+    def setup(self):
+        config = configparser.ConfigParser()
+        config.read(self.path / 'data' / 'medusa' / 'config.ini')
+        config['General']['web-root'] = '/tv'
+        config.save()
 
 
 def init_nginx(path, domain):
@@ -58,9 +72,16 @@ def compose(command, *args):
     return subprocess.check_output(args)
 
 
+def setup_apps(path):
+    for app in App.__subclasses__():
+        app(path).setup()
+
+
 def main(path, domain):
     init_nginx(path, domain)
     compose('up', '-d')
+    compose('down')
+    setup_apps(path)
     setup_onlyoffice()
 
 

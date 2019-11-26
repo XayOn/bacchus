@@ -202,7 +202,7 @@ http {{
  
     location ~* ^/homeassistant/ {{
         rewrite /homeassistant/(.*) /$1  break;
-                proxy_pass http://medusa; 
+                proxy_pass http://homeassistant; 
                 proxy_redirect     off;
 
                 client_max_body_size 100m;
@@ -214,12 +214,11 @@ http {{
                 proxy_set_header Host $http_host;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
+                proxy_set_header X-Forwarded-Host $the_host;
                 proxy_set_header X-Forwarded-Proto $the_scheme;
         }}
     
     location ~* ^/tv/ {{
-        rewrite /tv/(.*) /$1  break;
                 proxy_pass http://medusa; 
                 proxy_redirect     off;
 
@@ -232,12 +231,12 @@ http {{
                 proxy_set_header Host $http_host;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
+                proxy_set_header X-Forwarded-Host $the_host;
                 proxy_set_header X-Forwarded-Proto $the_scheme;
         }}
     
     location ~* ^/plex/ {{
-        rewrite /tv/(.*) /$1  break;
+        rewrite /plex/(.*) /$1  break;
                 proxy_pass http://plex;
                 proxy_redirect     off;
 
@@ -272,7 +271,7 @@ http {{
                 proxy_set_header X-Forwarded-Proto $the_scheme;
         }}
 
-        location ~ \.php(?:$|/) {{
+        location ~ /cloud/(.*)\.php(?:$|/) {{
             fastcgi_split_path_info ^(.+\.php)(/.+)$;
             include fastcgi_params;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
@@ -285,7 +284,7 @@ http {{
 
         # Adding the cache control header for js and css files
         # Make sure it is BELOW the location ~ \.php(?:$|/) {{ block
-        location ~* \.(?:css|js)$ {{
+        location ~* /cloud/(.*)\.(?:css|js)$ {{
             add_header Cache-Control "public, max-age=7200";
             # Add headers to serve security related headers
             add_header Strict-Transport-Security "max-age=15768000; includeSubDomains; preload;";
