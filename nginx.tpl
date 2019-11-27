@@ -22,8 +22,8 @@ http {{
       server homeassistant:80;
     }}
 
-    upstream backend {{
-      server nextcloud:9000;
+    upstream nextcloud {{
+      server nextcloud:80;
     }}
 
     upstream medusa {{
@@ -271,32 +271,18 @@ http {{
                 proxy_set_header X-Forwarded-Proto $the_scheme;
         }}
 
-        location ~ /cloud/(.*)\.php(?:$|/) {{
-            fastcgi_split_path_info ^(.+\.php)(/.+)$;
-            include fastcgi_params;
-            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-            fastcgi_param PATH_INFO $fastcgi_path_info;
-            fastcgi_param HTTPS off;
-            fastcgi_param modHeadersAvailable true; #Avoid sending the security headers twice
-            fastcgi_pass backend;
-            fastcgi_intercept_errors on;
-        }}
+	location /cloud/ {{
+	    proxy_headers_hash_max_size 512;
+	    proxy_headers_hash_bucket_size 64;
 
-        # Adding the cache control header for js and css files
-        # Make sure it is BELOW the location ~ \.php(?:$|/) {{ block
-        location ~* /cloud/(.*)\.(?:css|js)$ {{
-            add_header Cache-Control "public, max-age=7200";
-            # Add headers to serve security related headers
-            add_header Strict-Transport-Security "max-age=15768000; includeSubDomains; preload;";
-            add_header X-Content-Type-Options nosniff;
-            add_header X-Frame-Options "SAMEORIGIN";
-            add_header X-XSS-Protection "1; mode=block";
-            add_header X-Robots-Tag none;
-            add_header X-Download-Options noopen;
-            add_header X-Permitted-Cross-Domain-Policies none;
-            # Optional: Don't log access to assets
-            access_log off;
-        }}
+	    proxy_set_header Host $host;
+	    proxy_set_header X-Forwarded-Proto $scheme;
+	    proxy_set_header X-Real-IP $remote_addr;
+	    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+	    add_header Front-End-Https on;
+	    proxy_pass http://nextcloud/;
+	}}
 
         # Optional: Don't log access to other assets
         location ~* \.(?:jpg|jpeg|gif|bmp|ico|png|swf)$ {{

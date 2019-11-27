@@ -100,7 +100,7 @@ services:
 
   nextcloud:
     container_name: nextcloud 
-    image: nextcloud:fpm
+    image: nextcloud:latest
     stdin_open: true
     tty: true
     restart: always
@@ -108,7 +108,6 @@ services:
       - db
     expose:
       - '80'
-      - '9000'
     networks:
       - common
     volumes:
