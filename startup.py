@@ -6,6 +6,7 @@ from time import sleep
 import configparser
 import os
 import shutil
+import json
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
@@ -26,8 +27,9 @@ def compose(command, *args):
 
 
 class App:
-    def __init__(self, path):
+    def __init__(self, path, domain):
         self.path = Path(path)
+        self.domain = domain
 
 
 class Radarr(App):
@@ -116,19 +118,34 @@ class NextCloud(App):
                        '--no-warnings', *args)
 
 
-class homeassistant(app):
+class HomeAssistant(app):
     def setup(self):
-        pass
+        """Setup home assistant base url."""
+        logging.debug("Setting up jackett")
+        self.setup_nginx()
+        logging.debug("Set up %s", self.config_file)
 
+    def setup_nginx(self):
+        cfgdir = self.config / 'data' / 'homeassistant' / 'config'
+        config = (cfgdir / 'configuration.yaml').read_text()
+        if not 'base_url' in config:
+            config += f"http:\n  base_url: https://{self.domain}/homeassistant/"
 
-class Plex(app):
-    def setup(self):
-        pass
+        with open(str(cfgdir / 'configuration.yaml')) as fileo:
+            fileo.write(config)
 
 
 class Jackett(app):
     def setup(self):
-        pass
+        logging.debug("Setting up jackett")
+        self.setup_nginx()
+        logging.debug("Set up %s", self.config_file)
+
+    def setup_nginx(self):
+        config = self.path / 'jackett' / 'Jackett' / 'ServerConfig.json'
+        result = json.load(str(config))
+        result['BasePathOverride'] = '/trackers'
+        json.dump(str(config), result)
 
 
 class Nginx:
@@ -162,5 +179,5 @@ class Nginx:
 if __name__ == "__main__":
     Nginx(*sys.argv[1:]).setup()
     for app in App.__subclasses__():
-        app(sys.argv[1]).setup()
+        app(*sys.argv[1:]).setup()
     compose('up', '-d')

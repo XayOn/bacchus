@@ -19,7 +19,7 @@ http {{
     }}
 
     upstream homeassistant {{
-      server homeassistant:80;
+      server homeassistant:8123;
     }}
 
     upstream nextcloud {{
@@ -179,26 +179,16 @@ http {{
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
                 proxy_set_header X-Forwarded-Proto $the_scheme;
-        }}
+    }}
         
     location ~* ^/trackers/ {{
-        rewrite /trackers/(.*) /$1  break;
-                proxy_pass http://jackett; 
-                proxy_redirect     off;
-
-                client_max_body_size 100m;
-
-                proxy_http_version 1.1;
-                proxy_set_header Upgrade $http_upgrade;
-                proxy_set_header Connection "upgrade";
-
-                proxy_set_header Host $http_host;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
-                proxy_set_header X-Forwarded-Proto $the_scheme;
-        }}
-
+           proxy_pass http://jackett; 
+	   proxy_set_header X-Real-IP $remote_addr;
+	   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	   proxy_set_header X-Forwarded-Proto $scheme;
+	   proxy_set_header X-Forwarded-Host $http_host;
+	   proxy_redirect off;
+     }}
  
     location ~* ^/homeassistant/ {{
         rewrite /homeassistant/(.*) /$1  break;
@@ -234,9 +224,26 @@ http {{
                 proxy_set_header X-Forwarded-Host $the_host;
                 proxy_set_header X-Forwarded-Proto $the_scheme;
         }}
+ 
+    location ~* ^/media/ {{
+                proxy_pass http://plex;
+                proxy_redirect     off;
+
+                client_max_body_size 100m;
+
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+
+                proxy_set_header Host $http_host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
+                proxy_set_header X-Forwarded-Proto $the_scheme;
+        }}
+
     
-    location ~* ^/plex/ {{
-        rewrite /plex/(.*) /$1  break;
+    location ~* ^/web/ {{
                 proxy_pass http://plex;
                 proxy_redirect     off;
 

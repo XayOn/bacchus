@@ -101,8 +101,6 @@ services:
   nextcloud:
     container_name: nextcloud 
     image: nextcloud:latest
-    stdin_open: true
-    tty: true
     restart: always
     links:
       - db
@@ -113,6 +111,11 @@ services:
     volumes:
       - nextcloud_data:/var/www/html/
       - ./data/nextcloud/:/var/www/html/data
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
   onlyoffice-document-server:
     container_name: onlyoffice-document-server
     image: onlyoffice/documentserver:latest
