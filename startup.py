@@ -92,8 +92,13 @@ class Medusa(App):
 
 class NextCloud(App):
     def setup(self):
-        # self.setup_onlyoffice()
-        pass
+        self.setup_nginx()
+        self.setup_onlyoffice()
+
+    def setup_nginx(self):
+        self.occ('config:system.set', 'overwritewebroot', '--value',
+                 '/nextcloud/')
+        self.occ('config:system.set', 'overwriteprotocol', '--value', 'https')
 
     def setup_onlyoffice(self):
         trusted_domains = self.occ('config:system:get',
