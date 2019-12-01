@@ -47,8 +47,6 @@ http {{
     }}
 
 
-
-
     include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
 
@@ -78,6 +76,14 @@ http {{
        "" $this_host;
     }}
 
+
+    server {{
+    	listen 80 default_server;
+    	listen [::]:80 default_server;
+    	server_name _;
+    	return 301 https://$host$request_uri;
+    }}
+
     server {{
 
     listen 443 default_server ssl;
@@ -96,35 +102,27 @@ http {{
 
         gzip off;
 
-        index index.php;
-        error_page 403 /core/templates/403.php;
-        error_page 404 /core/templates/404.php;
-
-        rewrite ^/.well-known/carddav /remote.php/dav/ permanent;
-        rewrite ^/.well-known/caldav /remote.php/dav/ permanent;
+        index index.html;
 
         ssl_certificate /etc/certs/{domain}/fullchain.pem;
         ssl_certificate_key /etc/certs/{domain}/privkey.pem;
 
-        location = /robots.txt {{
+        location = /nextcloud/robots.txt {{
             allow all;
             log_not_found off;
             access_log off;
         }}
 
-        location ~ ^/(build|tests|config|lib|3rdparty|templates|data)/ {{
+        location ~ ^/nextcloud/(build|tests|config|lib|3rdparty|templates|data)/ {{
             deny all;
         }}
 
-        location ~ ^/(?:\.|autotest|occ|issue|indie|db_|console) {{
+        location ~ ^/nextcloud/(?:\.|autotest|occ|issue|indie|db_|console) {{
             deny all;
         }}
 
-        location / {{
-            rewrite ^/remote/(.*) /remote.php last;
-            rewrite ^(/core/doc/[^\/]+/)$ $1/index.html;
-            try_files $uri $uri/ =404;
-        }}
+        rewrite ^/nextcloud/.well-known/carddav /remote.php/dav/ permanent;
+        rewrite ^/nextcloud/.well-known/caldav /remote.php/dav/ permanent;
 
     location ~* ^/music/ {{
         rewrite /lidarr/(.*) /$1  break;
@@ -164,7 +162,6 @@ http {{
 
     
     location ~* ^/movies/ {{
-        rewrite /movies/(.*) /$1  break;
                 proxy_pass http://radarr;
                 proxy_redirect     off;
 
@@ -278,7 +275,12 @@ http {{
                 proxy_set_header X-Forwarded-Proto $the_scheme;
         }}
 
-	location /cloud/ {{
+	location /nextcloud/ {{
+	    rewrite ^/nextcloud(.*) $1 break;
+            rewrite ^/nextcloud/remote/(.*) /nextcloud/remote.php last;
+            rewrite ^(/nextcloud/core/doc/[^\/]+/)$ $1/index.html;
+            try_files $uri $uri/ =404;
+
 	    proxy_headers_hash_max_size 512;
 	    proxy_headers_hash_bucket_size 64;
 

@@ -43,7 +43,7 @@ class Radarr(App):
         return ET.parse(str(self.config_file))
 
     def setup_nginx(self):
-        self.config.find('UrlBase').text = '/movies/'
+        self.config.find('UrlBase').text = '/movies'
         self.config.write(str(self.config_file))
 
     def setup(self):
@@ -92,8 +92,18 @@ class Medusa(App):
 
 class NextCloud(App):
     def setup(self):
+        compose('up', '-d')
+        self.install()
         self.setup_nginx()
         self.setup_onlyoffice()
+        compose('stop')
+
+    def install(self):
+        sleep(30)
+        self.occ("maintenance:install", "-n", "--database", "mysql",
+                 "--database-host", "db", "--database-user", "root",
+                 "--database-pass", "root", "--admin-user", "admin",
+                 "--admin-pass", "pass", "--database-name", "nextcloud")
 
     def setup_nginx(self):
         self.occ('config:system.set', 'overwritewebroot', '--value',
@@ -123,7 +133,7 @@ class NextCloud(App):
                        '--no-warnings', *args)
 
 
-class HomeAssistant(app):
+class HomeAssistant(App):
     def setup(self):
         """Setup home assistant base url."""
         logging.debug("Setting up jackett")
@@ -140,7 +150,7 @@ class HomeAssistant(app):
             fileo.write(config)
 
 
-class Jackett(app):
+class Jackett(App):
     def setup(self):
         logging.debug("Setting up jackett")
         self.setup_nginx()
@@ -178,7 +188,7 @@ class Nginx:
             (self.path / 'nginx.tpl').read_text().format(domain=domain))
         compose('up', '-d')
         sleep(60 * 2)
-        compose('down')
+        compose('stop')
 
 
 if __name__ == "__main__":
