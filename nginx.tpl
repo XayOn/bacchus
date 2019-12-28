@@ -10,10 +10,6 @@ events {{
 
 http {{
 
-    upstream plex {{
-        server plex:32400;
-    }}
-
     upstream lidarr {{
       server lidarr:8686;
     }}
@@ -222,41 +218,7 @@ http {{
                 proxy_set_header X-Forwarded-Proto $the_scheme;
         }}
  
-    location ~* ^/media/ {{
-                proxy_pass http://plex;
-                proxy_redirect     off;
-
-                client_max_body_size 100m;
-
-                proxy_http_version 1.1;
-                proxy_set_header Upgrade $http_upgrade;
-                proxy_set_header Connection "upgrade";
-
-                proxy_set_header Host $http_host;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
-                proxy_set_header X-Forwarded-Proto $the_scheme;
-        }}
-
     
-    location ~* ^/web/ {{
-                proxy_pass http://plex;
-                proxy_redirect     off;
-
-                client_max_body_size 100m;
-
-                proxy_http_version 1.1;
-                proxy_set_header Upgrade $http_upgrade;
-                proxy_set_header Connection "upgrade";
-
-                proxy_set_header Host $http_host;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
-                proxy_set_header X-Forwarded-Proto $the_scheme;
-        }}
-
     location ~* ^/ds-vpath/ {{
         rewrite /ds-vpath/(.*) /$1  break;
                 proxy_pass http://onlyoffice-document-server;
@@ -276,11 +238,6 @@ http {{
         }}
 
 	location /nextcloud/ {{
-	    rewrite ^/nextcloud(.*) $1 break;
-            rewrite ^/nextcloud/remote/(.*) /nextcloud/remote.php last;
-            rewrite ^(/nextcloud/core/doc/[^\/]+/)$ $1/index.html;
-            try_files $uri $uri/ =404;
-
 	    proxy_headers_hash_max_size 512;
 	    proxy_headers_hash_bucket_size 64;
 
@@ -288,6 +245,9 @@ http {{
 	    proxy_set_header X-Forwarded-Proto $scheme;
 	    proxy_set_header X-Real-IP $remote_addr;
 	    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+            add_header Content-Security-Policy "None";
+	    proxy_hide_header Content-Security-Policy;
 
 	    add_header Front-End-Https on;
 	    proxy_pass http://nextcloud/;

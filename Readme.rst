@@ -21,22 +21,7 @@ Launching with docker-compose:
 - onlyoffice (online office solution)
 - Home-assistant (personal domotics)
 
-TODO List
----------
-
-- Add VPN support, so we need only to allow access to the VPN from the outside world
-- Automatically centralize links on nextcloud instance. 
-- Automatically configure all services to see between themselves, for example
-  radarr, lidarr and medussa with jaccket and transmission
-- Pre-configure a set of trackers on Jackett.
-- Add links to services on service list in Readme
-- Add a Pihole, and set VPN so that its clients will always use pihole as dns server 
-- Maybe some way to auto-configure those android apps? Maybe pre-create
-  application passwords for the main account, and add something to do the same
-  to extra accounts automatically 
-- Mycroft?
-- Add links to Android apps:
-
+- Recommended Android APPS: 
   + AndOpenoffice 
   + Nextcloud (file sync, photo sync (google photos), backups)
   + Davx5 (calendars and contacts sync with nextcloud)
@@ -51,3 +36,19 @@ TODO List
   + Nextcloud Notes app (Google-notes like app)
   + SMS for nextcloud (Google messages like app)
 
+TODO List
+---------
+
+- Add VPN support, so we need only to allow access to the VPN from the outside world
+- Automatically centralize links on nextcloud instance. 
+- Add a Pihole, and set VPN so that its clients will always use pihole as dns server 
+- Maybe some way to auto-configure those android apps? Maybe pre-create
+  application passwords for the main account, and add something to do the same
+  to extra accounts automatically 
+- Mycroft?
+
+Not working:
+  - Jackett does not load
+  - HomeAssistant does not load
+  - Pre-configure a set of trackers on Jackett.
+  - Auto-configure transmission and jackett on medusa, radarr, lidarr and headphones
