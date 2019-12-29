@@ -1,6 +1,7 @@
 version: '3'
 services:
   medusa:
+    restart: always
     image: linuxserver/medusa
     container_name: medusa
     networks:
@@ -18,6 +19,7 @@ services:
     restart: unless-stopped
 
   radarr:
+    restart: always
     image: linuxserver/radarr
     container_name: radarr
     networks:
@@ -35,6 +37,7 @@ services:
     restart: unless-stopped
   lazylibrarian:
     image: thraxis/lazylibrarian-calibre
+    restart: always
     container_name: lazylibrarian
     networks:
       - common
@@ -55,6 +58,7 @@ services:
 
   lidarr:
     image: linuxserver/lidarr
+    restart: always
     container_name: lidarr
     networks:
       - common
@@ -71,6 +75,7 @@ services:
     restart: unless-stopped
   jackett:
     image: linuxserver/jackett
+    restart: always
     container_name: jackett
     networks:
       - common
@@ -101,6 +106,7 @@ services:
   onlyoffice-document-server:
     container_name: onlyoffice-document-server
     image: onlyoffice/documentserver:latest
+    restart: always
     stdin_open: true
     tty: true
     restart: always
@@ -119,6 +125,7 @@ services:
     depends_on: 
       - onlyoffice-document-server
     image: nginx
+    restart: always
     stdin_open: true
     tty: true
     restart: always
@@ -137,6 +144,7 @@ services:
 
   transmission:
     image: linuxserver/transmission
+    restart: always
     container_name: transmission
     networks:
       - common
@@ -148,12 +156,13 @@ services:
     restart: unless-stopped
 
   homeassistant: 
-      image: homeassistant/home-assistant
-      container_name: homeassistant
-      volumes:
-        - ./data/homeassistant/config:/config
-      networks:
-        - common
+    image: homeassistant/home-assistant
+    restart: always
+    container_name: homeassistant
+    volumes:
+      - ./data/homeassistant/config:/config
+    networks:
+      - common
 
 networks:
   common: 
