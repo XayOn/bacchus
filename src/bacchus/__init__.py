@@ -24,7 +24,8 @@ class HomeServerSetup:
         and nextcloud_password variables
         """
         client = docker.from_env()
-        self.compose = DockerCompose(domain, client, docker_prefix, None, **kwargs)
+        self.compose = DockerCompose(domain, client, docker_prefix, None,
+                                     **kwargs)
         self.providers = {
             cls.__name__: cls(domain, client, docker_prefix, self.compose,
                               **kwargs)
@@ -45,3 +46,4 @@ class HomeServerSetup:
             self.providers[provider].wait_for_status()
             self.providers[provider].wait_for_config()
             self.providers[provider].setup()
+        self.compose.restart()
