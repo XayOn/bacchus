@@ -1,0 +1,11 @@
+Metadata-Version: 1.2
+Name: bacchus
+Version: 0.1.0
+Summary: Home Server solution based on docker
+Home-page: UNKNOWN
+Author: David Francos
+Author-email: opensource@davidfrancos.net
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Requires-Python: >=3.7,<4.0

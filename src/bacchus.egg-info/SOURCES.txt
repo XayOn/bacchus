@@ -1,0 +1,16 @@
+setup.py
+src/bacchus/__init__.py
+src/bacchus/base.py
+src/bacchus/compose.py
+src/bacchus/homeassistant.py
+src/bacchus/jackett.py
+src/bacchus/lidarr.py
+src/bacchus/medusa.py
+src/bacchus/nextcloud.py
+src/bacchus/nginx.py
+src/bacchus/radarr.py
+src/bacchus.egg-info/PKG-INFO
+src/bacchus.egg-info/SOURCES.txt
+src/bacchus.egg-info/dependency_links.txt
+src/bacchus.egg-info/requires.txt
+src/bacchus.egg-info/top_level.txt

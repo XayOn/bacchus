@@ -135,9 +135,8 @@ services:
     networks:
       - common 
     volumes:
-      - ./data/nginx.conf:/etc/nginx/nginx.conf
-      - ./data/certs:/etc/certs
-      - ./web:/var/www/html
+      - ./data/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./data/nginx/certs:/etc/certs
     env_file:
       - .env_general
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
