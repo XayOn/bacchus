@@ -18,6 +18,7 @@ class Nginx(HomeServerApp):
                 "-out", "{local_path}/{self.domain}/fullchain.pem", "-subj",
                 "/CN={self.domain}"
             ]
+            self.logger.debug(f'executing {" ".join(cmd)}')
             result = self.client.containers.run('frapsoft/openssl',
                                                 command=cmd,
                                                 volumes={
@@ -28,7 +29,6 @@ class Nginx(HomeServerApp):
                                                 },
                                                 auto_remove=True,
                                                 detach=False)
-            self.logger.debug(f'executing " ".join(cmd)')
             self.logger.debug(result.logs())
         except Exception as err:
             self.logger.exception('could not create ssl certs')
