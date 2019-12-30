@@ -42,6 +42,7 @@ class NextCloud(HomeServerApp):
         self.occ('app:install', 'external')
         self.occ(
             'config:app:set', 'external', 'sites',
+            '--value',
             json.dumps({
                 "1": {
                     "id": 1,
