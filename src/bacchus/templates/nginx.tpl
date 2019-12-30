@@ -103,22 +103,22 @@ http {{
         ssl_certificate /etc/certs/{domain}/fullchain.pem;
         ssl_certificate_key /etc/certs/{domain}/privkey.pem;
 
-        location = /nextcloud/robots.txt {{
+        location = /robots.txt {{
             allow all;
             log_not_found off;
             access_log off;
         }}
 
-        location ~ ^/nextcloud/(build|tests|config|lib|3rdparty|templates|data)/ {{
+        location ~ ^/(build|tests|config|lib|3rdparty|templates|data)/ {{
             deny all;
         }}
 
-        location ~ ^/nextcloud/(?:\.|autotest|occ|issue|indie|db_|console) {{
+        location ~ ^/(?:\.|autotest|occ|issue|indie|db_|console) {{
             deny all;
         }}
 
-        rewrite ^/nextcloud/.well-known/carddav /remote.php/dav/ permanent;
-        rewrite ^/nextcloud/.well-known/caldav /remote.php/dav/ permanent;
+        rewrite ^/.well-known/carddav /remote.php/dav/ permanent;
+        rewrite ^/.well-known/caldav /remote.php/dav/ permanent;
 
     location ~* ^/music/ {{
         rewrite /lidarr/(.*) /$1  break;
@@ -237,7 +237,7 @@ http {{
                 proxy_set_header X-Forwarded-Proto $the_scheme;
         }}
 
-	location /nextcloud/ {{
+	location / {{
 	    proxy_headers_hash_max_size 512;
 	    proxy_headers_hash_bucket_size 64;
 
