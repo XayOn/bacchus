@@ -28,12 +28,8 @@ class NextCloud(HomeServerApp):
                  'admin', '--admin-user', 'admin')
 
     def create_users(self):
-        self.occ('user:add',
-                 '--password-from-env',
-                 '--display-name',
-                 self.meta['nextcloud_username'],
-                 '1',
-                 environment={'OC_PASS': self.meta['nextcloud_password']})
+        self.occ('user:add', '--password-from-env', '--display-name',
+                 self.meta['nextcloud_username'], '1')
 
     def setup_paths(self):
         self.occ('config:system:set', 'overwritewebroot', '--value', '/')
@@ -45,8 +41,7 @@ class NextCloud(HomeServerApp):
         """Install top links to all the rest of apps, to centralice everything on nextcloud"""
         self.occ('app:install', 'external')
         self.occ(
-            'docker-docker', 'exec', '-u', 'www-data', 'nextcloud', 'php',
-            'occ', 'config:app:set', 'external', 'sites',
+            'config:app:set', 'external', 'sites',
             json.dumps({
                 "1": {
                     "id": 1,
@@ -71,7 +66,6 @@ class NextCloud(HomeServerApp):
                     "redirect": False
                 }
             }))
-        self.occ('user:add')
 
     def setup_onlyoffice(self):
         trusted_domains = self.occ('config:system:get',
@@ -96,7 +90,13 @@ class NextCloud(HomeServerApp):
         try:
             args = ['php', 'occ', '--no-warnings', *args]
             kwargs.update(
-                dict(user='www-data', stdout=True, demux=False, stderr=False))
-            return self.container.exec_run(args, **kwargs)[1]
+                dict(user='www-data',
+                     stdout=True,
+                     demux=False,
+                     stderr=False,
+                     environment={'OC_PASS': self.meta['nextcloud_password']}))
+            result = self.container.exec_run(args, **kwargs)
+            self.logger.debug(result)
+            return result[1]
         except:
             self.logger.exception('could not execute command')
