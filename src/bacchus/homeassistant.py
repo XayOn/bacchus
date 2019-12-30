@@ -4,8 +4,7 @@ from .base import HomeServerApp
 class HomeAssistant(HomeServerApp):
     @property
     def config_file(self):
-        cfgdir = self.path / 'data' / 'homeassistant' / 'config'
-        return cfgdir / 'configuration.yaml'
+        return self.path / 'config' / 'configuration.yaml'
 
     def setup(self):
         """Setup home assistant base url."""

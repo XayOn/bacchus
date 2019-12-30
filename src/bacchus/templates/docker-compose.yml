@@ -3,17 +3,14 @@ services:
   medusa:
     restart: always
     image: linuxserver/medusa
-    container_name: medusa
     networks:
       - common
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/London
     volumes:
       - ./data/medusa:/config
       - ./data/media/tv:/tv
       - ./data/downloads/finished:/downloads
+    env_file:
+      - .env_general
     ports:
       - 8081:8081 
     restart: unless-stopped
@@ -21,13 +18,10 @@ services:
   radarr:
     restart: always
     image: linuxserver/radarr
-    container_name: radarr
     networks:
       - common
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/London
+    env_file:
+      - .env_general
     volumes:
       - ./data/radarr:/config
       - ./data/media/movies:/movies
@@ -38,7 +32,6 @@ services:
   lazylibrarian:
     image: thraxis/lazylibrarian-calibre
     restart: always
-    container_name: lazylibrarian
     networks:
       - common
     environment:
@@ -59,7 +52,6 @@ services:
   lidarr:
     image: linuxserver/lidarr
     restart: always
-    container_name: lidarr
     networks:
       - common
     environment:
@@ -76,7 +68,6 @@ services:
   jackett:
     image: linuxserver/jackett
     restart: always
-    container_name: jackett
     networks:
       - common
     environment:
@@ -91,7 +82,6 @@ services:
     restart: unless-stopped
 
   nextcloud:
-    container_name: nextcloud 
     image: nextcloud:latest
     restart: always
     expose:
@@ -104,7 +94,6 @@ services:
       - .env_nextcloud
       - .env_general
   onlyoffice-document-server:
-    container_name: onlyoffice-document-server
     image: onlyoffice/documentserver:latest
     restart: always
     stdin_open: true
@@ -121,7 +110,6 @@ services:
       - document_data:/var/www/onlyoffice/Data
       - document_log:/var/log/onlyoffice
   nginx:
-    container_name: nginx
     depends_on: 
       - onlyoffice-document-server
     image: nginx
@@ -144,7 +132,6 @@ services:
   transmission:
     image: linuxserver/transmission
     restart: always
-    container_name: transmission
     networks:
       - common
     env_file:
@@ -154,14 +141,15 @@ services:
       - ./data/downloads:/downloads
     restart: unless-stopped
 
-  homeassistant: 
-    image: homeassistant/home-assistant
-    restart: always
-    container_name: homeassistant
-    volumes:
-      - ./data/homeassistant/config:/config
-    networks:
-      - common
+    #   homeassistant: 
+    #     image: homeassistant/home-assistant
+    #     restart: always
+    #     volumes:
+    #       - ./data/homeassistant/config:/config
+    #    env_file:
+    #      - .env_general
+    #     networks:
+    #       - common
 
 networks:
   common: 

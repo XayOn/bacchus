@@ -1,5 +1,5 @@
 import docker
-from bacchus.homeassistant import HomeAssistant
+# from bacchus.homeassistant import HomeAssistant
 from bacchus.jackett import Jackett
 from bacchus.lidarr import Lidarr
 from bacchus.radarr import Radarr
@@ -8,7 +8,7 @@ from bacchus.nextcloud import NextCloud
 from bacchus.nginx import Nginx
 from bacchus.compose import DockerCompose
 
-__all__ = [Nginx, NextCloud, HomeAssistant, Jackett, Lidarr, Radarr, Medusa]
+__all__ = [Nginx, NextCloud, Jackett, Lidarr, Radarr, Medusa]
 
 
 class HomeServerSetup:
@@ -24,11 +24,12 @@ class HomeServerSetup:
         and nextcloud_password variables
         """
         client = docker.from_env()
+        self.compose = DockerCompose(domain, client, docker_prefix, None, **kwargs)
         self.providers = {
-            cls.__name__: cls(domain, client, docker_prefix, **kwargs)
+            cls.__name__: cls(domain, client, docker_prefix, self.compose,
+                              **kwargs)
             for cls in __all__
         }
-        self.compose = DockerCompose(domain, client, docker_prefix, **kwargs)
 
     def configure(self, provider_names=None):
         """Configure given providers."""

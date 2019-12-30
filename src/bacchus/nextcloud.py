@@ -4,18 +4,23 @@ from .base import HomeServerApp
 
 class NextCloud(HomeServerApp):
     def setup(self):
+        self.logger.debug('Fixing directory permissions permissions')
         self.fix_permissions()
+        self.logger.debug('Installing nextcloud')
         self.install()
+        self.logger.debug('Creating new user')
         self.create_users()
+        self.logger.debug('Setting up nginx paths')
         self.setup_paths()
+        self.logger.debug('Installing external links apps')
         self.install_external_links()
+        self.logger.debug('Setting up onlyoffice')
         self.setup_onlyoffice()
+        self.logger.debug('Set up nextcloud')
 
     def fix_permissions(self):
-        self.container_exec_run('chown',
-                                '-R',
-                                'www-data',
-                                '/data',
+        self.container.exec_run(['chown', '-R', 'www-data', '/data'],
+                                stdout=False,
                                 privileged=True)
 
     def install(self):
@@ -73,9 +78,11 @@ class NextCloud(HomeServerApp):
                                    'trusted_domains').splitlines()
 
         if not any([b'nginx' in a for a in trusted_domains]):
+            self.logger.debug("Nginx not found in trusted domains, setting up")
             self.occ('config:system:set', 'trusted_domains',
                      str(len(trusted_domains)), '--value', 'nginx')
 
+        self.logger.debug("Installing onlyoffice app")
         self.occ('app:install', 'onlyoffice')
         self.occ('config:system:set', 'onlyoffice', 'DocumentServerUrl',
                  '--value', '/ds-vpath/')
@@ -88,10 +95,8 @@ class NextCloud(HomeServerApp):
     def occ(self, *args, **kwargs):
         try:
             args = ['php', 'occ', '--no-warnings', *args]
-            self.container.exec_run(*args,
-                                    stdout=False,
-                                    stderr=False,
-                                    user='www-data',
-                                    **kwargs)
+            kwargs.update(
+                dict(user='www-data', stdout=True, demux=False, stderr=False))
+            return self.container.exec_run(args, **kwargs)[1]
         except:
             self.logger.exception('could not execute command')

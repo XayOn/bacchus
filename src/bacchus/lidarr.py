@@ -7,7 +7,7 @@ from .base import HomeServerApp
 class Lidarr(HomeServerApp):
     @property
     def config_file(self):
-        return (self.path / 'data' / 'lidarr' / 'config.xml').absolute()
+        return self.path / 'config.xml'
 
     @property
     @lru_cache()

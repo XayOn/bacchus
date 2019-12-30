@@ -6,7 +6,7 @@ class Jackett(HomeServerApp):
     def setup(self):
         self.container.stop()
         self.setup_nginx()
-        self.container.start()
+        self.compose.start()
 
     def setup_nginx(self):
         config = self.path / 'Jackett' / 'ServerConfig.json'

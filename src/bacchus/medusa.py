@@ -5,7 +5,7 @@ from .base import HomeServerApp
 class Medusa(HomeServerApp):
     @property
     def config_file(self):
-        return (self.path / 'data' / 'medusa' / 'config.ini').absolute()
+        return self.path / 'config.ini'
 
     def setup_nginx(self):
         config = configparser.ConfigParser()
