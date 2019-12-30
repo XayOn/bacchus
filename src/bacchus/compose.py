@@ -20,6 +20,7 @@ class DockerCompose(HomeServerApp):
         root_pwd = uuid.uuid4().hex
         nextcloud_passwd = uuid.uuid4().hex
         (DOCKER_PATH / '.env_general').write_text(f"""PID={os.geteuid()}
+    PUID={os.geteuid()}
     PGID={os.getegid()}""")
         (DOCKER_PATH /
          '.env_nextcloud').write_text(f"""NEXTCLOUD_ADMIN_USER=admin
