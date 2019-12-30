@@ -1,20 +1,18 @@
 from .base import HomeServerApp
 from .base import TEMPLATES
 from pathlib import Path
+import subprocess
 
 
-class Nginx:
-    def __init__(self, path, domain):
-        self.path = Path(path)
-        self.domain = domain
-
+class Nginx(HomeServerApp):
     def setup_certificates(self):
         """Setup certificates"""
         data_path = self.path / self.domain
         if not data_path.exists():
             data_path.mkdir(parents=True, exist_ok=True)
             # TODO: call docker API.
-            self.docker.containers.run('frapsoft/openssl', detach=True)
+            # self.docker.containers.run_exec('frapsoft/openssl', detach=True)
+            # This is tedious because of the mounts stuff...
             subprocess.check_output(
                 f"docker run -v\"{data_path.parent.absolute()}:/etc/certs\" "
                 f"frapsoft/openssl req -x509 -nodes -newkey rsa:4096 "

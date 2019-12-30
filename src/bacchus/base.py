@@ -3,7 +3,7 @@ from time import sleep
 import docker
 
 TEMPLATES = Path(__file__).parent / 'templates'
-DOCKER_PATH = Path(__file__).parent / 'docker'
+DOCKER_PATH = Path(__file__).parent.parent.parent / 'docker'
 
 
 class HomeServerApp:
@@ -32,10 +32,13 @@ class HomeServerApp:
 
     @property
     def container(self):
-        return self.containers[self.__class__.__name__.lower()]
+        print(self.containers)
+        return self.containers.get(self.__class__.__name__.lower())
 
     @property
     def running(self):
+        if not self.container:
+            return False
         return self.container.status == 'running'
 
     def wait_for_status(self):
