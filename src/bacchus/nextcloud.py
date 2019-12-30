@@ -47,7 +47,7 @@ class NextCloud(HomeServerApp):
                 "1": {
                     "id": 1,
                     "name": "Series",
-                    "url": f"https:\/\/{self.domain}\/tv\/",
+                    "url": f"https://{self.domain}/tv/",
                     "lang": "",
                     "type": "link",
                     "device": "",
@@ -58,7 +58,7 @@ class NextCloud(HomeServerApp):
                 "2": {
                     "id": 2,
                     "name": "Movies",
-                    "url": f"https:\/\/{self.domain}\/movies\/",
+                    "url": f"https://{self.domain}/movies/",
                     "lang": "",
                     "type": "link",
                     "device": "",
