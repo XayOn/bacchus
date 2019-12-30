@@ -60,3 +60,36 @@ Recommended Android APPS
 - OpenScale, GadgetBridge and FoodTracker (open source apps that mostly replace google fit features) 
 - Nextcloud Notes app (Google-notes like app)
 - SMS for nextcloud (Google messages like app)
+
+
+Usage
+-----
+
+Bacchus is installed either directly with pypi::
+
+        pip install bacchus
+
+Or by downloading this repository and installing with poetry by executing::
+
+        poetry install 
+
+Afterwards, you'll have a bacchus command available.
+
+::
+
+    USAGE
+      bacchus install [<domain>] [<username>] [<password>]
+    
+    ARGUMENTS
+      <domain>               Domain (FQDN) for virtualhosts
+      <username>             Nextcloud first user's username
+      <password>             Nextcloud first user's password
+    
+    GLOBAL OPTIONS
+      -h (--help)            Display this help message
+      -q (--quiet)           Do not output any message
+      -v (--verbose)         Increase the verbosity of messages: "-v" for normal output, "-vv" for more verbose output and "-vvv" for debug
+      -V (--version)         Display this application version
+      --ansi                 Force ANSI output
+      --no-ansi              Disable ANSI output
+      -n (--no-interaction)  Do not ask any interactive question
