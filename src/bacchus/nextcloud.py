@@ -16,6 +16,22 @@ class NextCloud(HomeServerApp):
         self.install_external_links()
         self.logger.debug('Setting up onlyoffice')
         self.setup_onlyoffice()
+        self.logger.debug('Setting up music')
+        self.setup_music()
+        self.logger.debug('Setting up SMS sync')
+        self.setup_ocsms()
+        self.logger.debug('Setting up tasks')
+        self.setup_tasks()
+        self.logger.debug('Setting up calendar')
+        self.setup_calendar()
+        self.logger.debug('Setting up carnet')
+        self.setup_carnet()
+        self.logger.debug('Setting up keepass web')
+        self.setup_keeweb()
+        self.logger.debug('Setting up deck')
+        self.setup_deck()
+        self.logger.debug('Setting up contacts')
+        self.setup_contacts()
         self.logger.debug('Set up nextcloud')
 
     def fix_permissions(self):
@@ -37,12 +53,39 @@ class NextCloud(HomeServerApp):
         self.occ('config:system:set', 'trusted_domains', '0', '--value',
                  self.domain)
 
+    def setup_music(self):
+        self.occ('app:install', 'music')
+
+    def setup_ocsms(self):
+        self.occ('app:install', 'ocsms')
+
+    def setup_tasks(self):
+        self.occ('app:install', 'tasks')
+
+    def setup_calendar(self):
+        """Setup calendar"""
+        self.occ('app:install', 'calendar')
+
+    def setup_carnet(self):
+        """Setup carnet note-taking app"""
+        self.occ('app:install', 'carnet')
+
+    def setup_deck(self):
+        """Setup deck kanban"""
+        self.occ('app:install', 'deck')
+
+    def setup_contacts(self):
+        """Setup contacts"""
+        self.occ('app:install', 'contacts')
+
+    def setup_keeweb(self):
+        self.occ('app:install', 'keeweb')
+
     def install_external_links(self):
         """Install top links to all the rest of apps, to centralice everything on nextcloud"""
         self.occ('app:install', 'external')
         self.occ(
-            'config:app:set', 'external', 'sites',
-            '--value',
+            'config:app:set', 'external', 'sites', '--value',
             json.dumps({
                 "1": {
                     "id": 1,
