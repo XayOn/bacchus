@@ -127,8 +127,12 @@ class NextCloud(HomeServerApp):
         self.occ('config:system:set', 'onlyoffice',
                  'DocumentServerInternalUrl', '--value',
                  'http://onlyoffice-document-server/')
+        self.containers['onlyoffice-document-server'].exec_run(
+            "sed", "-i",
+            's/"rejectUnauthorized": true/"rejectUnauthroized": false/g',
+            '/etc/onlyoffice/documentserver/default.json')
         self.occ('config:system:set', 'onlyoffice', 'StorageUrl', '--value',
-                 'http://nginx/"')
+                 'https://nginx/"')
 
     def occ(self, *args, **kwargs):
         try:
