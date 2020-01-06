@@ -1,8 +1,15 @@
 import json
+import uuid
 from .base import HomeServerApp
 
 
 class NextCloud(HomeServerApp):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.password = uuid.uuid4().hex
+        self.logger.info(
+            f'Setting up admin password as "{self.password}", save it.')
+
     def setup(self):
         self.logger.debug('Fixing directory permissions permissions')
         self.fix_permissions()
@@ -41,11 +48,12 @@ class NextCloud(HomeServerApp):
 
     def install(self):
         self.occ('maintenance:install', '--data-dir', '/data', '--admin-pass',
-                 'admin', '--admin-user', 'admin')
+                 self.password, '--admin-user', 'admin')
 
     def create_users(self):
         self.occ('user:add', '--password-from-env', '--display-name',
-                 self.meta['nextcloud_username'], '1')
+                 self.meta['nextcloud_username'],
+                 self.meta['nextcloud_username'])
 
     def setup_paths(self):
         self.occ('config:system:set', 'overwritewebroot', '--value', '/')
