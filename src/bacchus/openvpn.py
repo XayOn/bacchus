@@ -1,8 +1,8 @@
 import tempfile
-from bacchus.base import BaseHomeApp
+from bacchus.base import HomeServerApp
 
 
-class OpenVPN(BaseHomeApp):
+class OpenVPN(HomeServerApp):
     def setup(self):
         try:
             self.logger.debug(
