@@ -35,10 +35,7 @@ class Nginx(HomeServerApp):
         self.logger.debug(list(data_path.glob('*')))
 
     def setup_config(self):
-        """Write nginx config.
-
-        TODO: Use a proper templating system?
-        """
+        """Write nginx config."""
         (self.path / 'nginx.conf').write_text(
             (TEMPLATES / 'nginx.tpl').read_text().format(domain=self.domain))
 

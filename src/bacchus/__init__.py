@@ -7,8 +7,9 @@ from bacchus.medusa import Medusa
 from bacchus.nextcloud import NextCloud
 from bacchus.nginx import Nginx
 from bacchus.compose import DockerCompose
+from bacchus.openvpn import OpenVPN
 
-__all__ = [Nginx, NextCloud, Jackett, Lidarr, Radarr, Medusa]
+__all__ = [Nginx, NextCloud, Jackett, Lidarr, Radarr, Medusa, OpenVPN]
 
 
 class HomeServerSetup:

@@ -21,6 +21,8 @@ services:
     ports:
        - "1194:1194/udp"
     restart: always
+    volumes:
+        ./data/openvpn/:/etc/openvpn
   radarr:
     restart: always
     image: linuxserver/radarr
