@@ -1,23 +1,24 @@
 import tempfile
-from bacchus.base import BaseHomeApp
+from bacchus.base import HomeServerApp
 
 
-class OpenVPN(BaseHomeApp):
+class OpenVPN(HomeServerApp):
     def setup(self):
         try:
+            print("INIT")
             self.logger.debug(
-                self.run("ovpn_genconfig"
-                         "-u", f"udp://{self.host}"))
-            self.logger.debug(self.run('ovpn_initpki'))
-            self.container.stop()
+                self.run("ovpn_genconfig", "-u", f"udp://{self.domain}"))
+            self.logger.debug(
+                self.run('bash', '-c',
+                         f'echo {self.domain}|ovpn_initpki nopass'))
+            # self.container.stop()
             self.compose.start()
             self.logger.debug(
                 self.run('easyrsa', 'build-client-full',
                          self.meta['nextcloud_username'], 'nopass'))
             response = self.run('ovpn_getclient',
                                 self.meta['nextcloud_username'])
-            with open(self.path / 'vpn_client.config') as fileo:
-                fileo.write(response)
+            (self.path / 'vpn_client.config').write_text(response)
         except Exception as err:
             self.logger.exception('could not create openvpn config')
 
@@ -28,8 +29,8 @@ class OpenVPN(BaseHomeApp):
                 'mode': 'rw'
             }
         }
-        return self.client.containers.run('frapsoft/openssl',
+        return self.client.containers.run('kylemanna/openvpn',
                                           command=cmd,
+                                          tty=True,
                                           volumes=volumes,
-                                          auto_remove=True,
                                           detach=False)
