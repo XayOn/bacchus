@@ -33,10 +33,13 @@ class HomeServerSetup:
             for cls in __all__
         }
 
-    def configure(self, provider_names=None):
+    def configure(self, provider_name=None):
         """Configure given providers."""
-        # TODO: Launch compose start.
-        if not provider_names:
+        if provider_name:
+            self.providers[provider_name].setup()
+            return
+
+        if not provider_name:
             provider_names = [a.__name__ for a in __all__]
 
         self.compose.copy_template()

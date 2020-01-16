@@ -20,7 +20,7 @@ class GreetCommand(Command):
                                 nextcloud_username=self.argument('username'),
                                 nextcloud_password=self.argument('password'))
 
-        setup.configure([self.argument('provider')])
+        setup.configure(self.argument('provider'))
 
 
 def main():
