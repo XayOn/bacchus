@@ -26,8 +26,13 @@ download.
 
 Installs your personal cloud, allowing backups and online/offline
 (android/linux/windows) collaborative document editing (nextcloud +
-onlyoffice), contacts syncronization and calendar synchronization.
+onlyoffice), contacts syncronization, calendar synchronization, task list...
 
+With KeePassDroid and KeePass Tusk you can sync your passwords safely between
+devices.
+
+Finally, it installs and configures a VPN server, so you just need to open the
+one VPN port, and share your freshly-generated VPN config with your devices.
 
 Currently installed apps
 ------------------------
@@ -40,6 +45,7 @@ Currently installed apps
 - Transmission-daemon 
 - Nextcloud 
 - onlyoffice
+- OpenVPN
 
 
 Android integration

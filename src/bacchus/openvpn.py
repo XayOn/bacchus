@@ -1,4 +1,5 @@
 import tempfile
+from pathlib import Path
 from bacchus.base import HomeServerApp
 
 
@@ -18,7 +19,7 @@ class OpenVPN(HomeServerApp):
                          self.meta['nextcloud_username'], 'nopass'))
             response = self.run('ovpn_getclient',
                                 self.meta['nextcloud_username'])
-            (self.path / 'vpn_client.config').write_text(response)
+            Path('vpn_client.config').write_text(response)
         except Exception as err:
             self.logger.exception('could not create openvpn config')
 
