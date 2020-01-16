@@ -1,4 +1,3 @@
-import tempfile
 from pathlib import Path
 from bacchus.base import HomeServerApp
 
@@ -6,7 +5,6 @@ from bacchus.base import HomeServerApp
 class OpenVPN(HomeServerApp):
     def setup(self):
         try:
-            print("INIT")
             self.logger.debug(
                 self.run("ovpn_genconfig", "-u", f"udp://{self.domain}"))
             self.logger.debug(

@@ -9,7 +9,7 @@ from bacchus.nginx import Nginx
 from bacchus.compose import DockerCompose
 from bacchus.openvpn import OpenVPN
 
-__all__ = [Nginx, NextCloud, Jackett, Lidarr, Radarr, Medusa, OpenVPN]
+__all__ = [Nginx, NextCloud, Jackett, Lidarr, Radarr, Medusa]
 
 
 class HomeServerSetup:
@@ -36,18 +36,14 @@ class HomeServerSetup:
     def configure(self, provider_name=None):
         """Configure given providers."""
         if provider_name:
-            self.providers[provider_name].setup()
-            return
-
-        if not provider_name:
-            provider_names = [a.__name__ for a in __all__]
+            return self.providers[provider_name].setup()
 
         self.compose.copy_template()
         self.compose.create_env_files()
         self.compose.start()
 
-        for provider in provider_names:
-            self.providers[provider].wait_for_status()
-            self.providers[provider].wait_for_config()
-            self.providers[provider].setup()
+        for provider in self.providers:
+            provider.wait_for_status()
+            provider.wait_for_config()
+            provider.setup()
         self.compose.restart()
