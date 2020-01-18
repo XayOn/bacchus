@@ -20,20 +20,20 @@ Features
 
 Note that this is just an installer/bundle of the real tools that make the magic.
 
-:heavy_check_mark: Keep track of your favourite movies
-:heavy_check_mark: Keep track of your favourite tv shows 
-:heavy_check_mark: Keep track of your favourite music
-:heavy_check_mark: Keep track of your favourite books
-:heavy_check_mark: Download all of them!
-:heavy_check_mark: Synchronize your calendars
-:heavy_check_mark: Synchronize your contacts
-:heavy_check_mark: Synchronize your SMS
-:heavy_check_mark: Password management and synchronization 
-:heavy_check_mark: TODO list 
-:heavy_check_mark: Post-its like notes 
-:heavy_check_mark: Kanban board
-:heavy_check_mark: Edit online your documents, spreadsheets, full office solution
-:heavy_check_mark: Synchronise your health tracking apps
+- :heavy_check_mark: Keep track of your favourite movies
+- :heavy_check_mark: Keep track of your favourite tv shows 
+- :heavy_check_mark: Keep track of your favourite music
+- :heavy_check_mark: Keep track of your favourite books
+- :heavy_check_mark: Download all of them!
+- :heavy_check_mark: Synchronize your calendars
+- :heavy_check_mark: Synchronize your contacts
+- :heavy_check_mark: Synchronize your SMS
+- :heavy_check_mark: Password management and synchronization 
+- :heavy_check_mark: TODO list 
+- :heavy_check_mark: Post-its like notes 
+- :heavy_check_mark: Kanban board
+- :heavy_check_mark: Edit online your documents, spreadsheets, full office solution
+- :heavy_check_mark: Synchronise your health tracking apps
 
 
 Android support
