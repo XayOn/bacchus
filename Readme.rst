@@ -77,15 +77,15 @@ one VPN port, and share your freshly-generated VPN config with your devices.
 
 Apps that provide the real services
 -----------------------------------
-`LazyLibrarian <https://lazylibrarian.gitlab.io>`_
-`Radarr <https://radarr.video>`_
-`Lidarr https://lidarr.audio>`_
-`Medussa <https://pymedusa.com>`_
-`Jackett <https://github.com/Jackett/Jackett>`_ 
-`Transmission <https://transmissionbt.com/>`_
-`Nextcloud <https://nextcloud.com>`_
-`OnlyOffice <https://onlyoffice.com>`_
-`OpenVPN <https://openvpn.net>`_
+- `LazyLibrarian <https://lazylibrarian.gitlab.io>`_
+- `Radarr <https://radarr.video>`_
+- `Lidarr https://lidarr.audio>`_
+- `Medussa <https://pymedusa.com>`_
+- `Jackett <https://github.com/Jackett/Jackett>`_ 
+- `Transmission <https://transmissionbt.com/>`_
+- `Nextcloud <https://nextcloud.com>`_
+- `OnlyOffice <https://onlyoffice.com>`_
+- `OpenVPN <https://openvpn.net>`_
 
 Usage
 -----
