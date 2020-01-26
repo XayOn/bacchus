@@ -97,7 +97,7 @@ class NextCloud(HomeServerApp):
             json.dumps({
                 "1": {
                     "id": 1,
-                    "name": "Series",
+                    "name": "Series downloads",
                     "url": f"https://{self.domain}/tv/",
                     "lang": "",
                     "type": "link",
@@ -108,8 +108,41 @@ class NextCloud(HomeServerApp):
                 },
                 "2": {
                     "id": 2,
-                    "name": "Movies",
+                    "name": "Movies downloads",
                     "url": f"https://{self.domain}/movies/",
+                    "lang": "",
+                    "type": "link",
+                    "device": "",
+                    "icon": "external.svg",
+                    "groups": [],
+                    "redirect": False
+                },
+                "3": {
+                    "id": 3,
+                    "name": "Music downloads",
+                    "url": f"https://{self.domain}/music/",
+                    "lang": "",
+                    "type": "link",
+                    "device": "",
+                    "icon": "external.svg",
+                    "groups": [],
+                    "redirect": False
+                },
+                "4": {
+                    "id": 4,
+                    "name": "Book downloads",
+                    "url": f"https://{self.domain}/books/",
+                    "lang": "",
+                    "type": "link",
+                    "device": "",
+                    "icon": "external.svg",
+                    "groups": [],
+                    "redirect": False
+                },
+                "5": {
+                    "id": 5,
+                    "name": "Media player",
+                    "url": f"https://{self.domain}/media/",
                     "lang": "",
                     "type": "link",
                     "device": "",

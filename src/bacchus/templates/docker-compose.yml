@@ -1,5 +1,21 @@
 version: '3'
 services:
+  jellyfin:
+    image: linuxserver/jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./data/jellyfin:/config
+      - ./data/media/tv:/data/tvshows
+      - ./data/media/moves:/data/movies
+    ports:
+      - 8096:8096
+    devices:
+      - /dev/dri:/dev/dri 
+      - /dev/vchiq:/dev/vchiq 
+    restart: unless-stopped
   medusa:
     restart: always
     image: linuxserver/medusa
@@ -14,6 +30,8 @@ services:
     ports:
       - 8081:8081 
     restart: always 
+    networks:
+      - common
   openvpn:
     cap_add:
       - NET_ADMIN
@@ -23,6 +41,8 @@ services:
     restart: always
     volumes:
       - ./data/openvpn/:/etc/openvpn
+    networks:
+      - common
   radarr:
     restart: always
     image: linuxserver/radarr
