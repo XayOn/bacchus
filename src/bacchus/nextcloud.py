@@ -142,7 +142,7 @@ class NextCloud(HomeServerApp):
                 "5": {
                     "id": 5,
                     "name": "Media player",
-                    "url": f"https://{self.domain}/media/",
+                    "url": f"https://{self.domain}/jellyfin/",
                     "lang": "",
                     "type": "link",
                     "device": "",

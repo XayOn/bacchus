@@ -205,7 +205,7 @@ http {{
         }}
  
 
-    location /media/ {
+    location /jellyfin/ {{
         proxy_pass http://jellyfin;
         proxy_pass_request_headers on;
         proxy_set_header Host $host;
@@ -215,7 +215,7 @@ http {{
         proxy_set_header X-Forwarded-Host $http_host;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $http_connection;
-    }
+    }}
 
     
     location ~* ^/ds-vpath/ {{
