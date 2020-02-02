@@ -1,14 +1,18 @@
-import docker
-# from bacchus.homeassistant import HomeAssistant
+from bacchus.certificates import CertManager
+from bacchus.compose import DockerCompose
 from bacchus.jackett import Jackett
+from bacchus.jellyfin import Jellyfin
 from bacchus.lidarr import Lidarr
-from bacchus.radarr import Radarr
 from bacchus.medusa import Medusa
 from bacchus.nextcloud import NextCloud
 from bacchus.nginx import Nginx
-from bacchus.compose import DockerCompose
+from bacchus.openvpn import OpenVPN
+from bacchus.radarr import Radarr
+import docker
 
-__all__ = [Nginx, NextCloud, Jackett, Lidarr, Radarr, Medusa]
+__all__ = [
+    Nginx, CertManager, NextCloud, Jackett, Lidarr, Radarr, Medusa, Jellyfin
+]
 
 
 class HomeServerSetup:
@@ -28,13 +32,12 @@ class HomeServerSetup:
                                      **kwargs)
         self.providers = {
             cls.__name__: cls(domain, client, docker_prefix, self.compose,
-                              **kwargs)
+                              self, **kwargs)
             for cls in __all__
         }
 
     def configure(self, provider_names=None):
         """Configure given providers."""
-        # TODO: Launch compose start.
         if not provider_names:
             provider_names = [a.__name__ for a in __all__]
 
