@@ -50,3 +50,7 @@ class DockerCompose(HomeServerApp):
         subprocess.check_output(['docker-compose', 'stop'],
                                 cwd=DOCKER_PATH,
                                 env=self.env)
+
+    def restart(self):
+        self.stop()
+        self.start()

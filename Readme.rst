@@ -1,66 +1,90 @@
 Bacchus
 -------
 
+**Get your cloud and multimedia solution ready in no time!**
+
 Freedom for your home and media. Fast setup to a libre solution on media
 manamement, torrent automatic downloads, cloud and office on-cloud.
 
 **Tired of installing the medusa/radarr/lidarr/transmission pack?**
-**What about nextcloud and onlyoffice?**
+**What about nextcloud, its apps and onlyoffice?**
 
 This proyect aims to make personal cloud and media management solutions more
 widely accesible, or at least a bit more painless to setup 
 
-To do so, it exposes a few services under the same subdomain, with a self-signed ssl certificate and proxy-pass directives.
-
+To do so, it exposes a few services under the same subdomain, with a
+self-signed ssl certificate and proxy-pass directives.
 
 Features
 --------
 
 Note that this is just an installer/bundle of the real tools that make the magic.
 
-Keeps track and auto-downloads your favorite movies (radarr), favourite TV
-Series (medusa), favorite music (lidarr) and books (lazylibrarian).
-Movies, TV Series, books and music auto-download.
-All with the help of Jackett and transmission daemon for torrent search and
-download.
+- Keep track of your favourite movies :heavy_check_mark: 
+- Keep track of your favourite tv shows  :heavy_check_mark:
+- Keep track of your favourite music :heavy_check_mark:
+- Keep track of your favourite books :heavy_check_mark:
+- Download all of them! :heavy_check_mark:
+- Synchronize your calendars :heavy_check_mark:
+- Synchronize your contacts :heavy_check_mark:
+- Synchronize your SMS :heavy_check_mark:
+- Password management and synchronization  :heavy_check_mark:
+- TODO list  :heavy_check_mark:
+- Post-its like notes  :heavy_check_mark:
+- Kanban board :heavy_check_mark:
+- Edit online your documents, spreadsheets, full office solution :heavy_check_mark:
+- Synchronise your health tracking apps :heavy_check_mark:
+
+Android support
+---------------
+
+- Handle your media using `Kodi <https://kodi.tv>`_. Add your remote server as a source.
+- Sync calendars and contacts with `Davx⁵ <https://www.davx5.com>`_
+- Manage your passwords with `KeePassDroid <http://www.keepassdroid.com/>`_ 
+- Keep your todo lists with `OpenTasks <https://opentasks.app/>`_
+- Manage your kanban with `Deck <https://f-droid.org/en/packages/it.niedermann.nextcloud.deck/>`_
+- Edit your documents with `AndrOpenoffice <https://play.google.com/store/apps/details?id=com.andropenoffice&hl=en_US>`_
+- Save your post-its (google keep-like) with `Carnet <https://www.f-droid.org/en/packages/com.spisoft.quicknote/>`_ 
+- Monitor your torrent downloads with `Tremotesf <https://f-droid.org/en/packages/org.equeim.tremotesf/>`_ 
+- `Etar <https://f-droid.org/en/packages/ws.xsoh.etar/>`_ for calendar and calendar widgets.
+- Keep track of your health and sync it with nextcloud with
+  `OpenScale <https://f-droid.org/en/packages/com.health.openscale/>`_, `GadgetBridge <https://www.f-droid.org/en/packages/nodomain.freeyourgadget.gadgetbridge/>`_ and `Food Tracker <https://f-droid.org/en/packages/org.secuso.privacyfriendlyfoodtracker/>`_
+- Keep your notes with `Nextcloud Notes <https://www.f-droid.org/en/packages/it.niedermann.owncloud.notes/>`_
+- Sync your SMS with  `Nextcloud SMS <https://f-droid.org/en/packages/fr.unix_experience.owncloud_sms/>`_
+- Connect to your local network from everywhere with <`OpenVPN <https://f-droid.org/en/packages/de.blinkt.openvpn/>`_
+
+
+
+Browser support
+---------------
+
+Most of the features are directly available within your browser on your
+configured domain, with SSL. Except password sync, you can achieve that by
+configuring `<https://addons.mozilla.org/en-US/firefox/addon/keepass-tusk/>
+Firefox Tusk add-on`_
+
 
 Installs your personal cloud, allowing backups and online/offline
 (android/linux/windows) collaborative document editing (nextcloud +
-onlyoffice), contacts syncronization and calendar synchronization.
+onlyoffice), contacts syncronization, calendar synchronization, task list...
 
+With KeePassDroid and KeePass Tusk you can sync your passwords safely between
+devices.
 
-Currently installed apps
-------------------------
+Finally, it installs and configures a VPN server, so you just need to open the
+one VPN port, and share your freshly-generated VPN config with your devices.
 
-- Lazylibrarian 
-- radarr 
-- lidarr
-- pymedussa 
-- jackett 
-- Transmission-daemon 
-- Nextcloud 
-- onlyoffice
-
-
-Android integration
--------------------
-
-Recommended Android APPS
-
-- AndOpenoffice 
-- Nextcloud (file sync, photo sync (google photos), backups)
-- Davx5 (calendars and contacts sync with nextcloud)
-- Keepass and Authenticator (Google-passwords like app, sync with nextcloud)
-- Deck (trello-like app on nextcloud)
-- Carnet (Google-keep like app on nextcloud)
-- Plex (Netflix-like app)
-- OpenVPN (VPN)
-- Transmission-remote (Torrents)
-- Etar (Google-Calendar like app)
-- OpenScale, GadgetBridge and FoodTracker (open source apps that mostly replace google fit features) 
-- Nextcloud Notes app (Google-notes like app)
-- SMS for nextcloud (Google messages like app)
-
+Apps that provide the real services
+-----------------------------------
+- `LazyLibrarian <https://lazylibrarian.gitlab.io>`_
+- `Radarr <https://radarr.video>`_
+- `Lidarr https://lidarr.audio>`_
+- `Medussa <https://pymedusa.com>`_
+- `Jackett <https://github.com/Jackett/Jackett>`_ 
+- `Transmission <https://transmissionbt.com/>`_
+- `Nextcloud <https://nextcloud.com>`_
+- `OnlyOffice <https://onlyoffice.com>`_
+- `OpenVPN <https://openvpn.net>`_
 
 Usage
 -----

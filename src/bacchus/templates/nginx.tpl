@@ -14,6 +14,10 @@ http {{
       server lidarr:8686;
     }}
 
+    upstream jellyfin {{
+      server jellyfin:8096; 
+    }}
+
     # upstream homeassistant {{
     #   server homeassistant:8123;
     # }}
@@ -182,25 +186,7 @@ http {{
 	   proxy_set_header X-Forwarded-Host $http_host;
 	   proxy_redirect off;
      }}
- 
-    # location ~* ^/homeassistant/ {{
-    #     rewrite /homeassistant/(.*) /$1  break;
-    #             proxy_pass http://homeassistant; 
-    #             proxy_redirect     off;
-
-    #             client_max_body_size 100m;
-
-    #             proxy_http_version 1.1;
-    #             proxy_set_header Upgrade $http_upgrade;
-    #             proxy_set_header Connection "upgrade";
-
-    #             proxy_set_header Host $http_host;
-    #             proxy_set_header X-Real-IP $remote_addr;
-    #             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    #             proxy_set_header X-Forwarded-Host $the_host;
-    #             proxy_set_header X-Forwarded-Proto $the_scheme;
-    #     }}
-    
+   
     location ~* ^/tv/ {{
                 proxy_pass http://medusa; 
                 proxy_redirect     off;
@@ -218,6 +204,19 @@ http {{
                 proxy_set_header X-Forwarded-Proto $the_scheme;
         }}
  
+
+    location /jellyfin/ {{
+        proxy_pass http://jellyfin;
+        proxy_pass_request_headers on;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $http_connection;
+    }}
+
     
     location ~* ^/ds-vpath/ {{
         rewrite /ds-vpath/(.*) /$1  break;

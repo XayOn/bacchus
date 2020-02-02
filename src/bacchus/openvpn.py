@@ -6,11 +6,11 @@ class OpenVPN(HomeServerApp):
     def setup(self):
         try:
             self.logger.debug(
-                self.run("ovpn_genconfig", "-u", f"udp://private.{self.domain}"))
+                self.run("ovpn_genconfig", "-u",
+                         f"udp://private.{self.domain}"))
             self.logger.debug(
                 self.run('bash', '-c',
                          f'echo private.{self.domain}|ovpn_initpki nopass'))
-            # self.container.stop()
             self.compose.start()
             self.logger.debug(
                 self.run('easyrsa', 'build-client-full',

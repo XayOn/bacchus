@@ -11,7 +11,8 @@ from bacchus.radarr import Radarr
 import docker
 
 __all__ = [
-    Nginx, CertManager, NextCloud, Jackett, Lidarr, Radarr, Medusa, Jellyfin
+    Nginx, CertManager, NextCloud, Jackett, Lidarr, Radarr, Medusa, Jellyfin,
+    OpenVPN
 ]
 
 
@@ -36,17 +37,17 @@ class HomeServerSetup:
             for cls in __all__
         }
 
-    def configure(self, provider_names=None):
+    def configure(self, provider_name=None):
         """Configure given providers."""
-        if not provider_names:
-            provider_names = [a.__name__ for a in __all__]
+        if provider_name:
+            return self.providers[provider_name].setup()
 
         self.compose.copy_template()
         self.compose.create_env_files()
         self.compose.start()
 
-        for provider in provider_names:
-            self.providers[provider].wait_for_status()
-            self.providers[provider].wait_for_config()
-            self.providers[provider].setup()
+        for provider in self.providers:
+            provider.wait_for_status()
+            provider.wait_for_config()
+            provider.setup()
         self.compose.restart()
