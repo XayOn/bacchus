@@ -6,14 +6,15 @@ Bacchus
 Freedom for your home and media. Fast setup to a libre solution on media
 manamement, torrent automatic downloads, cloud and office on-cloud.
 
-**Tired of installing the medusa/radarr/lidarr/transmission pack?**
-**What about nextcloud, its apps and onlyoffice?**
-
 This proyect aims to make personal cloud and media management solutions more
 widely accesible, or at least a bit more painless to setup 
 
-To do so, it exposes a few services under the same subdomain, with a
-self-signed ssl certificate and proxy-pass directives.
+You'll need to buy a domain (or have one already with "public" and "private"
+subdomains free).
+
+After installation, you can:
+- Connect to the VPN server from outside your home
+- See all the services under private.<your_domain>.com
 
 Features
 --------

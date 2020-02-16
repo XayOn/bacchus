@@ -43,7 +43,7 @@ class HomeServerSetup:
         self.compose.create_env_files()
         self.compose.start()
 
-        for provider in self.providers:
+        for provider in self.providers.values():
             provider.wait_for_status()
             provider.wait_for_config()
             provider.setup()

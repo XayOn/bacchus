@@ -2,10 +2,6 @@ version: '3'
 services:
   jellyfin:
     image: linuxserver/jellyfin
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/London
     volumes:
       - ./data/jellyfin:/config
       - ./data/media/tv:/data/tvshows
@@ -14,7 +10,10 @@ services:
       - 8096:8096
     devices:
       - /dev/dri:/dev/dri 
-      - /dev/vchiq:/dev/vchiq 
+    networks:
+      - common
+    env_file:
+      - .env_general
     restart: unless-stopped
   medusa:
     restart: always
