@@ -12,17 +12,18 @@ class OpenVPN(HomeServerApp):
         try:
             self.logger.debug(
                 self.run("ovpn_genconfig", "-u",
-                         f"udp://private.{self.domain}"))
+                         f"udp://public.{self.domain}"))
             with suppress(Exception):
                 self.logger.debug(
                     self.run(
                         'bash', '-c',
-                        f'echo private.{self.domain}|ovpn_initpki nopass'))
+                        f'echo public.{self.domain}|ovpn_initpki nopass'))
 
             self.compose.start()
-            self.logger.debug(
-                self.run('easyrsa', 'build-client-full',
-                         self.meta['nextcloud_username'], 'nopass'))
+            with suppress(Exception):
+                self.logger.debug(
+                    self.run('easyrsa', 'build-client-full',
+                             self.meta['nextcloud_username'], 'nopass'))
             response = self.run('ovpn_getclient',
                                 self.meta['nextcloud_username'])
             Path('vpn_client.config').write_bytes(response)
