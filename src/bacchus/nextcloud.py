@@ -59,7 +59,7 @@ class NextCloud(HomeServerApp):
         self.occ('config:system:set', 'overwritewebroot', '--value', '/')
         self.occ('config:system:set', 'overwriteprotocol', '--value', 'https')
         self.occ('config:system:set', 'trusted_domains', '0', '--value',
-                 self.domain)
+                 f'private.{self.domain}')
 
     def setup_music(self):
         self.occ('app:install', 'music')
@@ -98,7 +98,7 @@ class NextCloud(HomeServerApp):
                 "1": {
                     "id": 1,
                     "name": "Series downloads",
-                    "url": f"https://{self.domain}/tv/",
+                    "url": f"https://private.{self.domain}/tv/",
                     "lang": "",
                     "type": "link",
                     "device": "",
@@ -109,7 +109,7 @@ class NextCloud(HomeServerApp):
                 "2": {
                     "id": 2,
                     "name": "Movies downloads",
-                    "url": f"https://{self.domain}/movies/",
+                    "url": f"https://private.{self.domain}/movies/",
                     "lang": "",
                     "type": "link",
                     "device": "",
@@ -120,7 +120,7 @@ class NextCloud(HomeServerApp):
                 "3": {
                     "id": 3,
                     "name": "Music downloads",
-                    "url": f"https://{self.domain}/music/",
+                    "url": f"https://private.{self.domain}/music/",
                     "lang": "",
                     "type": "link",
                     "device": "",
@@ -131,7 +131,7 @@ class NextCloud(HomeServerApp):
                 "4": {
                     "id": 4,
                     "name": "Book downloads",
-                    "url": f"https://{self.domain}/books/",
+                    "url": f"https://private.{self.domain}/books/",
                     "lang": "",
                     "type": "link",
                     "device": "",
@@ -142,7 +142,7 @@ class NextCloud(HomeServerApp):
                 "5": {
                     "id": 5,
                     "name": "Media player",
-                    "url": f"https://{self.domain}/jellyfin/",
+                    "url": f"https://private.{self.domain}/jellyfin/",
                     "lang": "",
                     "type": "link",
                     "device": "",

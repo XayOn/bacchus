@@ -9,8 +9,12 @@ from bacchus.nginx import Nginx
 from bacchus.compose import DockerCompose
 from bacchus.openvpn import OpenVPN
 from bacchus.jellyfin import Jellyfin
+from bacchus.certificates import CertManager
 
-__all__ = [Nginx, NextCloud, Jackett, Lidarr, Radarr, Medusa, Jellyfin]
+__all__ = [
+    CertManager, Nginx, OpenVPN, NextCloud, Jackett, Lidarr, Radarr, Medusa,
+    Jellyfin
+]
 
 
 class HomeServerSetup:
@@ -26,13 +30,14 @@ class HomeServerSetup:
         and nextcloud_password variables
         """
         client = docker.from_env()
-        self.compose = DockerCompose(domain, client, docker_prefix, None,
+        self.providers = {}
+        self.compose = DockerCompose(domain, client, docker_prefix, None, self,
                                      **kwargs)
-        self.providers = {
+        self.providers.update({
             cls.__name__: cls(domain, client, docker_prefix, self.compose,
-                              **kwargs)
+                              self, **kwargs)
             for cls in __all__
-        }
+        })
 
     def configure(self, provider_name=None):
         """Configure given providers."""

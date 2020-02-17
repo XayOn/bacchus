@@ -14,8 +14,9 @@ class HomeServerApp:
 
     All common actions (config file placement, docker controls...) go here
     """
-    def __init__(self, domain, client, docker_prefix, compose, **kwargs):
+    def __init__(self, domain, client, docker_prefix, compose, parent, **kwargs):
         name = self.__class__.__name__.lower()
+        self.providers = parent.providers
         self.compose = compose
         self.path = DOCKER_PATH / 'data' / name
         self.domain = domain

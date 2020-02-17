@@ -1,3 +1,4 @@
+from contextlib import suppress
 import json
 import shutil
 from .base import HomeServerApp
@@ -13,11 +14,12 @@ class Jackett(HomeServerApp):
 
     def copy_indexers(self):
         indexers_path = (self.path / 'Jackett' / 'Indexers')
-        indexers_path.mkdir(parents=True, exists_ok=True)
+        with suppress(Exception):
+            indexers_path.mkdir(parents=True)
 
         files = ((TEMPLATES / 'jackett' / 'Indexers').absolute()).glob('*')
         for file in files:
-            shutil.copyfile(str(file.absolute()), indexers_path)
+            shutil.copyfile(str(file.absolute()), indexers_path / file.name)
 
     def setup_nginx(self):
         config = self.path / 'Jackett' / 'ServerConfig.json'

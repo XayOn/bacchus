@@ -104,8 +104,8 @@ http {{
 
         index index.html;
 
-        ssl_certificate /etc/certs/{domain}/fullchain.pem;
-        ssl_certificate_key /etc/certs/{domain}/privkey.pem;
+        ssl_certificate /etc/certs/private.{domain}.crt;
+        ssl_certificate_key /etc/certs/private.{domain}.key;
 
         location = /robots.txt {{
             allow all;

@@ -151,7 +151,7 @@ services:
       - common 
     volumes:
       - ./data/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./data/nginx/:/etc/certs
+      - ./data/certmanager/certificates/:/etc/certs
     env_file:
       - .env_general
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
