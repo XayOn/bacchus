@@ -1,4 +1,5 @@
 import netifaces as ni
+from contextlib import suppress
 from pathlib import Path
 from bacchus.base import HomeServerApp
 
