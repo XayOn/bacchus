@@ -10,6 +10,10 @@ events {{
 
 http {{
 
+    upstream transmission {{
+	server transmission:9091;
+    }}
+
     upstream lidarr {{
       server lidarr:8686;
     }}
@@ -141,7 +145,32 @@ http {{
                 proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
                 proxy_set_header X-Forwarded-Proto $the_scheme;
         }}
-    
+
+
+      location ^~ /transmission {
+      
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header Host $http_host;
+          proxy_set_header X-NginX-Proxy true;
+          proxy_http_version 1.1;
+          proxy_set_header Connection "";
+          proxy_pass_header X-Transmission-Session-Id;
+          add_header   Front-End-Https   on;
+      
+          location /transmission/rpc {
+              proxy_pass http://transmission;
+          }
+      
+          location /transmission/web/ {
+              proxy_pass http://transmission;
+          }
+      
+          location /transmission/upload {
+              proxy_pass http://transmission;
+          }
+      }
+
     location ~* ^/books/ {{
         rewrite /books/(.*) /$1  break;
                 proxy_pass http://lazylibrarian;
