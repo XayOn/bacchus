@@ -40,8 +40,6 @@ services:
     restart: always
     volumes:
       - ./data/openvpn/:/etc/openvpn
-    networks:
-      - common
   radarr:
     restart: always
     image: linuxserver/radarr
