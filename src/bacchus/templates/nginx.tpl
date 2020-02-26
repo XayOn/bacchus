@@ -147,7 +147,7 @@ http {{
         }}
 
 
-      location ^~ /transmission {
+      location ^~ /transmission {{
       
           proxy_set_header X-Real-IP $remote_addr;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -158,18 +158,18 @@ http {{
           proxy_pass_header X-Transmission-Session-Id;
           add_header   Front-End-Https   on;
       
-          location /transmission/rpc {
+          location /transmission/rpc {{
               proxy_pass http://transmission;
-          }
+          }}
       
-          location /transmission/web/ {
+          location /transmission/web/ {{
               proxy_pass http://transmission;
-          }
+          }}
       
-          location /transmission/upload {
+          location /transmission/upload {{
               proxy_pass http://transmission;
-          }
-      }
+          }}
+      }}
 
     location ~* ^/books/ {{
         rewrite /books/(.*) /$1  break;
