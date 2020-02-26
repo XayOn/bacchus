@@ -25,20 +25,22 @@ class Medusa(HomeServerApp):
         providers = []
         for prov in (TEMPLATES / 'jackett' / 'Indexers').glob('*.json'):
             providers.append(prov.stem.lower())
-            local = dict(name=prov.stem,
-                         cat_ids='5010, 5030, 5040',
-                         api_key=api_key,
-                         search_mode='eponly',
-                         search_fallback=0,
-                         enable_daily=1,
-                         enable_backlog=1,
-                         enable_manualsearch=1,
-                         enable_search_delay=0,
-                         ratio='',
-                         search_delay=480,
-                         minseed=1,
-                         url=(f'https://jackett:9117/trackers/api/v2.0/'
-                              'indexers/{prov.stem}/results/torznab/'))
+            local = dict(
+                name=prov.stem,
+                cat_ids=('5010, 5030, 5040, 2000, 2010, '
+                         '2020, 2030, 2035, 2040, 2045, 2050, 2060'),
+                api_key=api_key,
+                search_mode='eponly',
+                search_fallback=0,
+                enable_daily=1,
+                enable_backlog=1,
+                enable_manualsearch=1,
+                enable_search_delay=0,
+                ratio='',
+                search_delay=480,
+                minseed=1,
+                url=(f'https://private.{self.domain}/trackers/api/v2.0/'
+                     f'indexers/{prov.stem}/results/torznab/'))
             if not config.has_section(prov.stem.upper()):
                 config.add_section(prov.stem.upper())
             config[prov.stem.upper()].update({
