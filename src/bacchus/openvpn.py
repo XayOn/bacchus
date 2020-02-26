@@ -9,15 +9,15 @@ import requests
 class OpenVPN(HomeServerApp):
     def setup(self):
         self.setup_dns()
+        self.fix_dns_config_pihole()
         try:
             self.logger.debug(
                 self.run("ovpn_genconfig", "-u",
                          f"udp://public.{self.domain}"))
             with suppress(Exception):
                 self.logger.debug(
-                    self.run(
-                        'bash', '-c',
-                        f'echo public.{self.domain}|ovpn_initpki nopass'))
+                    self.run('bash', '-c',
+                             f'echo public.{self.domain}|ovpn_initpki nopass'))
 
             self.compose.start()
             with suppress(Exception):
@@ -29,6 +29,13 @@ class OpenVPN(HomeServerApp):
             Path('vpn_client.config').write_bytes(response)
         except Exception as err:
             self.logger.exception('could not create openvpn config')
+
+    def fix_dns_config_pihole():
+        server_config = [
+            a for a in (self.path / 'openvpn.conf').open().readlines()
+            if not 'dhcp-option DNS' in a
+        ] + ['push "dhcp-option DNS 127.0.0.1"']
+        (self.path / 'openvpn.conf').write_text('\n'.join(server_config))
 
     def run(self, *cmd):
         volumes = {
