@@ -8,3 +8,4 @@ class Transmission(HomeServerApp):
         set = json.load((self.path / 'config' / 'settings.json').read_bytes())
         set['rpc-whitelist-enabled'] = False
         (self.path / 'config' / 'settings.json').write_bytes(json.dumps(set))
+        self.compose.start()

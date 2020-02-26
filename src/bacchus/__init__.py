@@ -1,7 +1,7 @@
 import docker
 # from bacchus.homeassistant import HomeAssistant
 from bacchus.jackett import Jackett
-from bacchus.Transmission import Transmission
+from bacchus.transmission import Transmission
 from bacchus.lidarr import Lidarr
 from bacchus.radarr import Radarr
 from bacchus.medusa import Medusa
