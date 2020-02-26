@@ -30,12 +30,13 @@ class OpenVPN(HomeServerApp):
         except Exception as err:
             self.logger.exception('could not create openvpn config')
 
-    def fix_dns_config_pihole():
+    def fix_dns_config_pihole(self):
         server_config = [
             a for a in (self.path / 'openvpn.conf').open().readlines()
             if not 'dhcp-option DNS' in a
         ] + ['push "dhcp-option DNS 127.0.0.1"']
-        (self.path / 'openvpn.conf').write_text('\n'.join(server_config))
+        # TODO: Fix permissions issues
+        # (self.path / 'openvpn.conf').write_text('\n'.join(server_config))
 
     def run(self, *cmd):
         volumes = {

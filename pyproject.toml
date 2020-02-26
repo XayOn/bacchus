@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bacchus"
-version = "0.1.29"
+version = "0.1.30"
 description = "Home Server solution based on docker"
 authors = ["David Francos <opensource@davidfrancos.net>"]
 packages = [{ include = "bacchus", from = "src" }]
