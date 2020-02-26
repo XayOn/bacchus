@@ -1,30 +1,28 @@
 Bacchus
 -------
 
-**Get your cloud and multimedia solution ready in no time!**
+Personal cloud and media management solutions made widely accesible.
+With a more simple configuration and few requirements, get a lot of tools
+installed and pre-configured, ready to fly!
 
-Freedom for your home and media. Fast setup to a libre solution on media
-manamement, torrent automatic downloads, cloud and office on-cloud.
+You'll need to have a domain on ghandi.net and get your ghandi.net API key.
 
-This proyect aims to make personal cloud and media management solutions more
-widely accesible, or at least a bit more painless to setup 
-
-You'll need to buy a domain (or have one already with "public" and "private"
-subdomains free).
+All the services will only be available on your home network, but a VPN server
+is setup and a client configuration file is automatically issued upon
+installation, so you only need to forward VPN port to the machine where you've
+got bacchus installed.
 
 After installation, you can:
 - Connect to the VPN server from outside your home
-- See all the services under private.<your_domain>.com
+- See all the services under https://private.<your_domain>.com/
+  The main interface is NextCloud, with the media applications embedded on it.
 
 Features
 --------
 
 Note that this is just an installer/bundle of the real tools that make the magic.
 
-- Keep track of your favourite movies :heavy_check_mark: 
-- Keep track of your favourite tv shows  :heavy_check_mark:
-- Keep track of your favourite music :heavy_check_mark:
-- Keep track of your favourite books :heavy_check_mark:
+- Keep track, download automatically and watch online your favourite movies, tv shows and music :heavy_check_mark: 
 - Download all of them! :heavy_check_mark:
 - Synchronize your calendars :heavy_check_mark:
 - Synchronize your contacts :heavy_check_mark:
@@ -39,7 +37,7 @@ Note that this is just an installer/bundle of the real tools that make the magic
 Android support
 ---------------
 
-- Handle your media using `Kodi <https://kodi.tv>`_. Add your remote server as a source.
+- Handle your media using jellyfin `<https://jellyfin.io>`_
 - Sync calendars and contacts with `Davx⁵ <https://www.davx5.com>`_
 - Manage your passwords with `KeePassDroid <http://www.keepassdroid.com/>`_ 
 - Keep your todo lists with `OpenTasks <https://opentasks.app/>`_
@@ -54,8 +52,6 @@ Android support
 - Sync your SMS with  `Nextcloud SMS <https://f-droid.org/en/packages/fr.unix_experience.owncloud_sms/>`_
 - Connect to your local network from everywhere with <`OpenVPN <https://f-droid.org/en/packages/de.blinkt.openvpn/>`_
 
-
-
 Browser support
 ---------------
 
@@ -64,16 +60,6 @@ configured domain, with SSL. Except password sync, you can achieve that by
 configuring `<https://addons.mozilla.org/en-US/firefox/addon/keepass-tusk/>
 Firefox Tusk add-on`_
 
-
-Installs your personal cloud, allowing backups and online/offline
-(android/linux/windows) collaborative document editing (nextcloud +
-onlyoffice), contacts syncronization, calendar synchronization, task list...
-
-With KeePassDroid and KeePass Tusk you can sync your passwords safely between
-devices.
-
-Finally, it installs and configures a VPN server, so you just need to open the
-one VPN port, and share your freshly-generated VPN config with your devices.
 
 Apps that provide the real services
 -----------------------------------
