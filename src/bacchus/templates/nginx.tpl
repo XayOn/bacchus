@@ -10,6 +10,10 @@ events {{
 
 http {{
 
+    upstream pihole {{
+	server pihole:80;
+    }}
+
     upstream transmission {{
 	server transmission:9091;
     }}
@@ -244,8 +248,20 @@ http {{
         proxy_set_header X-Forwarded-Host $http_host;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $http_connection;
+
     }}
 
+    location /pihole/ {{
+	proxy_pass http://pihole;
+        proxy_pass_request_headers on;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $http_connection;
+    }}
     
     location ~* ^/ds-vpath/ {{
         rewrite /ds-vpath/(.*) /$1  break;

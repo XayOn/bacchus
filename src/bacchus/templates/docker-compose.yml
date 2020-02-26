@@ -165,16 +165,23 @@ services:
       - ./data/transmission/config:/config
       - ./data/downloads:/downloads
     restart: unless-stopped
-
-    #   homeassistant: 
-    #     image: homeassistant/home-assistant
-    #     restart: always
-    #     volumes:
-    #       - ./data/homeassistant/config:/config
-    #    env_file:
-    #      - .env_general
-    #     networks:
-    #       - common
+  pihole:
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+    env_file:
+      - .env_general
+    volumes:
+      - './etc-pihole/:/etc/pihole/'
+      - './etc-dnsmasq.d/:/etc/dnsmasq.d/'
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped
 
 networks:
   common: 
