@@ -25,6 +25,7 @@ class Radarr(HomeServerApp):
         api_key = json.loads((self.path / '..' / 'jackett' / 'Jackett' /
                               'ServerConfig.json').read_text())['APIKey']
         indexer_files = (TEMPLATES / 'jackett' / 'Indexers').glob('*.json')
+        indexers = []
         for num, name in enumerate((a.stem.lower() for a in indexer_files)):
             base_url = (f"https://private.{self.domain}/trackers/api/v2.0/"
                         f"indexers/{name}/results/torznab/")
