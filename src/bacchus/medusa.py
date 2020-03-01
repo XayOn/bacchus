@@ -55,7 +55,7 @@ class Medusa(HomeServerApp):
             config['TORRENT'].update(
                 dict(torrent_username='',
                      torrent_password='',
-                     torrent_host=f'https://{self.domain}',
+                     torrent_host=f'https://private.{self.domain}',
                      torrent_path='',
                      torrent_seed_time='3',
                      torrent_paused='0',
@@ -63,7 +63,7 @@ class Medusa(HomeServerApp):
                      torrent_label='',
                      torrent_label_anime='',
                      torrent_verify_cert='0',
-                     torrent_rpcurl='transmission/rpc',
+                     torrent_rpcurl='transmission',
                      torrent_auth_type='',
                      torrent_seed_location=''))
 
