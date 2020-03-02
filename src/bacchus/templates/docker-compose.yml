@@ -5,7 +5,8 @@ services:
     volumes:
       - ./data/jellyfin:/config
       - ./data/media/tv:/data/tvshows
-      - ./data/media/moves:/data/movies
+      - ./data/media/movies:/data/movies
+      - ./data/media/music:/data/music
     ports:
       - 8096:8096
     devices:
@@ -86,7 +87,7 @@ services:
     volumes:
       - ./data/lidarr:/config
       - ./data/media/music:/music
-      - ./data/downloads/finished:/downloads
+      - ./data/downloads/complete:/downloads
     ports:
       - 8686:8686 
     restart: unless-stopped

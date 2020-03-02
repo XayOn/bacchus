@@ -52,6 +52,10 @@ class Medusa(HomeServerApp):
             if not config.has_section('TORRENT'):
                 config.add_section('TORRENT')
 
+            config['General']['process_method'] = 'move'
+            config['General']['process_automatically'] = '1'
+            config['General']['tv_download_dir'] = '/downloads'
+
             config['TORRENT'].update(
                 dict(torrent_username='',
                      torrent_password='',
