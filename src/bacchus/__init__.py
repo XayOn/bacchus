@@ -9,8 +9,9 @@ from bacchus.nginx import Nginx
 from bacchus.compose import DockerCompose
 from bacchus.openvpn import OpenVPN
 from bacchus.jellyfin import Jellyfin
+from bacchus.lazylibrarian import LazyLibrarian
 
-__all__ = [Nginx, NextCloud, Jackett, Lidarr, Radarr, Medusa, Jellyfin]
+__all__ = [Nginx, NextCloud, Jackett, Lidarr, Radarr, Medusa, Jellyfin, LazyLibrarian]
 
 
 class HomeServerSetup:

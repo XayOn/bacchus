@@ -142,23 +142,14 @@ http {{
                 proxy_set_header X-Forwarded-Proto $the_scheme;
         }}
     
-    location ~* ^/books/ {{
-        rewrite /books/(.*) /$1  break;
-                proxy_pass http://lazylibrarian;
-                proxy_redirect     off;
-
-                client_max_body_size 100m;
-
-                proxy_http_version 1.1;
-                proxy_set_header Upgrade $http_upgrade;
-                proxy_set_header Connection "upgrade";
-
-                proxy_set_header Host $http_host;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
-                proxy_set_header X-Forwarded-Proto $the_scheme;
-        }}
+    location /books/ {{
+        proxy_pass http://lazylibrarian;
+        proxy_redirect     off;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $the_scheme;
+    }}
 
     
     location ~* ^/movies/ {{
