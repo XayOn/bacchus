@@ -116,6 +116,7 @@ services:
       - common
     volumes:
       - ./data/media/nextcloud/:/data/
+      - ./data/media/nextcloud_config:/var/www/html/config/
     env_file:
       - .env_nextcloud
       - .env_general
