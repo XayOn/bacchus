@@ -6,6 +6,7 @@ services:
       - ./data/jellyfin:/config
       - ./data/media/tv:/data/tvshows
       - ./data/media/movies:/data/movies
+      - ./data/media/books:/data/books
       - ./data/media/music:/data/music
     ports:
       - 8096:8096
@@ -24,7 +25,7 @@ services:
     volumes:
       - ./data/medusa:/config
       - ./data/media/tv:/tv
-      - ./data/downloads/finished:/downloads
+      - ./data/downloads/complete:/downloads
     env_file:
       - .env_general
     ports:
@@ -51,7 +52,7 @@ services:
     volumes:
       - ./data/radarr:/config
       - ./data/media/movies:/movies
-      - ./data/downloads/finished:/downloads
+      - ./data/downloads/:/downloads
     ports:
       - 7878:7878 
     restart: unless-stopped
@@ -66,7 +67,7 @@ services:
       - TZ=Europe/London
     volumes:
       - ./data/lazylibrarian:/config
-      - ./data/downloads/finished:/downloads
+      - ./data/downloads/complete/:/downloads/complete
       - ./data/media/books:/books
       - ./data/media/audiobooks:/audiobooks
       - ./data/media/magazines:/magazines
@@ -102,7 +103,7 @@ services:
       - TZ=Europe/London
     volumes:
       - ./data/jackett:/config
-      - ./data/downloads/finished:/downloads
+      - ./data/downloads/complete:/downloads
     ports:
       - 9117:9117
     restart: unless-stopped
@@ -116,7 +117,7 @@ services:
       - common
     volumes:
       - ./data/media/nextcloud/:/data/
-      - ./data/media/nextcloud_config:/var/www/html/config/
+      - ./nextcloud_config/:/var/www/html/config/
     env_file:
       - .env_nextcloud
       - .env_general
@@ -161,6 +162,9 @@ services:
     restart: always
     networks:
       - common
+    ports:
+      - "51413:51413/tcp" 
+      - "51413:51413/udp"
     env_file:
       - .env_general
     volumes:
