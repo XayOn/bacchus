@@ -24,7 +24,7 @@ services:
     volumes:
       - ./data/medusa:/config
       - ./data/media/tv:/tv
-      - ./data/downloads/finished:/downloads
+      - ./data/downloads/complete:/downloads
     env_file:
       - .env_general
     ports:
@@ -87,7 +87,7 @@ services:
     volumes:
       - ./data/lidarr:/config
       - ./data/media/music:/music
-      - ./data/downloads/complete:/downloads
+      - ./data/downloads/:/downloads
     ports:
       - 8686:8686 
     restart: unless-stopped

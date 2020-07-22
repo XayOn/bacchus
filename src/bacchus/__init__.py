@@ -19,7 +19,7 @@ __all__ = [
 
 
 class HomeServerSetup:
-    """Base cmdline class. 
+    """Base cmdline class.
 
     Not currently extending a CLEO App so this can be extended easily.
     Params are the same as BaseHomeApp class from `base` module.
