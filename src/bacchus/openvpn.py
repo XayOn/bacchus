@@ -26,7 +26,7 @@ class OpenVPN(HomeServerApp):
                              self.meta['nextcloud_username'], 'nopass'))
             response = self.run('ovpn_getclient',
                                 self.meta['nextcloud_username'])
-            Path('vpn_client.config').write_bytes(response)
+            (self.path / '..' / 'openvpn.conf').write_bytes(response)
         except Exception as err:
             self.logger.exception('could not create openvpn config')
 
@@ -35,8 +35,8 @@ class OpenVPN(HomeServerApp):
             a for a in (self.path / 'openvpn.conf').open().readlines()
             if not 'dhcp-option DNS' in a
         ] + ['push "dhcp-option DNS 127.0.0.1"']
-        # TODO: Fix permissions issues
-        # (self.path / 'openvpn.conf').write_text('\n'.join(server_config))
+        (self.path / '..' / 'openvpn.conf').write_text(
+            '\n'.join(server_config))
 
     def run(self, *cmd):
         volumes = {
