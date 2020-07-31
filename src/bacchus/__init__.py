@@ -2,6 +2,7 @@ import docker
 # from bacchus.homeassistant import HomeAssistant
 from bacchus.jackett import Jackett
 from bacchus.transmission import Transmission
+from bacchus.lazylibrarian import LazyLibrarian
 from bacchus.lidarr import Lidarr
 from bacchus.radarr import Radarr
 from bacchus.medusa import Medusa
@@ -14,7 +15,7 @@ from bacchus.certificates import CertManager
 
 __all__ = [
     CertManager, Nginx, OpenVPN, NextCloud, Transmission, Jackett, Lidarr,
-    Radarr, Medusa, Jellyfin
+    LazyLibrarian, Radarr, Medusa, Jellyfin
 ]
 
 
