@@ -9,7 +9,6 @@ import requests
 class OpenVPN(HomeServerApp):
     def setup(self):
         self.setup_dns()
-        self.fix_dns_config_pihole()
         try:
             self.logger.debug(
                 self.run("ovpn_genconfig", "-u",
@@ -26,17 +25,21 @@ class OpenVPN(HomeServerApp):
                              self.meta['nextcloud_username'], 'nopass'))
             response = self.run('ovpn_getclient',
                                 self.meta['nextcloud_username'])
-            (self.path / '..' / 'openvpn.conf').write_bytes(response)
+            (self.path / '..' / 'openvpn_client.conf').write_bytes(response)
         except Exception as err:
             self.logger.exception('could not create openvpn config')
+
+        try:
+            self.fix_dns_config_pihole()
+        except Exception as err:
+            self.logger.exception('cant_dns_pihole')
 
     def fix_dns_config_pihole(self):
         server_config = [
             a for a in (self.path / 'openvpn.conf').open().readlines()
             if not 'dhcp-option DNS' in a
         ] + ['push "dhcp-option DNS 127.0.0.1"']
-        (self.path / '..' / 'openvpn.conf').write_text(
-            '\n'.join(server_config))
+        (self.path / 'openvpn.conf').write_text('\n'.join(server_config))
 
     def run(self, *cmd):
         volumes = {
