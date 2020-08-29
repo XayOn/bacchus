@@ -56,7 +56,7 @@ class OpenVPN(HomeServerApp):
 
     def setup_dns(self):
         default_iface = next(a for a in ni.interfaces() if any(
-            a.startswith(b) for b in ('eth', 'enp')))
+            a.startswith(b) for b in ('eth', 'en')))
         iface = self.meta.get('iface') or default_iface
         private_ip = ni.ifaddresses(iface)[ni.AF_INET][0]['addr']
         public_ip = requests.get('https://api.ipify.org').text

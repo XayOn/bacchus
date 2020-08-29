@@ -13,7 +13,7 @@ class DockerCompose(HomeServerApp):
     """Basic docker compose commands."""
     @property
     def env(self):
-        return {'COMPOSE_PROJECT_NAME': self.meta['project_name']}
+        return {**os.environ, 'COMPOSE_PROJECT_NAME': self.meta['project_name']}
 
     def create_env_files(self):
         """Create environment files for docker copose"""
@@ -43,7 +43,7 @@ class DockerCompose(HomeServerApp):
         subprocess.check_output(
             ['docker-compose', '-p', self.meta['project_name'], 'up', '-d' ],
             cwd=DOCKER_PATH,
-            env=self.env)
+            env={**os.environ, **self.env})
 
     def stop(self):
         """Stop."""
