@@ -28,17 +28,17 @@ iframes) to external tools (like media management).
 - Post-its notes and kanban board with nextcloud :heavy_check_mark:
 - Edit online your documents, spreadsheets, full office solution :heavy_check_mark:
 
-# :computer: Bacchus automatically sets up the following applications
+# :computer: Bacchus set, configures and manages up the following applications
 
-- `LazyLibrarian <https://lazylibrarian.gitlab.io>`_
-- `Radarr <https://radarr.video>`_
-- `Lidarr https://lidarr.audio>`_
-- `Medussa <https://pymedusa.com>`_
-- `Jackett <https://github.com/Jackett/Jackett>`_ 
-- `Transmission <https://transmissionbt.com/>`_
-- `Nextcloud <https://nextcloud.com>`_
-- `OnlyOffice <https://onlyoffice.com>`_
-- `OpenVPN <https://openvpn.net>`_
+- [LazyLibrarian][2] 
+- [Radarr][3]
+- [Lidarr][4]
+- [Medussa][5]
+- [Jackett][6]
+- [Transmission][7]
+- [Nextcloud][8]
+- [OnlyOffice][9]
+- [OpenVPN][10]
 
 > And links them inside nextcloud for a seamless user experience. 
 
@@ -83,3 +83,12 @@ Afterwards, you'll have a bacchus command available.
 
 
 [1]: https://github.com/nextcloud/nextcloud
+[2]: https://lazylibrarian.gitlab.io
+[3]: https://radarr.video
+[4]: https://lidarr.audio
+[5]: https://pymedusa.com
+[6]: https://github.com/Jackett/Jackett
+[7]: https://transmissionbt.com
+[8]: https://nextcloud.com
+[9]: https://onlyoffice.com
+[10]: https://openvpn.net
