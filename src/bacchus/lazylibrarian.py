@@ -18,3 +18,10 @@ class LazyLibrarian(HomeServerApp):
 
     def setup(self):
         self.setup_nginx()
+        config = configparser.ConfigParser()
+        config.read(str(self.config_file))
+        config.set('General', 'http_root', '/books')
+        config.set('General', 'ebook_dir', '/books')
+        config.set('General', 'download_dir', '/downloads')
+        with open(self.config_file, 'w') as fileo:
+            config.write(fileo)

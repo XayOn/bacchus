@@ -1,6 +1,8 @@
 import docker
 # from bacchus.homeassistant import HomeAssistant
 from bacchus.jackett import Jackett
+from bacchus.transmission import Transmission
+from bacchus.lazylibrarian import LazyLibrarian
 from bacchus.lidarr import Lidarr
 from bacchus.radarr import Radarr
 from bacchus.medusa import Medusa
@@ -10,12 +12,16 @@ from bacchus.compose import DockerCompose
 from bacchus.openvpn import OpenVPN
 from bacchus.jellyfin import Jellyfin
 from bacchus.lazylibrarian import LazyLibrarian
+from bacchus.certificates import CertManager
 
-__all__ = [Nginx, NextCloud, Jackett, Lidarr, Radarr, Medusa, Jellyfin, LazyLibrarian]
+__all__ = [
+    CertManager, Nginx, OpenVPN, NextCloud, Transmission, Jackett, Lidarr,
+    LazyLibrarian, Radarr, Medusa, Jellyfin
+]
 
 
 class HomeServerSetup:
-    """Base cmdline class. 
+    """Base cmdline class.
 
     Not currently extending a CLEO App so this can be extended easily.
     Params are the same as BaseHomeApp class from `base` module.
@@ -27,13 +33,14 @@ class HomeServerSetup:
         and nextcloud_password variables
         """
         client = docker.from_env()
-        self.compose = DockerCompose(domain, client, docker_prefix, None,
+        self.providers = {}
+        self.compose = DockerCompose(domain, client, docker_prefix, None, self,
                                      **kwargs)
-        self.providers = {
+        self.providers.update({
             cls.__name__: cls(domain, client, docker_prefix, self.compose,
-                              **kwargs)
+                              self, **kwargs)
             for cls in __all__
-        }
+        })
 
     def configure(self, provider_name=None):
         """Configure given providers."""
@@ -44,7 +51,7 @@ class HomeServerSetup:
         self.compose.create_env_files()
         self.compose.start()
 
-        for provider in self.providers:
+        for provider in self.providers.values():
             provider.wait_for_status()
             provider.wait_for_config()
             provider.setup()

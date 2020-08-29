@@ -7,7 +7,7 @@ class Jellyfin(HomeServerApp):
     """Jellyfin"""
     @property
     def config_file(self):
-        return self.path / 'config.xml'
+        return self.path / 'system.xml'
 
     @property
     @lru_cache()

@@ -2,19 +2,20 @@ version: '3'
 services:
   jellyfin:
     image: linuxserver/jellyfin
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/London
     volumes:
       - ./data/jellyfin:/config
       - ./data/media/tv:/data/tvshows
-      - ./data/media/moves:/data/movies
+      - ./data/media/movies:/data/movies
+      - ./data/media/books:/data/books
+      - ./data/media/music:/data/music
     ports:
       - 8096:8096
     devices:
       - /dev/dri:/dev/dri 
-      - /dev/vchiq:/dev/vchiq 
+    networks:
+      - common
+    env_file:
+      - .env_general
     restart: unless-stopped
   medusa:
     restart: always
@@ -24,7 +25,7 @@ services:
     volumes:
       - ./data/medusa:/config
       - ./data/media/tv:/tv
-      - ./data/downloads/finished:/downloads
+      - ./data/downloads/complete:/downloads
     env_file:
       - .env_general
     ports:
@@ -41,8 +42,6 @@ services:
     restart: always
     volumes:
       - ./data/openvpn/:/etc/openvpn
-    networks:
-      - common
   radarr:
     restart: always
     image: linuxserver/radarr
@@ -53,7 +52,7 @@ services:
     volumes:
       - ./data/radarr:/config
       - ./data/media/movies:/movies
-      - ./data/downloads/finished:/downloads
+      - ./data/downloads/:/downloads
     ports:
       - 7878:7878 
     restart: unless-stopped
@@ -68,7 +67,7 @@ services:
       - TZ=Europe/London
     volumes:
       - ./data/lazylibrarian:/config
-      - ./data/downloads/finished:/downloads
+      - ./data/downloads/complete/:/downloads/complete
       - ./data/media/books:/books
       - ./data/media/audiobooks:/audiobooks
       - ./data/media/magazines:/magazines
@@ -89,7 +88,7 @@ services:
     volumes:
       - ./data/lidarr:/config
       - ./data/media/music:/music
-      - ./data/downloads/finished:/downloads
+      - ./data/downloads/:/downloads
     ports:
       - 8686:8686 
     restart: unless-stopped
@@ -104,7 +103,7 @@ services:
       - TZ=Europe/London
     volumes:
       - ./data/jackett:/config
-      - ./data/downloads/finished:/downloads
+      - ./data/downloads/complete:/downloads
     ports:
       - 9117:9117
     restart: unless-stopped
@@ -118,6 +117,7 @@ services:
       - common
     volumes:
       - ./data/media/nextcloud/:/data/
+      - ./nextcloud_config/:/var/www/html/config/
     env_file:
       - .env_nextcloud
       - .env_general
@@ -140,6 +140,15 @@ services:
   nginx:
     depends_on: 
       - onlyoffice-document-server
+      - pihole
+      - transmission
+      - lidarr
+      - jellyfin
+      - radarr
+      - nextcloud
+      - medusa
+      - lazylibrarian
+      - jackett
     image: nginx
     restart: always
     stdin_open: true
@@ -152,7 +161,7 @@ services:
       - common 
     volumes:
       - ./data/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./data/nginx/:/etc/certs
+      - ./data/certmanager/certificates/:/etc/certs
     env_file:
       - .env_general
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
@@ -162,22 +171,34 @@ services:
     restart: always
     networks:
       - common
+    ports:
+      - "51413:51413/tcp" 
+      - "51413:51413/udp"
     env_file:
       - .env_general
     volumes:
       - ./data/transmission/config:/config
       - ./data/downloads:/downloads
     restart: unless-stopped
-
-    #   homeassistant: 
-    #     image: homeassistant/home-assistant
-    #     restart: always
-    #     volumes:
-    #       - ./data/homeassistant/config:/config
-    #    env_file:
-    #      - .env_general
-    #     networks:
-    #       - common
+  pihole:
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+    env_file:
+      - .env_general
+    volumes:
+      - './data/etc-pihole/:/etc/pihole/'
+      - './data/etc-dnsmasq.d/:/etc/dnsmasq.d/'
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - common
+    restart: unless-stopped
 
 networks:
   common: 

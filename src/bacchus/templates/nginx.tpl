@@ -10,6 +10,14 @@ events {{
 
 http {{
 
+    upstream pihole {{
+	server pihole:80;
+    }}
+
+    upstream transmission {{
+	server transmission:9091;
+    }}
+
     upstream lidarr {{
       server lidarr:8686;
     }}
@@ -104,8 +112,8 @@ http {{
 
         index index.html;
 
-        ssl_certificate /etc/certs/{domain}/fullchain.pem;
-        ssl_certificate_key /etc/certs/{domain}/privkey.pem;
+        ssl_certificate /etc/certs/private.{domain}.crt;
+        ssl_certificate_key /etc/certs/private.{domain}.key;
 
         location = /robots.txt {{
             allow all;
@@ -141,15 +149,49 @@ http {{
                 proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
                 proxy_set_header X-Forwarded-Proto $the_scheme;
         }}
-    
-    location /books/ {{
-        proxy_pass http://lazylibrarian;
-        proxy_redirect     off;
-        proxy_set_header Host $http_host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $the_scheme;
-    }}
+   
+
+      location ^~ /transmission {{
+      
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header Host $http_host;
+          proxy_set_header X-NginX-Proxy true;
+          proxy_http_version 1.1;
+          proxy_set_header Connection "";
+          proxy_pass_header X-Transmission-Session-Id;
+          add_header   Front-End-Https   on;
+      
+          location /transmission/rpc {{
+              proxy_pass http://transmission;
+          }}
+      
+          location /transmission/web/ {{
+              proxy_pass http://transmission;
+          }}
+      
+          location /transmission/upload {{
+              proxy_pass http://transmission;
+          }}
+      }}
+
+    location ~* ^/books/ {{
+        rewrite /books/(.*) /$1  break;
+                proxy_pass http://lazylibrarian;
+                proxy_redirect     off;
+
+                client_max_body_size 100m;
+
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+
+                proxy_set_header Host $http_host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
+                proxy_set_header X-Forwarded-Proto $the_scheme;
+        }}
 
     
     location ~* ^/movies/ {{
@@ -206,8 +248,20 @@ http {{
         proxy_set_header X-Forwarded-Host $http_host;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $http_connection;
+
     }}
 
+    location /pihole/ {{
+	proxy_pass http://pihole;
+        proxy_pass_request_headers on;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $http_connection;
+    }}
     
     location ~* ^/ds-vpath/ {{
         rewrite /ds-vpath/(.*) /$1  break;
