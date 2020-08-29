@@ -1,6 +1,11 @@
-- name: Publish package
-  if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-  uses: pypa/gh-action-pypi-publish@master
-  with:
+name: Publish to PyPi
+on: [push]
+jobs:
+  build:
+    steps:
+    - name: Publish package
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+      uses: pypa/gh-action-pypi-publish@master
+      with:
         user: XayOn
         password: ${{ secrets.pypi_password }}
