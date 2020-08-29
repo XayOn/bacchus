@@ -140,6 +140,15 @@ services:
   nginx:
     depends_on: 
       - onlyoffice-document-server
+      - pihole
+      - transmission
+      - lidarr
+      - jellyfin
+      - radarr
+      - nextcloud
+      - medusa
+      - lazylibrarian
+      - jackett
     image: nginx
     restart: always
     stdin_open: true
@@ -187,6 +196,8 @@ services:
       - 1.1.1.1
     cap_add:
       - NET_ADMIN
+    networks:
+      - common
     restart: unless-stopped
 
 networks:
