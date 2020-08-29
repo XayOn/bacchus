@@ -1,5 +1,3 @@
-# Bacchus
-
 <span style="display:block;text-align:center">[![](https://raw.githubusercontent.com/XayOn/bacchus/develop/bacchus.png)](https://github.com/XayOn/bacchus) </span>
 
 ## Keep your data to yourself
@@ -24,43 +22,13 @@ iframes) to external tools (like media management).
 
 - Keep track, download automatically and watch online your favourite movies, tv
   shows and music :heavy_check_mark: 
-- Download all of them! :heavy_check_mark:
-- Synchronize your calendars :heavy_check_mark:
-- Synchronize your contacts :heavy_check_mark:
-- Synchronize your SMS :heavy_check_mark:
-- Password management and synchronization  :heavy_check_mark:
-- TODO list  :heavy_check_mark:
-- Post-its like notes  :heavy_check_mark:
-- Kanban board :heavy_check_mark:
+- Download all of them automatically! :heavy_check_mark:
+- Synchronize your calendars, contacts and SMS trough nextcloud :heavy_check_mark:
+- TODO list with nextcloud :heavy_check_mark:
+- Post-its notes and kanban board with nextcloud :heavy_check_mark:
 - Edit online your documents, spreadsheets, full office solution :heavy_check_mark:
-- Synchronise your health tracking apps :heavy_check_mark:
 
-# Android support
-
-- Handle your media using jellyfin `<https://jellyfin.io>`_
-- Sync calendars and contacts with `Davx⁵ <https://www.davx5.com>`_
-- Manage your passwords with `KeePassDroid <http://www.keepassdroid.com/>`_ 
-- Keep your todo lists with `OpenTasks <https://opentasks.app/>`_
-- Manage your kanban with `Deck <https://f-droid.org/en/packages/it.niedermann.nextcloud.deck/>`_
-- Edit your documents with `AndrOpenoffice <https://play.google.com/store/apps/details?id=com.andropenoffice&hl=en_US>`_
-- Save your post-its (google keep-like) with `Carnet <https://www.f-droid.org/en/packages/com.spisoft.quicknote/>`_ 
-- Monitor your torrent downloads with `Tremotesf <https://f-droid.org/en/packages/org.equeim.tremotesf/>`_ 
-- `Etar <https://f-droid.org/en/packages/ws.xsoh.etar/>`_ for calendar and calendar widgets.
-- Keep track of your health and sync it with nextcloud with
-  `OpenScale <https://f-droid.org/en/packages/com.health.openscale/>`_, `GadgetBridge <https://www.f-droid.org/en/packages/nodomain.freeyourgadget.gadgetbridge/>`_ and `Food Tracker <https://f-droid.org/en/packages/org.secuso.privacyfriendlyfoodtracker/>`_
-- Keep your notes with `Nextcloud Notes <https://www.f-droid.org/en/packages/it.niedermann.owncloud.notes/>`_
-- Sync your SMS with  `Nextcloud SMS <https://f-droid.org/en/packages/fr.unix_experience.owncloud_sms/>`_
-- Connect to your local network from everywhere with <`OpenVPN <https://f-droid.org/en/packages/de.blinkt.openvpn/>`_
-
-# Browser support
-
-Most of the features are directly available within your browser on your
-configured domain, with SSL. Except password sync, you can achieve that by
-configuring `<https://addons.mozilla.org/en-US/firefox/addon/keepass-tusk/>
-Firefox Tusk add-on`_
-
-
-# Apps that provide the real services
+# :computer: Bacchus automatically sets up the following applications
 
 - `LazyLibrarian <https://lazylibrarian.gitlab.io>`_
 - `Radarr <https://radarr.video>`_
@@ -71,6 +39,8 @@ Firefox Tusk add-on`_
 - `Nextcloud <https://nextcloud.com>`_
 - `OnlyOffice <https://onlyoffice.com>`_
 - `OpenVPN <https://openvpn.net>`_
+
+> And links them inside nextcloud for a seamless user experience. 
 
 # Usage
 
