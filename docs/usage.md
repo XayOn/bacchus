@@ -13,6 +13,7 @@ and configure access restrictions".
 
 After having your API KEY, you can execute bacchus.
 
+
 ```bash
 bacchus install domain.com your_email@your_provider user_nextcloud_pass API_KEY
 ```

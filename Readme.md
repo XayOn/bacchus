@@ -45,33 +45,12 @@ You should at least be confortable with docker, linux and a bit on the linux CLI
 
 And links them inside nextcloud for a seamless user experience. 
 
-## Usage
+## Install 
 
 Bacchus is provided as a python executable, you can, for example, install it with pip as user:
 
 ```bash
 pip install --user bacchus
-```
-
-Afterwards, you'll have a bacchus command available.
-
-```
-USAGE
-  bacchus install [<domain>] [<username>] [<password>]
-
-ARGUMENTS
-  <domain>               Domain (FQDN) for virtualhosts
-  <username>             Nextcloud first user's username
-  <password>             Nextcloud first user's password
-
-GLOBAL OPTIONS
-  -h (--help)            Display this help message
-  -q (--quiet)           Do not output any message
-  -v (--verbose)         Increase the verbosity of messages: "-v" for normal output, "-vv" for more verbose output and "-vvv" for debug
-  -V (--version)         Display this application version
-  --ansi                 Force ANSI output
-  --no-ansi              Disable ANSI output
-  -n (--no-interaction)  Do not ask any interactive question
 ```
 
 See [usage documentation][11] for more.
