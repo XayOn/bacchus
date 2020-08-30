@@ -14,6 +14,9 @@ Ultimately, bacchus works around [NextCloud][1], adding custom links inside (as
 iframes) to external tools (like media management and automated
 episode/movies/books downloads)
 
+:warning: :computer: Note that you need a certain technical knowledge to run this.
+You should at least be confortable with docker, linux and a bit on the linux CLI.
+
 ## Features
 
 :warning: Note that this is just an installer/bundle of the real tools that make the magic.
