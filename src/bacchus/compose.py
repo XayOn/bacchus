@@ -51,6 +51,18 @@ class DockerCompose(HomeServerApp):
                                 cwd=DOCKER_PATH,
                                 env=self.env)
 
+    def get_service_id(self, name):
+        return subprocess.check_output(['docker-compose', 'ps', '-q', name],
+                                cwd=DOCKER_PATH,
+                                env=self.env).strip().decode()
+
+    @property
+    def services(self):
+        services = [a.strip() for a in subprocess.check_output(['docker-compose', 'ps', '--services'],
+                                cwd=DOCKER_PATH,
+                                env=self.env).decode().splitlines()]
+        return services
+
     def restart(self):
         self.stop()
         self.start()

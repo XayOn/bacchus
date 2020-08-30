@@ -15,10 +15,10 @@ class HomeServerApp:
     All common actions (config file placement, docker controls...) go here
     """
     def __init__(self, domain, client, docker_prefix, compose, parent, **kwargs):
-        name = self.__class__.__name__.lower()
+        self.service_name = self.__class__.__name__.lower()
         self.providers = parent.providers
         self.compose = compose
-        self.path = DOCKER_PATH / 'data' / name
+        self.path = DOCKER_PATH / 'data' / self.service_name
         self.domain = domain
         self.meta = kwargs
         self.meta['project_name'] = docker_prefix
@@ -29,23 +29,15 @@ class HomeServerApp:
         self.prefix = docker_prefix
 
     @property
-    def containers(self):
-        """Return a list of all containers associated with current docker"""
-        return {
-            a.name.split('_')[1]: a
-            for a in self.client.containers.list()
-            if a.name.split('_')[0] == self.prefix
-        }
+    def running(self):
+        return self.__class__.__name__.lower() in self.compose.services
+
+    def container_for(self, service_name):
+        return next((a for a in self.client.containers.list() if a.id == self.compose.get_service_id(service_name)))
 
     @property
     def container(self):
-        return self.containers.get(self.__class__.__name__.lower())
-
-    @property
-    def running(self):
-        if not self.container:
-            return False
-        return self.container.status == 'running'
+        return self.container_for(self.service_name)
 
     def wait_for_status(self):
         """Wait for container to start."""
