@@ -50,7 +50,5 @@ class Lidarr(HomeServerApp):
         conn.commit()
         conn.close()
 
-
-
     def setup(self):
         self.setup_nginx()

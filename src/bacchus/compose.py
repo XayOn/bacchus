@@ -13,7 +13,9 @@ class DockerCompose(HomeServerApp):
     """Basic docker compose commands."""
     @property
     def env(self):
-        return {**os.environ, 'COMPOSE_PROJECT_NAME': self.meta['project_name']}
+        return {
+            **os.environ, 'COMPOSE_PROJECT_NAME': self.meta['project_name']
+        }
 
     def create_env_files(self):
         """Create environment files for docker copose"""
@@ -41,9 +43,12 @@ class DockerCompose(HomeServerApp):
         """Start."""
         print(f'starting {self.meta["project_name"]}')
         subprocess.check_output(
-            ['docker-compose', '-p', self.meta['project_name'], 'up', '-d' ],
+            ['docker-compose', '-p', self.meta['project_name'], 'up', '-d'],
             cwd=DOCKER_PATH,
-            env={**os.environ, **self.env})
+            env={
+                **os.environ,
+                **self.env
+            })
 
     def stop(self):
         """Stop."""
@@ -53,14 +58,17 @@ class DockerCompose(HomeServerApp):
 
     def get_service_id(self, name):
         return subprocess.check_output(['docker-compose', 'ps', '-q', name],
-                                cwd=DOCKER_PATH,
-                                env=self.env).strip().decode()
+                                       cwd=DOCKER_PATH,
+                                       env=self.env).strip().decode()
 
     @property
     def services(self):
-        services = [a.strip() for a in subprocess.check_output(['docker-compose', 'ps', '--services'],
-                                cwd=DOCKER_PATH,
-                                env=self.env).decode().splitlines()]
+        services = [
+            a.strip() for a in subprocess.check_output(
+                ['docker-compose', 'ps', '--services'],
+                cwd=DOCKER_PATH,
+                env=self.env).decode().splitlines()
+        ]
         return services
 
     def restart(self):

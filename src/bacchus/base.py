@@ -14,7 +14,8 @@ class HomeServerApp:
 
     All common actions (config file placement, docker controls...) go here
     """
-    def __init__(self, domain, client, docker_prefix, compose, parent, **kwargs):
+    def __init__(self, domain, client, docker_prefix, compose, parent,
+                 **kwargs):
         self.service_name = self.__class__.__name__.lower()
         self.providers = parent.providers
         self.compose = compose
@@ -33,7 +34,8 @@ class HomeServerApp:
         return self.__class__.__name__.lower() in self.compose.services
 
     def container_for(self, service_name):
-        return next((a for a in self.client.containers.list() if a.id == self.compose.get_service_id(service_name)))
+        return next((a for a in self.client.containers.list()
+                     if a.id == self.compose.get_service_id(service_name)))
 
     @property
     def container(self):

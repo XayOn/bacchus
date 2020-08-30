@@ -14,17 +14,19 @@ class CertManager(HomeServerApp):
             self.logger.debug('Setting up certificates with lego')
             try:
                 self.logger.debug(
-                    self.client.containers.run(
-                        'goacme/lego',
-                        command=cmd,
-                        environment={'GANDIV5_API_KEY': self.meta['dns_api_key']},
-                        volumes={
-                            self.path.absolute(): {
-                                'bind': '/.lego',
-                                'mode': 'rw'
-                            }
-                        },
-                        detach=False))
+                    self.client.containers.run('goacme/lego',
+                                               command=cmd,
+                                               environment={
+                                                   'GANDIV5_API_KEY':
+                                                   self.meta['dns_api_key']
+                                               },
+                                               volumes={
+                                                   self.path.absolute(): {
+                                                       'bind': '/.lego',
+                                                       'mode': 'rw'
+                                                   }
+                                               },
+                                               detach=False))
             except Exception as err:
                 print(err)
 
