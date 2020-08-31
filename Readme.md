@@ -28,6 +28,8 @@ You should at least be confortable with docker, linux and a bit on the linux CLI
 - TODO list with nextcloud :heavy_check_mark:
 - Post-its notes and kanban board with nextcloud :heavy_check_mark:
 - Edit online your documents, spreadsheets, full office solution :heavy_check_mark:
+- Setup KODI directly on the machine, that will dually act as an htpc, media
+  server and cloud storage.
 
 ## :computer: How? 
 
