@@ -11,11 +11,15 @@ events {{
 http {{
 
     upstream pihole {{
-	server pihole:80;
+	  server pihole:80;
+    }}
+
+    upstream kodi {{
+      server kodi:8080;
     }}
 
     upstream transmission {{
-	server transmission:9091;
+	  server transmission:9091;
     }}
 
     upstream lidarr {{
@@ -280,6 +284,26 @@ http {{
                 proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
                 proxy_set_header X-Forwarded-Proto $the_scheme;
         }}
+
+    location /kodi {{
+      rewrite /kodi/(.*) /$1  break;
+      proxy_pass         http://kodi;
+      proxy_set_header   Host $host;
+      proxy_set_header   X-Real-IP $remote_addr;
+      proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header   X-Forwarded-Server $host;
+      proxy_set_header   X-Forwarded-Host $server_name;
+    }}
+
+
+    location /jsonrpc {{
+      proxy_pass         http://kodi;
+      proxy_set_header   Host $host;
+      proxy_set_header   X-Real-IP $remote_addr;
+      proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header   X-Forwarded-Server $host;
+      proxy_set_header   X-Forwarded-Host $server_name;
+    }}
 
 	location / {{
 	    proxy_headers_hash_max_size 512;
