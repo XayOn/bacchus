@@ -205,7 +205,8 @@ services:
      image: xayon/docker-kodi-beta:gbm 
      privileged: True
      volumes:
-      - /.data/.kodi_matrix:/root
+      - ./data/kodi_matrix:/root
+      - /dev/bus/usb:/dev/bus/usb
       - /etc/group:/etc/group:ro
       - /etc/passwd:/etc/passwd:ro
       - /etc/shadow:/etc/shadow:ro
