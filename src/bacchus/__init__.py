@@ -1,5 +1,4 @@
 import docker
-# from bacchus.homeassistant import HomeAssistant
 from bacchus.jackett import Jackett
 from bacchus.transmission import Transmission
 from bacchus.lazylibrarian import LazyLibrarian

@@ -26,10 +26,6 @@ http {{
       server jellyfin:8096; 
     }}
 
-    # upstream homeassistant {{
-    #   server homeassistant:8123;
-    # }}
-
     upstream nextcloud {{
       server nextcloud:80;
     }}
