@@ -149,6 +149,7 @@ services:
       - medusa
       - lazylibrarian
       - jackett
+      - kodi
     image: nginx
     restart: always
     stdin_open: true
@@ -199,6 +200,18 @@ services:
     networks:
       - common
     restart: unless-stopped
+  kodi:
+     restart: always
+     image: xayon/docker-kodi-beta:gbm 
+     privileged: True
+     volumes:
+      - ./data/kodi_matrix:/root
+      - /dev/bus/usb:/dev/bus/usb
+      - /etc/group:/etc/group:ro
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/shadow:/etc/shadow:ro
+     ports:
+      - 8080:8080
 
 networks:
   common: 

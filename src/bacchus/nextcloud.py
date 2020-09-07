@@ -15,8 +15,6 @@ class NextCloud(HomeServerApp):
         self.fix_permissions()
         self.logger.debug('Installing nextcloud')
         self.install()
-        self.logger.debug('Creating new user')
-        self.create_users()
         self.logger.debug('Setting up nginx paths')
         self.setup_paths()
         self.logger.debug('Installing external links apps')
@@ -35,11 +33,6 @@ class NextCloud(HomeServerApp):
     def install(self):
         self.occ('maintenance:install', '--data-dir', '/data', '--admin-pass',
                  self.password, '--admin-user', 'admin')
-
-    def create_users(self):
-        self.occ('user:add', '--password-from-env', '--display-name',
-                 self.meta['nextcloud_username'],
-                 self.meta['nextcloud_username'])
 
     def setup_paths(self):
         self.occ('config:system:set', 'overwritewebroot', '--value', '/')

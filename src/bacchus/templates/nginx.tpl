@@ -1,56 +1,28 @@
-user  www-data;
+{%raw%}user  www-data;
 worker_processes  1;
 
 error_log  /var/log/nginx/error.log warn;
 pid        /var/run/nginx.pid;
 
-events {{
+events {
     worker_connections  1024;
-}}
+}
 
-http {{
+http {
+{%endraw%}
 
-    upstream pihole {{
-	server pihole:80;
-    }}
+    {% for service, port in services.items() %}
+    upstream {service} {{
+        server {service}:{port};
+    }} 
 
-    upstream transmission {{
-	server transmission:9091;
-    }}
-
-    upstream lidarr {{
-      server lidarr:8686;
-    }}
-
-    upstream jellyfin {{
-      server jellyfin:8096; 
-    }}
-
-    upstream nextcloud {{
-      server nextcloud:80;
-    }}
-
-    upstream medusa {{
-      server medusa:8081;
-    }}
-
-    upstream lazylibrarian {{
-      server lazylibrarian:5299;
-    }}
-
-    upstream radarr {{
-      server radarr:7878;
-    }}
-
-    upstream jackett {{
-      server jackett:9117;
-    }}
-
-    upstream onlyoffice-document-server {{
+    {% if selected.get('NextCloud') %}{%raw%}
+    upstream onlyoffice-document-server {
       server onlyoffice-document-server; 
-    }}
+    }
+    {%endraw%}{%endif}
 
-
+{%raw%}
     include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
 
@@ -65,30 +37,30 @@ http {{
 
     keepalive_timeout  65;
 
-    map $http_host $this_host {{
+    map $http_host $this_host {
         "" $host;
         default $http_host;
-    }}
+    }
 
-    map $http_x_forwarded_proto $the_scheme {{
+    map $http_x_forwarded_proto $the_scheme {
         default $http_x_forwarded_proto;
         "" $scheme;
-    }}
+    }
 
-    map $http_x_forwarded_host $the_host {{
+    map $http_x_forwarded_host $the_host {
        default $http_x_forwarded_host;
        "" $this_host;
-    }}
+    }
 
 
-    server {{
+    server {
     	listen 80 default_server;
     	listen [::]:80 default_server;
     	server_name _;
     	return 301 https://$host$request_uri;
-    }}
+    }
 
-    server {{
+    server {
 
     listen 443 default_server ssl;
 
@@ -111,192 +83,213 @@ http {{
         ssl_certificate /etc/certs/private.{domain}.crt;
         ssl_certificate_key /etc/certs/private.{domain}.key;
 
-        location = /robots.txt {{
+        location = /robots.txt {
             allow all;
             log_not_found off;
             access_log off;
-        }}
+        }
 
-        location ~ ^/(build|tests|config|lib|3rdparty|templates|data)/ {{
+        location ~ ^/(build|tests|config|lib|3rdparty|templates|data)/ {
             deny all;
-        }}
+        }
 
-        location ~ ^/(?:\.|autotest|occ|issue|indie|db_|console) {{
+        location ~ ^/(?:\.|autotest|occ|issue|indie|db_|console) {
             deny all;
-        }}
+        }
 
         rewrite ^/.well-known/carddav /remote.php/dav/ permanent;
         rewrite ^/.well-known/caldav /remote.php/dav/ permanent;
 
-    location ~* ^/music/ {{
-        rewrite /lidarr/(.*) /$1  break;
-                proxy_pass http://lidarr;
-                proxy_redirect     off;
+        {%endraw%}{% if 'Lidarr' in selected %}{%raw%}
+        location ~* ^/music/ {
+            rewrite /lidarr/(.*) /$1  break;
+            proxy_pass http://lidarr;
+            proxy_redirect     off;
+            client_max_body_size 100m;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
+            proxy_set_header X-Forwarded-Proto $the_scheme;
+        }
+        {%endraw%}{%endif%}
 
-                client_max_body_size 100m;
+        {% if 'Transmission' in selected %}{%raw%}
+        location ^~ /transmission {
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-NginX-Proxy true;
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+            proxy_pass_header X-Transmission-Session-Id;
+            add_header   Front-End-Https   on;
+            
+            location /transmission/rpc {
+                proxy_pass http://transmission;
+            }
+            
+            location /transmission/web/ {
+                proxy_pass http://transmission;
+            }
+            
+            location /transmission/upload {
+                proxy_pass http://transmission;
+            }
+        }
+        {%endraw%}{%endif%}
 
-                proxy_http_version 1.1;
-                proxy_set_header Upgrade $http_upgrade;
-                proxy_set_header Connection "upgrade";
+        {% if 'LazyLibrarian' in selected %}{%raw%}
+        location ~* ^/books/ {
+            rewrite /books/(.*) /$1  break;
+            proxy_pass http://lazylibrarian;
+            proxy_redirect     off;
+            client_max_body_size 100m;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
+            proxy_set_header X-Forwarded-Proto $the_scheme;
+        }
+        {%endraw%}{%endif%}
 
-                proxy_set_header Host $http_host;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
-                proxy_set_header X-Forwarded-Proto $the_scheme;
-        }}
-   
+        {% if 'Radarr' in selected %}{%raw%}
+        location ~* ^/movies/ {
+            proxy_pass http://radarr;
+            proxy_redirect     off;
+            client_max_body_size 100m;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
+            proxy_set_header X-Forwarded-Proto $the_scheme;
+        }
+        {%endraw%}{%endif%}
 
-      location ^~ /transmission {{
-      
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header Host $http_host;
-          proxy_set_header X-NginX-Proxy true;
-          proxy_http_version 1.1;
-          proxy_set_header Connection "";
-          proxy_pass_header X-Transmission-Session-Id;
-          add_header   Front-End-Https   on;
-      
-          location /transmission/rpc {{
-              proxy_pass http://transmission;
-          }}
-      
-          location /transmission/web/ {{
-              proxy_pass http://transmission;
-          }}
-      
-          location /transmission/upload {{
-              proxy_pass http://transmission;
-          }}
-      }}
-
-    location ~* ^/books/ {{
-        rewrite /books/(.*) /$1  break;
-                proxy_pass http://lazylibrarian;
-                proxy_redirect     off;
-
-                client_max_body_size 100m;
-
-                proxy_http_version 1.1;
-                proxy_set_header Upgrade $http_upgrade;
-                proxy_set_header Connection "upgrade";
-
-                proxy_set_header Host $http_host;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
-                proxy_set_header X-Forwarded-Proto $the_scheme;
-        }}
-
-    
-    location ~* ^/movies/ {{
-                proxy_pass http://radarr;
-                proxy_redirect     off;
-
-                client_max_body_size 100m;
-
-                proxy_http_version 1.1;
-                proxy_set_header Upgrade $http_upgrade;
-                proxy_set_header Connection "upgrade";
-
-                proxy_set_header Host $http_host;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
-                proxy_set_header X-Forwarded-Proto $the_scheme;
-    }}
-        
-    location ~* ^/trackers/ {{
+        {% if 'Jackett' in selected %}{%raw%}
+        location ~* ^/trackers/ {
            proxy_pass http://jackett; 
-	   proxy_set_header X-Real-IP $remote_addr;
-	   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-	   proxy_set_header X-Forwarded-Proto $scheme;
-	   proxy_set_header X-Forwarded-Host $http_host;
-	   proxy_redirect off;
-     }}
-   
-    location ~* ^/tv/ {{
-                proxy_pass http://medusa; 
-                proxy_redirect     off;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+           proxy_set_header X-Forwarded-Host $http_host;
+           proxy_redirect off;
+        }
+        {%endraw%}{%endif%}
 
-                client_max_body_size 100m;
+        {% if 'Medusa' in selected %}{%raw%}
+        location ~* ^/tv/ {
+            proxy_pass http://medusa; 
+            proxy_redirect     off;
+            client_max_body_size 100m;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Host $the_host;
+            proxy_set_header X-Forwarded-Proto $the_scheme;
+        }
+        {%endraw%}{%endif%}
 
-                proxy_http_version 1.1;
-                proxy_set_header Upgrade $http_upgrade;
-                proxy_set_header Connection "upgrade";
+        {% if 'Jellyfin' in selected %}{%raw%}
+        location /jellyfin/ {
+            proxy_pass http://jellyfin;
+            proxy_pass_request_headers on;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $http_host;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $http_connection;
+        }
+        {%endraw%}{%endif%}
 
-                proxy_set_header Host $http_host;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Host $the_host;
-                proxy_set_header X-Forwarded-Proto $the_scheme;
-        }}
- 
+        {% if 'PiHole' in selected %}{%raw%}
+        location /pihole/ {
+            proxy_pass http://pihole;
+            proxy_pass_request_headers on;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $http_host;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $http_connection;
+        }
+        {%endraw%}{%endif%}
+        
+        {% if 'NextCloud' in selected %}{%raw%}
+        // NextCloud is actually mandatory
+        location ~* ^/ds-vpath/ {
+            rewrite /ds-vpath/(.*) /$1  break;
+            proxy_pass http://onlyoffice-document-server;
+            proxy_redirect     off;
 
-    location /jellyfin/ {{
-        proxy_pass http://jellyfin;
-        proxy_pass_request_headers on;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $http_host;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $http_connection;
+            client_max_body_size 100m;
 
-    }}
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
 
-    location /pihole/ {{
-	proxy_pass http://pihole;
-        proxy_pass_request_headers on;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $http_host;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $http_connection;
-    }}
-    
-    location ~* ^/ds-vpath/ {{
-        rewrite /ds-vpath/(.*) /$1  break;
-                proxy_pass http://onlyoffice-document-server;
-                proxy_redirect     off;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
+            proxy_set_header X-Forwarded-Proto $the_scheme;
+        }
+        {%endraw%}{%endif%}
 
-                client_max_body_size 100m;
+        {% if 'Kodi' in selected %}{%raw%}
+        location /kodi {
+            rewrite /kodi/(.*) /$1  break;
+            proxy_pass         http://kodi;
+            proxy_set_header   Host $host;
+            proxy_set_header   X-Real-IP $remote_addr;
+            proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header   X-Forwarded-Server $host;
+            proxy_set_header   X-Forwarded-Host $server_name;
+        }
 
-                proxy_http_version 1.1;
-                proxy_set_header Upgrade $http_upgrade;
-                proxy_set_header Connection "upgrade";
+        location /jsonrpc {
+            proxy_pass         http://kodi;
+            proxy_set_header   Host $host;
+            proxy_set_header   X-Real-IP $remote_addr;
+            proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header   X-Forwarded-Server $host;
+            proxy_set_header   X-Forwarded-Host $server_name;
+        }
+        {%endraw%}{%endif%}
 
-                proxy_set_header Host $http_host;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
-                proxy_set_header X-Forwarded-Proto $the_scheme;
-        }}
+        location / {
+            proxy_headers_hash_max_size 512;
+            proxy_headers_hash_bucket_size 64;
 
-	location / {{
-	    proxy_headers_hash_max_size 512;
-	    proxy_headers_hash_bucket_size 64;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
-	    proxy_set_header Host $host;
-	    proxy_set_header X-Forwarded-Proto $scheme;
-	    proxy_set_header X-Real-IP $remote_addr;
-	    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                add_header Content-Security-Policy "None";
+            proxy_hide_header Content-Security-Policy;
 
-            add_header Content-Security-Policy "None";
-	    proxy_hide_header Content-Security-Policy;
+            add_header Front-End-Https on;
+            proxy_pass http://nextcloud/;
+        }
 
-	    add_header Front-End-Https on;
-	    proxy_pass http://nextcloud/;
-	}}
-
-        # Optional: Don't log access to other assets
-        location ~* \.(?:jpg|jpeg|gif|bmp|ico|png|swf)$ {{
+        location ~* \.(?:jpg|jpeg|gif|bmp|ico|png|swf)$ {
             access_log off;
-        }}
-
-    }}
-}}
+        }
+    }
+}
