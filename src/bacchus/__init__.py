@@ -45,16 +45,17 @@ class HomeServerSetup:
         self.client = docker.from_env()
         # tree-like, both compose (wich itself is a provider) and providers
         # need access to each other, so we'd do that trough the parent.
-        self.providers.update(
-            {cls.__name__: cls(domain, self, **kwargs)
+        self.providers = {}
+        self.providers.update({cls.__name__: cls(domain, self, **kwargs)
              for cls in __all__})
 
     def configure(self, provider_name=None, categories=None):
         """Configure given providers."""
+        compose = self.providers['DockerCompose']
 
-        self.compose.copy_template()
-        self.compose.create_env_files()
-        self.compose.start()
+        compose.copy_template()
+        compose.create_env_files()
+        compose.start()
 
         if provider_name:
             providers = [self.providers[provider_name]]
@@ -73,4 +74,4 @@ class HomeServerSetup:
             provider.wait_for_config()
             provider.setup()
 
-        self.compose.restart()
+        compose.restart()

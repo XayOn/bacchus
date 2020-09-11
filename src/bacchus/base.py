@@ -17,6 +17,7 @@ class HomeServerApp:
     def __init__(self, domain, parent, **kwargs):
         self.service_name = self.__class__.__name__.lower()
         self.providers = parent.providers
+        self.parent = parent
         self.path = DOCKER_PATH / 'data' / self.service_name
         self.domain = domain
         self.meta = kwargs

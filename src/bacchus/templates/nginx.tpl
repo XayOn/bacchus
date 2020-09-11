@@ -11,16 +11,17 @@ events {
 http {
 {%endraw%}
 
-    {% for service, port in services.items() %}
-    upstream {service} {{
-        server {service}:{port};
-    }} 
+    {% for service in services %}
+      upstream {{service}} {{ '{' }}
+        server {{service}}:{{services[service]}};
+      {{ '}' }}
+    {%endfor%}
 
-    {% if selected.get('NextCloud') %}{%raw%}
+    {% if 'NextCloud' in selected %}{%raw%}
     upstream onlyoffice-document-server {
       server onlyoffice-document-server; 
     }
-    {%endraw%}{%endif}
+    {%endraw%}{%endif%}
 
 {%raw%}
     include       /etc/nginx/mime.types;
@@ -271,6 +272,7 @@ http {
             proxy_set_header   X-Forwarded-Host $server_name;
         }
         {%endraw%}{%endif%}
+{%raw%}
 
         location / {
             proxy_headers_hash_max_size 512;
@@ -293,3 +295,4 @@ http {
         }
     }
 }
+{%endraw%}
