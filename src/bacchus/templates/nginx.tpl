@@ -80,9 +80,10 @@ http {
         gzip off;
 
         index index.html;
-
-        ssl_certificate /etc/certs/private.{domain}.crt;
-        ssl_certificate_key /etc/certs/private.{domain}.key;
+{%endraw%}
+        ssl_certificate /etc/certs/private.{{domain}}.crt;
+        ssl_certificate_key /etc/certs/private.{{domain}}.key;
+{%raw%}
 
         location = /robots.txt {
             allow all;
