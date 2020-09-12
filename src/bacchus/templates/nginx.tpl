@@ -233,7 +233,6 @@ http {
         {%endraw%}{%endif%}
         
         {% if 'NextCloud' in selected %}{%raw%}
-        // NextCloud is actually mandatory
         location ~* ^/ds-vpath/ {
             rewrite /ds-vpath/(.*) /$1  break;
             proxy_pass http://onlyoffice-document-server;

@@ -140,8 +140,7 @@ class NextCloud(HomeServerApp):
                 dict(user='www-data',
                      stdout=True,
                      demux=False,
-                     stderr=False,
-                     environment={'OC_PASS': self.meta['nextcloud_password']}))
+                     stderr=False))
             result = self.container.exec_run(args, **kwargs)
             self.logger.debug(result)
             return result[1]
