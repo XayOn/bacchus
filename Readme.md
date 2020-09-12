@@ -28,20 +28,35 @@ You should at least be confortable with docker, linux and a bit on the linux CLI
 - TODO list with nextcloud :heavy_check_mark:
 - Post-its notes and kanban board with nextcloud :heavy_check_mark:
 - Edit online your documents, spreadsheets, full office solution :heavy_check_mark:
+- Setup KODI directly on the machine, that will dually act as an htpc, media
+  server and cloud storage.
 
 ## :computer: How? 
 
 **Bacchus sets, configures and manages up the following applications**
 
-- [LazyLibrarian][2] :
-- [Radarr][3]
-- [Lidarr][4]
-- [Medussa][5]
-- [Jackett][6]
-- [Transmission][7]
-- [Nextcloud][8]
-- [OnlyOffice][9]
-- [OpenVPN][10]
+## Media management and download
+
+- [LazyLibrarian][2] (books download and management)
+- [Radarr][3] (movies download and management)
+- [Lidarr][4] (audio download and management)
+- [Medussa][5] (series downloads and management)
+- [Jackett][6] (torrent tracker search management)
+- [Transmission][7] (torrent downloads)
+
+## Media management and playback
+
+- [kodi][12] (media player, tv-like)
+- [Jellyfin][13] (media player, android/web, integration with kodi available)
+
+## Cloud
+
+- [Nextcloud][8] (files, calendar, contacts...)
+- [OnlyOffice][9] (online office suite)
+
+## Utilities
+
+- [OpenVPN][10] (to securely connect to your home server from otside)
 
 And links them inside nextcloud for a seamless user experience. 
 
@@ -66,3 +81,5 @@ See [usage documentation][11] for more.
 [9]: https://onlyoffice.com
 [10]: https://openvpn.net
 [11]: docs/usage.md
+[12]: https://kodi.tv
+[13]: https://jellyfin.org

@@ -5,7 +5,7 @@ class CertManager(HomeServerApp):
     def setup(self):
         cmd = [
             '--dns', 'gandiv5', '-a', '-d', f'private.{self.domain}',
-            '--email', f'{self.meta["nextcloud_username"]}', 'run'
+            '--email', f'{self.meta["email"]}', 'run'
         ]
         if (self.path / 'certificates' /
                 f'private.{self.domain}.key').exists():

@@ -1,4 +1,5 @@
 import json
+from contextlib import suppress
 from functools import lru_cache
 from .base import TEMPLATES
 import sqlite3
@@ -48,13 +49,13 @@ class Radarr(HomeServerApp):
                 num + 1, name, 'Torznab',
                 json.dumps(settings), 'TorznabSettings', 1, 1
             ])
-
-        conn = sqlite3.connect(str((self.path / 'nzbdrone.db').absolute()))
-        cursor = conn.cursor()
-        cursor.executemany('insert into Indexers values (?, ?, ?, ?, ?, ?, ?)',
-                           indexers)
-        conn.commit()
-        conn.close()
+        with suppress(Exception):
+            conn = sqlite3.connect(str((self.path / 'nzbdrone.db').absolute()))
+            cursor = conn.cursor()
+            cursor.executemany('insert into Indexers values (?, ?, ?, ?, ?, ?, ?)',
+                               indexers)
+            conn.commit()
+            conn.close()
 
     def setup(self):
         self.setup_nginx()

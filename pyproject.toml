@@ -17,6 +17,7 @@ docker = "^4.1"
 dns-lexicon = "^3.3.17"
 requests = "^2.22.0"
 netifaces = "^0.10.9"
+jinja2 = "^2.11.2"
 
 [tool.poetry.dev-dependencies]
 netifaces = "^0.10.9"

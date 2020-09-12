@@ -14,20 +14,22 @@ class HomeServerApp:
 
     All common actions (config file placement, docker controls...) go here
     """
-    def __init__(self, domain, client, docker_prefix, compose, parent,
-                 **kwargs):
+    def __init__(self, domain, parent, **kwargs):
         self.service_name = self.__class__.__name__.lower()
         self.providers = parent.providers
-        self.compose = compose
+        self.parent = parent
         self.path = DOCKER_PATH / 'data' / self.service_name
         self.domain = domain
         self.meta = kwargs
-        self.meta['project_name'] = docker_prefix
+        self.meta['project_name'] = 'bacchus'
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.setLevel(logging.DEBUG)
         self.path.mkdir(parents=True, exist_ok=True)
-        self.client = client
-        self.prefix = docker_prefix
+        self.client = parent.client
+
+    @property
+    def compose(self):
+        return self.providers.get('DockerCompose')
 
     @property
     def running(self):

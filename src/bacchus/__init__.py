@@ -1,3 +1,4 @@
+import itertools
 import docker
 from bacchus.jackett import Jackett
 from bacchus.transmission import Transmission
@@ -12,11 +13,22 @@ from bacchus.openvpn import OpenVPN
 from bacchus.jellyfin import Jellyfin
 from bacchus.lazylibrarian import LazyLibrarian
 from bacchus.certificates import CertManager
+from bacchus.kodi import Kodi
+from bacchus.pihole import PiHole
 
 __all__ = [
-    CertManager, Nginx, OpenVPN, NextCloud, Transmission, Jackett, Lidarr,
-    LazyLibrarian, Radarr, Medusa, Jellyfin
+    DockerCompose, CertManager, Nginx, OpenVPN, NextCloud, Transmission,
+    Jackett, Lidarr, LazyLibrarian, Radarr, Medusa, Jellyfin, Kodi, PiHole
 ]
+
+CATEGORIES = {
+    'base': [CertManager, Nginx, OpenVPN, PiHole],
+    'media_download':
+    [Jackett, Lidarr, LazyLibrarian, Radarr, Medusa, Transmission],
+    'media_management': [Jellyfin],
+    'media_player': [Kodi],
+    'cloud': [NextCloud]
+}
 
 
 class HomeServerSetup:
@@ -25,33 +37,41 @@ class HomeServerSetup:
     Not currently extending a CLEO App so this can be extended easily.
     Params are the same as BaseHomeApp class from `base` module.
     """
-    def __init__(self, domain, docker_prefix="bacchus", **kwargs):
+    def __init__(self, domain, **kwargs):
         """Setup providers.
 
-        Kwargs will be inherited as metadata, for example, nextcloud will use the nextcloud_username
-        and nextcloud_password variables
+        Kwargs will be inherited as metadata
         """
-        client = docker.from_env()
+        self.client = docker.from_env()
+        # tree-like, both compose (wich itself is a provider) and providers
+        # need access to each other, so we'd do that trough the parent.
         self.providers = {}
-        self.compose = DockerCompose(domain, client, docker_prefix, None, self,
-                                     **kwargs)
-        self.providers.update({
-            cls.__name__: cls(domain, client, docker_prefix, self.compose,
-                              self, **kwargs)
-            for cls in __all__
-        })
+        self.providers.update({cls.__name__: cls(domain, self, **kwargs)
+             for cls in __all__})
 
-    def configure(self, provider_name=None):
+    def configure(self, provider_name=None, categories=None):
         """Configure given providers."""
+        compose = self.providers['DockerCompose']
+
+        compose.copy_template()
+        compose.create_env_files()
+        compose.start()
+
         if provider_name:
-            return self.providers[provider_name].setup()
+            providers = [self.providers[provider_name]]
+        elif categories:
+            providers = list(
+                itertools.chain.from_iterable(
+                    [CATEGORIES[b] for b in categories]))
+        else:
+            providers = self.providers.values()
 
-        self.compose.copy_template()
-        self.compose.create_env_files()
-        self.compose.start()
+        self.selected_providers = [a.__class__.__name__ for a in providers]
+        self.selected_categories = categories
 
-        for provider in self.providers.values():
+        for provider in providers:
             provider.wait_for_status()
             provider.wait_for_config()
             provider.setup()
-        self.compose.restart()
+
+        compose.restart()
