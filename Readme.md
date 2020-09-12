@@ -1,9 +1,12 @@
 <span style="display:block;text-align:center">[![](https://raw.githubusercontent.com/XayOn/bacchus/develop/docs/bacchus.png)](https://github.com/XayOn/bacchus) </span>
 
+![](https://img.shields.io/pypi/l/bacchus) ![](https://img.shields.io/librariesio/release/pypi/bacchus) ![](https://img.shields.io/pypi/dm/bacchus)
+
 ## Keep your data to yourself
 
 Bacchus helps you configure a set of self-hosted tools that would allow you to
-live without big corporations, while keeping your data secure.
+live without big corporations, while keeping your data secure. Save hours
+setting up your cloud and media services.
 
 All the services will only be available on your home network, a VPN server
 is setup and a client configuration file is automatically issued upon
