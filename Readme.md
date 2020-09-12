@@ -13,12 +13,11 @@ is setup and a client configuration file is automatically issued upon
 installation, so you only need to forward VPN port to the machine where you've
 got bacchus installed trough your router.
 
+![](https://raw.githubusercontent.com/XayOn/bacchus/develop/docs/main.png)
+
 Ultimately, bacchus works around [NextCloud][1], adding custom links inside (as
 iframes) to external tools (like media management and automated
 episode/movies/books downloads)
-
-:warning: :computer: Note that you need a certain technical knowledge to run this.
-You should at least be confortable with docker, linux and a bit on the linux CLI.
 
 ## :computer: What will I get?
 

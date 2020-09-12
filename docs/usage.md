@@ -1,5 +1,8 @@
 # Usage
 
+:warning: :computer: Note that you need a certain technical knowledge to run this.
+You should at least be confortable with docker, linux and a bit on the linux CLI.
+
 To properly use bacchus, you'd need:
 
 - A domain name bought from [ghandi][1]
