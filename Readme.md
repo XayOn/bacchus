@@ -17,21 +17,7 @@ episode/movies/books downloads)
 :warning: :computer: Note that you need a certain technical knowledge to run this.
 You should at least be confortable with docker, linux and a bit on the linux CLI.
 
-## Features
-
-:warning: Note that this is just an installer/bundle of the real tools that make the magic.
-
-- Keep track, download automatically and watch online your favourite movies, tv
-  shows and music :heavy_check_mark: 
-- Download all of them automatically! :heavy_check_mark:
-- Synchronize your calendars, contacts and SMS trough nextcloud :heavy_check_mark:
-- TODO list with nextcloud :heavy_check_mark:
-- Post-its notes and kanban board with nextcloud :heavy_check_mark:
-- Edit online your documents, spreadsheets, full office solution :heavy_check_mark:
-- Setup KODI directly on the machine, that will dually act as an htpc, media
-  server and cloud storage.
-
-## :computer: How? 
+## :computer: What will I get?
 
 **Bacchus sets, configures and manages up the following applications**
 
@@ -70,6 +56,7 @@ pip install --user bacchus
 ```
 
 See [usage documentation][11] for more.
+
 
 [1]: https://github.com/nextcloud/nextcloud
 [2]: https://lazylibrarian.gitlab.io
