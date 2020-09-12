@@ -57,6 +57,7 @@ You should at least be confortable with docker, linux and a bit on the linux CLI
 ## Utilities
 
 - [OpenVPN][10] (to securely connect to your home server from otside)
+- [PiHole][14] (remove internet advertisings)
 
 And links them inside nextcloud for a seamless user experience. 
 
@@ -83,3 +84,4 @@ See [usage documentation][11] for more.
 [11]: docs/usage.md
 [12]: https://kodi.tv
 [13]: https://jellyfin.org
+[14]: https://pi-hole.net/
