@@ -1,6 +1,6 @@
 <span style="display:block;text-align:center">[![](https://raw.githubusercontent.com/XayOn/bacchus/develop/docs/bacchus.png)](https://github.com/XayOn/bacchus) </span>
 
-![](https://img.shields.io/pypi/l/bacchus) ![](https://img.shields.io/librariesio/release/pypi/bacchus) ![](https://img.shields.io/pypi/dm/bacchus) ![](https://img.shields.io/pypi/pyversions/bacchus) ![](https://img.shields.io/pypi/v/bacchus)
+<span style="display:block;text-align:center">![](https://img.shields.io/pypi/l/bacchus) ![](https://img.shields.io/librariesio/release/pypi/bacchus) ![](https://img.shields.io/pypi/dm/bacchus) ![](https://img.shields.io/pypi/pyversions/bacchus) ![](https://img.shields.io/pypi/v/bacchus)</span>
 
 ## Keep your data to yourself
 
