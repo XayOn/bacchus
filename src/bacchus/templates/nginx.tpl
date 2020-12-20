@@ -102,23 +102,6 @@ http {
         rewrite ^/.well-known/carddav /remote.php/dav/ permanent;
         rewrite ^/.well-known/caldav /remote.php/dav/ permanent;
 
-        {%endraw%}{% if 'Lidarr' in selected %}{%raw%}
-        location ~* ^/music/ {
-            rewrite /lidarr/(.*) /$1  break;
-            proxy_pass http://lidarr;
-            proxy_redirect     off;
-            client_max_body_size 100m;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "upgrade";
-            proxy_set_header Host $http_host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
-            proxy_set_header X-Forwarded-Proto $the_scheme;
-        }
-        {%endraw%}{%endif%}
-
         {% if 'Transmission' in selected %}{%raw%}
         location ^~ /transmission {
             proxy_set_header X-Real-IP $remote_addr;
@@ -144,10 +127,41 @@ http {
         }
         {%endraw%}{%endif%}
 
-        {% if 'LazyLibrarian' in selected %}{%raw%}
-        location ~* ^/books/ {
-            rewrite /books/(.*) /$1  break;
-            proxy_pass http://lazylibrarian;
+        {% if 'Sonarr' in selected %}{%raw%}
+        location ~* ^/downloads/tv/ {
+            proxy_pass http://Sonarr;
+            proxy_redirect     off;
+            client_max_body_size 100m;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
+            proxy_set_header X-Forwarded-Proto $the_scheme;
+        }
+        {%endraw%}{%endif%}
+
+        {% if 'Bazaar' in selected %}{%raw%}
+        location ~* ^/downloads/subtitles/ {
+            proxy_pass http://bazaar;
+            proxy_redirect     off;
+            client_max_body_size 100m;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
+            proxy_set_header X-Forwarded-Proto $the_scheme;
+        }
+        {%endraw%}{%endif%}
+
+        {% if 'Readarr' in selected %}{%raw%}
+        location ~* ^/downloads/books/ {
+            proxy_pass http://readarr;
             proxy_redirect     off;
             client_max_body_size 100m;
             proxy_http_version 1.1;
@@ -162,7 +176,7 @@ http {
         {%endraw%}{%endif%}
 
         {% if 'Radarr' in selected %}{%raw%}
-        location ~* ^/movies/ {
+        location ~* ^/downloads/movies/ {
             proxy_pass http://radarr;
             proxy_redirect     off;
             client_max_body_size 100m;
@@ -177,6 +191,24 @@ http {
         }
         {%endraw%}{%endif%}
 
+        {%endraw%}{% if 'Lidarr' in selected %}{%raw%}
+        location ~* ^/downloads/music/ {
+            rewrite /lidarr/(.*) /$1  break;
+            proxy_pass http://lidarr;
+            proxy_redirect     off;
+            client_max_body_size 100m;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Host $the_host/ds-vpath;
+            proxy_set_header X-Forwarded-Proto $the_scheme;
+        }
+        {%endraw%}{%endif%}
+
+
         {% if 'Jackett' in selected %}{%raw%}
         location ~* ^/trackers/ {
            proxy_pass http://jackett; 
@@ -188,9 +220,10 @@ http {
         }
         {%endraw%}{%endif%}
 
-        {% if 'Medusa' in selected %}{%raw%}
-        location ~* ^/tv/ {
-            proxy_pass http://medusa; 
+
+        {% if 'Ubooquity' in selected %}{%raw%}
+        location ~* ^/library/ {
+            proxy_pass http://ubooquity; 
             proxy_redirect     off;
             client_max_body_size 100m;
             proxy_http_version 1.1;

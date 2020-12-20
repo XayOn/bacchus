@@ -1,6 +1,5 @@
 <span style="display:block;text-align:center">[![](https://raw.githubusercontent.com/XayOn/bacchus/develop/docs/bacchus.png)](https://github.com/XayOn/bacchus) </span>
 
-<span style="display:block;text-align:center">![](https://img.shields.io/pypi/l/bacchus) ![](https://img.shields.io/librariesio/release/pypi/bacchus) ![](https://img.shields.io/pypi/dm/bacchus) ![](https://img.shields.io/pypi/pyversions/bacchus) ![](https://img.shields.io/pypi/v/bacchus)</span>
 
 ## Keep your data to yourself
 
@@ -23,14 +22,10 @@ episode/movies/books downloads)
 
 **Bacchus sets, configures and manages up the following applications**
 
-## Media management and download
+## Media download
 
-- [LazyLibrarian][2] (books download and management)
-- [Radarr][3] (movies download and management)
-- [Lidarr][4] (audio download and management)
-- [Medussa][5] (series downloads and management)
-- [Jackett][6] (torrent tracker search management)
-- [Transmission][7] (torrent downloads)
+- The *arrs for media download management ([Radarr][3] (movies download and management), [Lidarr][4] (audio download and management), [Readarr][2] (books download and management) [bazarr][8] (Subtitles downloads), [sonarr][9] (series downloads and management)
+- Torrent management ([Jackett][6] (torrent tracker search management), [Transmission][7] (torrent downloads))
 
 ## Media management and playback
 
@@ -40,12 +35,12 @@ episode/movies/books downloads)
 ## Cloud
 
 - [Nextcloud][8] (files, calendar, contacts...)
-- [OnlyOffice][9] (online office suite)
 
 ## Utilities
 
 - [OpenVPN][10] (to securely connect to your home server from otside)
 - [PiHole][14] (remove internet advertisings)
+- [Watchtower][20] (Manage docker updates)
 
 And links them inside nextcloud for a seamless user experience. 
 
@@ -54,7 +49,7 @@ And links them inside nextcloud for a seamless user experience.
 Bacchus is provided as a python executable, you can, for example, install it with pip as user:
 
 ```bash
-pip install --user bacchus
+pip install bacchus
 ```
 
 See [usage documentation][11] for more.

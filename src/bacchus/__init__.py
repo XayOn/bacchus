@@ -1,31 +1,36 @@
 import itertools
 import docker
-from bacchus.jackett import Jackett
-from bacchus.transmission import Transmission
-from bacchus.lazylibrarian import LazyLibrarian
+from bacchus.compose import DockerCompose
+from bacchus.certificates import CertManager
+
 from bacchus.lidarr import Lidarr
 from bacchus.radarr import Radarr
-from bacchus.medusa import Medusa
+from bacchus.readarr import Readarr
+from bacchus.sonarr import Sonarr
+from bacchus.bazarr import Bazarr
+
 from bacchus.nextcloud import NextCloud
 from bacchus.nginx import Nginx
-from bacchus.compose import DockerCompose
+
+from bacchus.jackett import Jackett
+from bacchus.transmission import Transmission
 from bacchus.openvpn import OpenVPN
-from bacchus.jellyfin import Jellyfin
-from bacchus.lazylibrarian import LazyLibrarian
-from bacchus.certificates import CertManager
-from bacchus.kodi import Kodi
 from bacchus.pihole import PiHole
 
+from bacchus.jellyfin import Jellyfin
+from bacchus.ubooquity import Ubooquity
+from bacchus.homer import Homer
+from bacchus.kodi import Kodi
+
 __all__ = [
-    DockerCompose, CertManager, Nginx, OpenVPN, NextCloud, Transmission,
-    Jackett, Lidarr, LazyLibrarian, Radarr, Medusa, Jellyfin, Kodi, PiHole
+    DockerCompose, CertManager, Lidarr, Radarr, Readarr, Sonarr, Bazarr, NextCloud, Nginx, 
+    Jackett, Transmission, OpenVPN, PiHole, Jellyfin, Kodi, Ubooquity, Homer
 ]
 
 CATEGORIES = {
-    'base': [CertManager, Nginx, OpenVPN, PiHole],
-    'media_download':
-    [Jackett, Lidarr, LazyLibrarian, Radarr, Medusa, Transmission],
-    'media_management': [Jellyfin],
+    'base': [CertManager, Nginx, OpenVPN, PiHole, Homer],
+    'media_download': [Lidarr, Radarr, Readarr, Sonarr, Bazarr, Transmission, Jackett],
+    'media_management': [Jellyfin, Ubooquity],
     'media_player': [Kodi],
     'cloud': [NextCloud]
 }

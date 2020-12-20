@@ -1,15 +1,13 @@
 version: '3'
 services:
   jellyfin:
-    image: linuxserver/jellyfin
+    image: ghcr.io/linuxserver/jellyfin 
     volumes:
       - ./data/jellyfin:/config
-      - ./data/media/tv:/data/tvshows
-      - ./data/media/movies:/data/movies
-      - ./data/media/books:/data/books
-      - ./data/media/music:/data/music
-    ports:
-      - 8096:8096
+      - ./media/tv:/data/tvshows
+      - ./media/movies:/data/movies
+      - ./media/books:/data/books
+      - ./media/music:/data/music
     devices:
       - /dev/dri:/dev/dri 
     networks:
@@ -17,128 +15,74 @@ services:
     env_file:
       - .env_general
     restart: unless-stopped
-  medusa:
-    restart: always
-    image: linuxserver/medusa
-    networks:
-      - common
-    volumes:
-      - ./data/medusa:/config
-      - ./data/media/tv:/tv
-      - ./data/downloads/complete:/downloads
+  bazarr:
+    image: ghcr.io/linuxserver/bazarr
     env_file:
       - .env_general
-    ports:
-      - 8081:8081 
-    restart: always 
+    volumes:
+      - ./data/bazarr:/config
+      - ./media/tv:/tv
+      - ./media/movies:/movies
+    restart: unless-stopped
     networks:
       - common
-  openvpn:
-    cap_add:
-      - NET_ADMIN
-    image: kylemanna/openvpn
-    ports:
-       - "1194:1194/udp"
-    restart: always
-    volumes:
-      - ./data/openvpn/:/etc/openvpn
   radarr:
     restart: always
-    image: linuxserver/radarr
+    image: ghcr.io/linuxserver/radarr
     networks:
       - common
     env_file:
       - .env_general
     volumes:
       - ./data/radarr:/config
-      - ./data/media/movies:/movies
+      - ./media/movies:/movies
       - ./data/downloads/:/downloads
-    ports:
-      - 7878:7878 
     restart: unless-stopped
-  lazylibrarian:
-    image: thraxis/lazylibrarian-calibre
-    restart: always
-    networks:
-      - common
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/London
-    volumes:
-      - ./data/lazylibrarian:/config
-      - ./data/downloads/complete/:/downloads/complete
-      - ./data/media/books:/books
-      - ./data/media/audiobooks:/audiobooks
-      - ./data/media/magazines:/magazines
-      - ./data/media/comics:/comics
-    ports:
-      - 5299:5299 
-    restart: unless-stopped
-
   lidarr:
-    image: linuxserver/lidarr
+    image: ghcr.io/linuxserver/lidarr
     restart: always
+    env_file:
+      - .env_general
     networks:
       - common
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/London
     volumes:
       - ./data/lidarr:/config
-      - ./data/media/music:/music
+      - ./media/music:/music
       - ./data/downloads/:/downloads
-    ports:
-      - 8686:8686 
     restart: unless-stopped
-  jackett:
-    image: linuxserver/jackett
-    restart: always
+  readarr:
+    image: hotio/readarr:nightly
+    env_file:
+      - .env_general
+    volumes:
+      - ./data/readarr:/config
+      - ./media/books:/books
+      - ./data/downloads/complete:/downloads
     networks:
       - common
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/London
-    volumes:
-      - ./data/jackett:/config
-      - ./data/downloads/complete:/downloads
-    ports:
-      - 9117:9117
     restart: unless-stopped
-
+  sonarr:
+    image: ghcr.io/linuxserver/sonarr
+    env_file:
+      - .env_general
+    volumes:
+      - ./data/sonarr:/config
+      - ./media/tv:/tv
+      - ./data/downloads/complete:/downloads
+    restart: unless-stopped
   nextcloud:
     image: nextcloud:latest
     restart: always
-    expose:
-      - '80'
     networks:
       - common
     volumes:
-      - ./data/media/nextcloud/:/data/
+      - ./media/nextcloud/:/data/
     env_file:
       - .env_nextcloud
       - .env_general
-  onlyoffice-document-server:
-    image: onlyoffice/documentserver:latest
-    restart: always
-    stdin_open: true
-    tty: true
-    restart: always
-    env_file:
-      - .env_general
-    networks:
-      - common 
-    expose:
-      - '80'
-      - '443'
-    volumes:
-      - document_data:/var/www/onlyoffice/Data
-      - document_log:/var/log/onlyoffice
+
   nginx:
     depends_on: 
-      - onlyoffice-document-server
       - pihole
       - transmission
       - lidarr
@@ -146,7 +90,6 @@ services:
       - radarr
       - nextcloud
       - medusa
-      - lazylibrarian
       - jackett
       - kodi
     image: nginx
@@ -166,8 +109,19 @@ services:
       - .env_general
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
 
+  jackett:
+    image: ghcr.io/linuxserver/jackett
+    restart: always
+    env_file:
+      - .env_general
+    networks:
+      - common
+    volumes:
+      - ./data/jackett:/config
+      - ./data/downloads/complete:/downloads
+    restart: unless-stopped
   transmission:
-    image: linuxserver/transmission
+    image: ghcr.io/linuxserver/transmission
     restart: always
     networks:
       - common
@@ -180,6 +134,32 @@ services:
       - ./data/transmission/config:/config
       - ./data/downloads:/downloads
     restart: unless-stopped
+
+  kodi:
+    restart: always
+    image: xayon/docker-kodi-beta:gbm 
+    privileged: True
+    volumes:
+     - ./data/kodi_matrix:/root
+     - /dev/bus/usb:/dev/bus/usb
+     - /etc/group:/etc/group:ro
+     - /etc/passwd:/etc/passwd:ro
+     - /etc/shadow:/etc/shadow:ro
+    ports:
+     - 8080:8080
+    networks:
+     - common 
+
+  openvpn:
+    cap_add:
+      - NET_ADMIN
+    image: kylemanna/openvpn
+    ports:
+       - "1194:1194/udp"
+    restart: always
+    volumes:
+      - ./data/openvpn/:/etc/openvpn
+
   pihole:
     image: pihole/pihole:latest
     ports:
@@ -199,20 +179,18 @@ services:
     networks:
       - common
     restart: unless-stopped
-  kodi:
-    restart: always
-    image: xayon/docker-kodi-beta:gbm 
-    privileged: True
+  ubooquity:
+    image: ghcr.io/linuxserver/ubooquity
+    env_file:
+      - .env_general
     volumes:
-     - ./data/kodi_matrix:/root
-     - /dev/bus/usb:/dev/bus/usb
-     - /etc/group:/etc/group:ro
-     - /etc/passwd:/etc/passwd:ro
-     - /etc/shadow:/etc/shadow:ro
-    ports:
-     - 8080:8080
-    networks:
-     - common 
+      - ./data/ubooquity:/config
+      - ./media/books/:/books
+      - ./media/comics/:/comics
+    restart: unless-stopped
+  homer:
+    volumes:
+      - ./data/:/www/assets
 
 networks:
   common: 
