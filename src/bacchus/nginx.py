@@ -11,16 +11,23 @@ class Nginx(HomeServerApp):
         template = Template((TEMPLATES / 'nginx.tpl').read_text())
 
         services = {
-            'Transmission': ["transmission", "9091"],
             'Lidarr': ["lidarr", "8686"],
-            'Jellyfin': ["jellyfin", "8096"],
-            'NextCloud': ["nextcloud", "80"],
-            'Medusa': ["medusa", "8081"],
-            'LazyLibrarian': ["lazylibrarian", "5299"],
             'Radarr': ["radarr", "7878"],
+            'Readarr': ["readarr", "8787"],
+            'Sonarr': ["sonarr", "8989"],
+            'Bazarr': ["bazarr", "6767"],
+
+            'NextCloud': ["nextcloud", "80"],
+
             'Jackett': ["jackett", "9117"],
-            'Kodi': ['kodi', '8080'],
+            'Transmission': ["transmission", "9091"],
             'PiHole': ['pihole', '80']
+
+            'Jellyfin': ["jellyfin", "8096"],
+            'Ubooquity': ["ubooquity", "2202"],
+            'Homer': ["homer", "8080"],
+            'Kodi': ['kodi', '8080'],
+
         }
 
         context = dict(domain=self.domain,

@@ -251,6 +251,22 @@ http {
         }
         {%endraw%}{%endif%}
 
+        {% if 'Homer' in selected %}{%raw%}
+        location /home/ {
+            proxy_pass http://homer;
+            proxy_pass_request_headers on;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $http_host;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $http_connection;
+        }
+        {%endraw%}{%endif%}
+
+
+
         {% if 'PiHole' in selected %}{%raw%}
         location /pihole/ {
             proxy_pass http://pihole;
