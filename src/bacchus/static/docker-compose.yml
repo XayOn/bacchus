@@ -176,6 +176,22 @@ services:
       - com.centurylinklabs.watchtower.enable=true
     env_file:
       - .env_general
+  ubooquity:
+    image: ghcr.io/linuxserver/ubooquity
+    restart: always
+    env_file:
+      - .env_general
+    volumes:
+      - ./data/ubooquity:/config
+      - ./data/media/books/:/books
+      - ./data/media/comics/:/comics
+    # TODO: Admin iface
+    labels:
+      - traefik.http.routers.ubooquity.rule=Host(`private.dionysos.tech`) && PathPrefix(`/ubooquity`)
+      - traefik.http.routers.ubooquity.tls=true
+      - traefik.http.routers.ubooquity.tls.certresolver=letsencrypt
+      - traefik.http.services.ubooquity.loadbalancer.server.port=2202
+      - com.centurylinklabs.watchtower.enable=true
   nextcloud:
     image: nextcloud:latest
     restart: always
