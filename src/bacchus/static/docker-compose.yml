@@ -129,6 +129,21 @@ services:
       - com.centurylinklabs.watchtower.enable=true
     env_file:
       - .env_general
+  readarr:
+    image: ghcr.io/linuxserver/readarr
+    restart: always
+    volumes:
+      - ./data/readarr:/config
+      - ./media/movies:/movies
+      - ./data/downloads/complete:/downloads
+    labels:
+      - traefik.http.routers.readarr.rule=Host(`private.dionysos.tech`) && PathPrefix(`/readarr`)
+      - traefik.http.routers.readarr.tls=true
+      - traefik.http.routers.readarr.tls.certresolver=letsencrypt
+      - traefik.http.services.readarr.loadbalancer.server.port=7878
+      - com.centurylinklabs.watchtower.enable=true
+    env_file:
+      - .env_general
   radarr:
     image: ghcr.io/linuxserver/radarr
     restart: always
@@ -176,22 +191,6 @@ services:
       - com.centurylinklabs.watchtower.enable=true
     env_file:
       - .env_general
-  ubooquity:
-    image: ghcr.io/linuxserver/ubooquity
-    restart: always
-    env_file:
-      - .env_general
-    volumes:
-      - ./data/ubooquity:/config
-      - ./data/media/books/:/books
-      - ./data/media/comics/:/comics
-    # TODO: Admin iface
-    labels:
-      - traefik.http.routers.ubooquity.rule=Host(`private.dionysos.tech`) && PathPrefix(`/ubooquity`)
-      - traefik.http.routers.ubooquity.tls=true
-      - traefik.http.routers.ubooquity.tls.certresolver=letsencrypt
-      - traefik.http.services.ubooquity.loadbalancer.server.port=2202
-      - com.centurylinklabs.watchtower.enable=true
   nextcloud:
     image: nextcloud:latest
     restart: always
@@ -218,6 +217,22 @@ services:
       - com.centurylinklabs.watchtower.enable=true
     volumes:
       - ./data/redis:/data
+  ubooquity:
+    image: ghcr.io/linuxserver/ubooquity
+    restart: always
+    env_file:
+      - .env_general
+    volumes:
+      - ./data/ubooquity:/config
+      - ./data/media/books/:/books
+      - ./data/media/comics/:/comics
+    # TODO: Admin iface
+    labels:
+      - traefik.http.routers.ubooquity.rule=Host(`private.dionysos.tech`) && PathPrefix(`/ubooquity`)
+      - traefik.http.routers.ubooquity.tls=true
+      - traefik.http.routers.ubooquity.tls.certresolver=letsencrypt
+      - traefik.http.services.ubooquity.loadbalancer.server.port=2202
+      - com.centurylinklabs.watchtower.enable=true
   nextcloud:
     image: nextcloud:latest
     restart: always
