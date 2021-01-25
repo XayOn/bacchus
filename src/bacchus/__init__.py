@@ -1,26 +1,32 @@
 import itertools
 import docker
-from bacchus.jackett import Jackett
-from bacchus.transmission import Transmission
+from bacchus.compose import DockerCompose
+
 from bacchus.lidarr import Lidarr
 from bacchus.radarr import Radarr
+from bacchus.readarr import Readarr
 from bacchus.sonarr import Sonarr
+from bacchus.ubooquity import Ubooquity
+
 from bacchus.nextcloud import NextCloud
-from bacchus.compose import DockerCompose
+
+from bacchus.jackett import Jackett
+from bacchus.transmission import Transmission
 from bacchus.openvpn import OpenVPN
+from bacchus.pihole import PiHole
+
 from bacchus.jellyfin import Jellyfin
 from bacchus.kodi import Kodi
 
 __all__ = [
-    DockerCompose, OpenVPN, NextCloud, Transmission,
-    Jackett, Lidarr, Sonarr, Radarr, Jellyfin, Kodi
+    DockerCompose, Lidarr, Radarr, Readarr, Sonarr, NextCloud, Jackett,
+    Transmission, OpenVPN, PiHole, Jellyfin, Kodi
 ]
 
 CATEGORIES = {
-    'base': [OpenVPN],
-    'media_download':
-    [Jackett, Lidarr, Radarr, Sonarr, Transmission],
-    'media_management': [Jellyfin],
+    'base': [OpenVPN, PiHole],
+    'media_download': [Lidarr, Radarr, Readarr, Sonarr, Transmission, Jackett],
+    'media_management': [Jellyfin, Ubooquity],
     'media_player': [Kodi],
     'cloud': [NextCloud]
 }
@@ -40,16 +46,18 @@ class HomeServerSetup:
         self.client = docker.from_env()
         # tree-like, both compose (wich itself is a provider) and providers
         # need access to each other, so we'd do that trough the parent.
+        self.providers = {}
         self.providers.update(
             {cls.__name__: cls(domain, self, **kwargs)
              for cls in __all__})
 
     def configure(self, provider_name=None, categories=None):
         """Configure given providers."""
+        compose = self.providers['DockerCompose']
 
-        self.compose.copy_template()
-        self.compose.create_env_files()
-        self.compose.start()
+        compose.copy_template()
+        compose.create_env_files()
+        compose.start()
 
         if provider_name:
             providers = [self.providers[provider_name]]
@@ -60,9 +68,12 @@ class HomeServerSetup:
         else:
             providers = self.providers.values()
 
+        self.selected_providers = [a.__class__.__name__ for a in providers]
+        self.selected_categories = categories
+
         for provider in providers:
             provider.wait_for_status()
             provider.wait_for_config()
             provider.setup()
 
-        self.compose.restart()
+        compose.restart()

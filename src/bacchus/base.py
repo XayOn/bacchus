@@ -1,6 +1,5 @@
 from pathlib import Path
 from time import sleep
-import docker
 import logging
 
 TEMPLATES = Path(__file__).parent / 'static'
@@ -17,6 +16,7 @@ class HomeServerApp:
     def __init__(self, domain, parent, **kwargs):
         self.service_name = self.__class__.__name__.lower()
         self.providers = parent.providers
+        self.parent = parent
         self.path = DOCKER_PATH / 'data' / self.service_name
         self.domain = domain
         self.meta = kwargs
@@ -50,7 +50,7 @@ class HomeServerApp:
             sleep(1)
 
     def wait_for_config(self):
-        """If we are waiting for a configuration file to be written, wait for it."""
+        """Wait for config to be created."""
         self.logger.debug(f'Waiting for {self.__class__.__name__} config')
         if hasattr(self, "config_file"):
             while not self.config_file.exists():

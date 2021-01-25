@@ -45,7 +45,7 @@ class NextCloud(HomeServerApp):
             self.occ('app:install', app)
 
     def install_external_links(self):
-        """Install top links to all the rest of apps, to centralice everything on nextcloud"""
+        """Install top links to all the rest of apps"""
         self.occ('app:install', 'external')
         self.occ(
             'config:app:set', 'external', 'sites', '--value',
@@ -92,10 +92,9 @@ class NextCloud(HomeServerApp):
                 dict(user='www-data',
                      stdout=True,
                      demux=False,
-                     stderr=False,
-                     environment={'OC_PASS': self.meta['nextcloud_password']}))
+                     stderr=False))
             result = self.container.exec_run(args, **kwargs)
             self.logger.debug(result)
             return result[1]
-        except:
+        except Exception:
             self.logger.exception('could not execute command')

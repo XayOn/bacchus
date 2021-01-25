@@ -1,8 +1,8 @@
 from .arr import Arr
 
 
-class Lidarr(Arr):
-    base_path = '/lidarr'
+class Readarr(Arr):
+    base_path = '/readarr'
 
     def settings(self, base_url, api_key):
         cats = [

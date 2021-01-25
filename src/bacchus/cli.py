@@ -21,8 +21,7 @@ class InstallCommand(Command):
                                 email=self.argument('email'),
                                 iface=self.argument('iface'),
                                 dns_api_key=self.argument('dns'))
-
-        setup.configure(self.argument('provider'))
+        setup.configure(self.option('provider'), self.option('categories'))
 
 
 def main():

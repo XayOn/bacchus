@@ -29,8 +29,12 @@ class DockerCompose(HomeServerApp):
     """)
 
     def copy_template(self):
-        shutil.copyfile((TEMPLATES / 'docker-compose.yml').as_posix(),
-                        (DOCKER_PATH / 'docker-compose.yml').as_posix())
+        compose = (TEMPLATES / 'docker-compose.yml').read_text()
+        if not Path('/dev/dri').exists():
+            compose = compose.replace(""" devices:
+      - /dev/dri:/dev/dri""", '')
+        (DOCKER_PATH / 'docker-compose.yml').write_text(compose)
+
 
     def start(self):
         """Start."""
@@ -53,6 +57,11 @@ class DockerCompose(HomeServerApp):
         return subprocess.check_output(['docker-compose', 'ps', '-q', name],
                                        cwd=DOCKER_PATH,
                                        env=self.env).strip().decode()
+    def wait_for_status(self):
+        pass
+
+    def setup(self):
+        pass
 
     @property
     def services(self):

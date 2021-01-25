@@ -1,0 +1,16 @@
+Project rewrite with traefik
+----------------------------
+
+Some of this project (mostly the nginx and certmanager parts) may be simplified
+by adding traefik to the mix on the docker-compose
+
+
+New services
+------------
+
+Some useful services:
+
+- Watchtower
+- 
+
+Also

@@ -23,18 +23,10 @@ class Arr:
         for num, name in enumerate((a.stem.lower() for a in indexer_files)):
             base_url = (f"https://private.{self.domain}/trackers/api/v2.0/"
                         f"indexers/{name}/results/torznab/")
-            categories = [3000, 3010, 3020, 3030, 3040]
-            settings = {
-                "minimumSeeders": 1,
-                "baseUrl": base_url,
-                "apiKey": api_key,
-                "apiPath": "/api",
-                "seedCriteria": "{}",
-                "categories": categories,
-            }
             indexers.append([
                 num + 1, name, 'Torznab',
-                json.dumps(settings), 'TorznabSettings', 1, 1, 1
+                json.dumps(self.settings(base_url, api_key)),
+                'TorznabSettings', 1, 1, 1
             ])
 
         conn = sqlite3.connect(str((self.path / 'nzbdrone.db').absolute()))
