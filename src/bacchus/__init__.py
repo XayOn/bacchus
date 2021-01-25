@@ -2,28 +2,24 @@ import itertools
 import docker
 from bacchus.jackett import Jackett
 from bacchus.transmission import Transmission
-from bacchus.lazylibrarian import LazyLibrarian
 from bacchus.lidarr import Lidarr
 from bacchus.radarr import Radarr
-from bacchus.medusa import Medusa
+from bacchus.sonarr import Sonarr
 from bacchus.nextcloud import NextCloud
-from bacchus.nginx import Nginx
 from bacchus.compose import DockerCompose
 from bacchus.openvpn import OpenVPN
 from bacchus.jellyfin import Jellyfin
-from bacchus.lazylibrarian import LazyLibrarian
-from bacchus.certificates import CertManager
 from bacchus.kodi import Kodi
 
 __all__ = [
-    DockerCompose, CertManager, Nginx, OpenVPN, NextCloud, Transmission,
-    Jackett, Lidarr, LazyLibrarian, Radarr, Medusa, Jellyfin, Kodi
+    DockerCompose, OpenVPN, NextCloud, Transmission,
+    Jackett, Lidarr, Sonarr, Radarr, Jellyfin, Kodi
 ]
 
 CATEGORIES = {
-    'base': [CertManager, Nginx, OpenVPN],
+    'base': [OpenVPN],
     'media_download':
-    [Jackett, Lidarr, LazyLibrarian, Radarr, Medusa, Transmission],
+    [Jackett, Lidarr, Radarr, Sonarr, Transmission],
     'media_management': [Jellyfin],
     'media_player': [Kodi],
     'cloud': [NextCloud]

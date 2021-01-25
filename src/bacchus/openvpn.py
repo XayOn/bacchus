@@ -1,6 +1,5 @@
 import netifaces as ni
 from contextlib import suppress
-from pathlib import Path
 from bacchus.base import HomeServerApp
 
 import requests
@@ -26,18 +25,18 @@ class OpenVPN(HomeServerApp):
             response = self.run('ovpn_getclient',
                                 self.meta['nextcloud_username'])
             (self.path / '..' / 'openvpn_client.conf').write_bytes(response)
-        except Exception as err:
+        except Exception:
             self.logger.exception('could not create openvpn config')
 
         try:
             self.fix_dns_config_pihole()
-        except Exception as err:
+        except Exception:
             self.logger.exception('cant_dns_pihole')
 
     def fix_dns_config_pihole(self):
         server_config = [
             a for a in (self.path / 'openvpn.conf').open().readlines()
-            if not 'dhcp-option DNS' in a
+            if 'dhcp-option DNS' not in a
         ] + ['push "dhcp-option DNS 127.0.0.1"']
         (self.path / 'openvpn.conf').write_text('\n'.join(server_config))
 

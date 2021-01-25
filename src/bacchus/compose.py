@@ -1,4 +1,3 @@
-from pathlib import Path
 import os
 import shutil
 import subprocess
@@ -19,7 +18,6 @@ class DockerCompose(HomeServerApp):
 
     def create_env_files(self):
         """Create environment files for docker copose"""
-        root_pwd = uuid.uuid4().hex
         nextcloud_passwd = uuid.uuid4().hex
         (DOCKER_PATH / '.env_general').write_text(f"""PID={os.geteuid()}
     PUID={os.geteuid()}
@@ -33,11 +31,6 @@ class DockerCompose(HomeServerApp):
     def copy_template(self):
         shutil.copyfile((TEMPLATES / 'docker-compose.yml').as_posix(),
                         (DOCKER_PATH / 'docker-compose.yml').as_posix())
-
-        # Hack to allow nginx docker config mount
-        nginx_path = DOCKER_PATH / 'data' / 'nginx'
-        nginx_path.mkdir(exist_ok=True, parents=True)
-        (nginx_path / 'nginx.conf').write_text('')
 
     def start(self):
         """Start."""

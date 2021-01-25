@@ -3,7 +3,7 @@ from time import sleep
 import docker
 import logging
 
-TEMPLATES = Path(__file__).parent / 'templates'
+TEMPLATES = Path(__file__).parent / 'static'
 DOCKER_PATH = Path(__file__).parent.parent.parent / 'docker'
 
 logging.basicConfig(level=logging.INFO)
