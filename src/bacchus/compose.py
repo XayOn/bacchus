@@ -30,6 +30,7 @@ NEXTCLOUD_UPDATE=1"""
         (DOCKER_PATH / '.env_general').write_text(gen)
         (DOCKER_PATH / '.env_traefik').write_text(gandi)
         (DOCKER_PATH / '.env_nextcloud').write_text(nextcloud)
+        (DOCKER_PATH / '.env_mariadb').write_text('')
 
     def copy_template(self):
         compose = (TEMPLATES / 'docker-compose.yml').read_text()
