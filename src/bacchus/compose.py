@@ -2,6 +2,7 @@ import os
 import shutil
 import subprocess
 import uuid
+from pathlib import Path
 
 from .base import HomeServerApp
 from .base import DOCKER_PATH
@@ -19,22 +20,26 @@ class DockerCompose(HomeServerApp):
     def create_env_files(self):
         """Create environment files for docker copose"""
         nextcloud_passwd = uuid.uuid4().hex
-        (DOCKER_PATH / '.env_general').write_text(f"""PID={os.geteuid()}
-    PUID={os.geteuid()}
-    PGID={os.getegid()}""")
-        (DOCKER_PATH /
-         '.env_nextcloud').write_text(f"""NEXTCLOUD_ADMIN_USER=admin
-    NEXTCLOUD_ADMIN_PASSWORD={nextcloud_passwd}
-    NEXTCLOUD_UPDATE=1
-    """)
+
+        gen = f"PID={os.geteuid()}\nPUID={os.geteuid()}\nPGID={os.getegid()}"
+        gandi = f"GANDIV5_API_KEY={self.meta['dns_api_key']}"
+        nextcloud = f"""NEXTCLOUD_ADMIN_USER=admin
+NEXTCLOUD_ADMIN_PASSWORD={nextcloud_passwd}
+NEXTCLOUD_UPDATE=1"""
+
+        (DOCKER_PATH / '.env_general').write_text(gen)
+        (DOCKER_PATH / '.env_traefik').write_text(gandi)
+        (DOCKER_PATH / '.env_nextcloud').write_text(nextcloud)
 
     def copy_template(self):
         compose = (TEMPLATES / 'docker-compose.yml').read_text()
+        compose = compose.replace('EMAIL', self.meta['nextcloud_username'])
+        compose = compose.replace('HOST', self.domain)
         if not Path('/dev/dri').exists():
-            compose = compose.replace(""" devices:
+            compose = compose.replace(
+                """ devices:
       - /dev/dri:/dev/dri""", '')
         (DOCKER_PATH / 'docker-compose.yml').write_text(compose)
-
 
     def start(self):
         """Start."""
@@ -42,10 +47,7 @@ class DockerCompose(HomeServerApp):
         subprocess.check_output(
             ['docker-compose', '-p', self.meta['project_name'], 'up', '-d'],
             cwd=DOCKER_PATH,
-            env={
-                **os.environ,
-                **self.env
-            })
+            env=dict(**os.environ, **self.env))
 
     def stop(self):
         """Stop."""
@@ -57,6 +59,7 @@ class DockerCompose(HomeServerApp):
         return subprocess.check_output(['docker-compose', 'ps', '-q', name],
                                        cwd=DOCKER_PATH,
                                        env=self.env).strip().decode()
+
     def wait_for_status(self):
         pass
 
