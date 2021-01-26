@@ -1,11 +1,11 @@
 import json
 from functools import lru_cache
-from .base import TEMPLATES
+from .base import TEMPLATES, HomeServerApp
 import sqlite3
 import xml.etree.ElementTree as ET
 
 
-class Arr:
+class Arr(HomeServerApp):
     @property
     def config_file(self):
         return self.path / 'config.xml'
