@@ -21,9 +21,9 @@ class OpenVPN(HomeServerApp):
             with suppress(Exception):
                 self.logger.debug(
                     self.run('easyrsa', 'build-client-full',
-                             self.meta['nextcloud_username'], 'nopass'))
+                             self.meta['email'], 'nopass'))
             response = self.run('ovpn_getclient',
-                                self.meta['nextcloud_username'])
+                                self.meta['email'])
             (self.path / '..' / 'openvpn_client.conf').write_bytes(response)
         except Exception:
             self.logger.exception('could not create openvpn config')

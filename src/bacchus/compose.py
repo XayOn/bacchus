@@ -33,7 +33,7 @@ NEXTCLOUD_UPDATE=1"""
 
     def copy_template(self):
         compose = (TEMPLATES / 'docker-compose.yml').read_text()
-        compose = compose.replace('EMAIL', self.meta['nextcloud_username'])
+        compose = compose.replace('EMAIL', self.meta['email'])
         compose = compose.replace('HOST', self.domain)
         if not Path('/dev/dri').exists():
             compose = compose.replace(
@@ -47,7 +47,7 @@ NEXTCLOUD_UPDATE=1"""
         subprocess.check_output(
             ['docker-compose', '-p', self.meta['project_name'], 'up', '-d'],
             cwd=DOCKER_PATH,
-            env=dict(**os.environ, **self.env))
+            env={**os.environ, **self.env})
 
     def stop(self):
         """Stop."""
