@@ -34,6 +34,7 @@ class OpenVPN(HomeServerApp):
             a for a in (self.path / 'openvpn.conf').open().readlines()
             if 'dhcp-option DNS' not in a
         ] + ['push "dhcp-option DNS 127.0.0.1"']
+        # TODO: Use docker cp or api...
         (self.path / 'openvpn.conf').write_text('\n'.join(server_config))
 
     def run(self, *cmd):

@@ -191,13 +191,6 @@ services:
       - com.centurylinklabs.watchtower.enable=true
     env_file:
       - .env_general
-  nextcloud:
-    image: nextcloud:latest
-    restart: always
-    networks:
-      - common
-    volumes:
-      - ./media/nextcloud/:/data/
   mariadb:
     image: mariadb:10
     restart: always
@@ -242,7 +235,9 @@ services:
       - traefik
       - watchtower
     volumes:
-      - ./data/nextcloud/html:/var/www/html
+      - ./data/nextcloud/:/data
+    env_file:
+      - .env_general
     labels:
       - traefik.enable=true
       - traefik.http.middlewares.nextcloud-caldav.redirectregex.permanent=true
