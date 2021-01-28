@@ -6,17 +6,14 @@ from .base import TEMPLATES
 
 
 class Jackett(HomeServerApp):
-    def setup(self):
-        self.container.stop()
+    def setup_first_step(self):
         config = self.path / 'Jackett' / 'ServerConfig.json'
         result = json.load(config.open('r'))
+        indexers_path = (self.path / 'Jackett' / 'Indexers')
+
         result['BasePathOverride'] = '/jackett'
         json.dump(result, config.open('w'))
-        self.copy_indexers()
-        self.compose.start()
 
-    def copy_indexers(self):
-        indexers_path = (self.path / 'Jackett' / 'Indexers')
         with suppress(Exception):
             indexers_path.mkdir(parents=True)
 
