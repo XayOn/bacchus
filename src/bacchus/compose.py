@@ -61,12 +61,6 @@ NEXTCLOUD_UPDATE=1"""
                                        cwd=DOCKER_PATH,
                                        env=self.env).strip().decode()
 
-    def wait_for_status(self):
-        pass
-
-    def setup(self):
-        pass
-
     @property
     def services(self):
         services = [

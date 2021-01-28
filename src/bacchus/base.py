@@ -26,14 +26,6 @@ class HomeServerApp:
         self.path.mkdir(parents=True, exist_ok=True)
         self.client = parent.client
 
-    @property
-    def compose(self):
-        return self.providers.get('DockerCompose')
-
-    @property
-    def running(self):
-        return self.__class__.__name__.lower() in self.compose.services
-
     def container_for(self, service_name):
         return next((a for a in self.client.containers.list()
                      if a.id == self.compose.get_service_id(service_name)))
@@ -42,16 +34,12 @@ class HomeServerApp:
     def container(self):
         return self.container_for(self.service_name)
 
-    def wait_for_status(self):
-        """Wait for container to start."""
-        while not self.running:
-            self.logger.debug(
-                f'Waiting for {self.__class__.__name__} to start')
-            sleep(1)
+    @property
+    def compose(self):
+        return self.providers.get('DockerCompose')
 
-    def wait_for_config(self):
-        """Wait for config to be created."""
-        self.logger.debug(f'Waiting for {self.__class__.__name__} config')
-        if hasattr(self, "config_file"):
-            while not self.config_file.exists():
-                sleep(1)
+    def setup_first_step(self):
+        """Setup after first boot-and-wait"""
+
+    def setup_second_step(self):
+        """Setup after restart."""

@@ -1,33 +1,29 @@
 import itertools
+from time import sleep
 import docker
 from bacchus.compose import DockerCompose
 
 from bacchus.lidarr import Lidarr
 from bacchus.radarr import Radarr
-from bacchus.readarr import Readarr
+from bacchus.dns import DNS
 from bacchus.sonarr import Sonarr
-from bacchus.ubooquity import Ubooquity
 
 from bacchus.nextcloud import NextCloud
 
 from bacchus.jackett import Jackett
 from bacchus.transmission import Transmission
 from bacchus.openvpn import OpenVPN
-from bacchus.pihole import PiHole
-
 from bacchus.jellyfin import Jellyfin
-from bacchus.kodi import Kodi
 
 __all__ = [
-    DockerCompose, Lidarr, Radarr, Readarr, Sonarr, NextCloud, Jackett,
-    Transmission, OpenVPN, PiHole, Jellyfin, Kodi
+    DockerCompose, DNS, Lidarr, Radarr, Sonarr, NextCloud, Jackett,
+    Transmission, OpenVPN, Jellyfin
 ]
 
 CATEGORIES = {
-    'base': [OpenVPN, PiHole],
-    'media_download': [Lidarr, Radarr, Readarr, Sonarr, Transmission, Jackett],
-    'media_management': [Jellyfin, Ubooquity],
-    'media_player': [Kodi],
+    'base': [DNS, OpenVPN],
+    'media_download': [Lidarr, Radarr, Sonarr, Transmission, Jackett],
+    'media_management': [Jellyfin],
     'cloud': [NextCloud]
 }
 
@@ -71,9 +67,14 @@ class HomeServerSetup:
         self.selected_providers = [a.__class__.__name__ for a in providers]
         self.selected_categories = categories
 
-        for provider in providers:
-            provider.wait_for_status()
-            provider.wait_for_config()
-            provider.setup()
+        sleep(60 * 2)
+        compose.stop()
 
-        compose.restart()
+        for provider in providers:
+            provider.setup_first_step()
+
+        compose.start()
+
+        sleep(60 * 2)
+        for provider in providers:
+            provider.setup_second_step()

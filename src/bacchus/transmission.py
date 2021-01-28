@@ -3,10 +3,8 @@ from .base import HomeServerApp
 
 
 class Transmission(HomeServerApp):
-    def setup(self):
-        if self.container:
-            self.container.stop()
-        cfg = json.loads((self.path / 'config' / 'settings.json').read_bytes())
+    def setup_first_step(self):
+        cfg = json.load((self.path / 'config' / 'settings.json').open())
         cfg['rpc-whitelist-enabled'] = False
-        (self.path / 'config' / 'settings.json').write_text(json.dumps(cfg))
-        self.compose.start()
+        print(cfg)
+        json.dump(cfg, (self.path / 'config' / 'settings.json').open('w'))

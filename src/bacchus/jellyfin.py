@@ -14,6 +14,6 @@ class Jellyfin(HomeServerApp):
     def config(self):
         return ET.parse(str(self.config_file))
 
-    def setup(self):
+    def setup_first_step(self):
         self.config.find('BaseUrl').text = '/jellyfin/'
         self.config.write(str(self.config_file))
