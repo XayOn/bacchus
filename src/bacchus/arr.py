@@ -54,10 +54,10 @@ def send(url, arr_name, arr_api_key, jackett_api_key, provider):
         send("https://private.foo.com/", "radarr", "f00asdf0123100", "1337x")
     """
     return requests.post(
-        f'{url}/{arr_name}/api/v3/indexer',
+        f'{url}{arr_name}/api/v3/indexer',
         headers={'X-Api-Key': arr_api_key},
         json=get_provider(
-            f"{url}/jackett/api/v2.0/indexers/{provider}/results/torznab/",
+            f"{url}jackett/api/v2.0/indexers/{provider}/results/torznab/",
             jackett_api_key, provider))
 
 
@@ -87,7 +87,9 @@ class Arr(HomeServerApp):
         api_key = json.loads((self.path / '..' / 'jackett' / 'Jackett' /
                               'ServerConfig.json').read_text())['APIKey']
         indexer_files = (TEMPLATES / 'jackett' / 'Indexers').glob('*.json')
+        print(f"Configuring indexers on {self.__class__.__name__}")
 
         for name in (a.stem.lower() for a in indexer_files):
+            print(f"Configuring {name} on {self.__class__.__name__}")
             send(f"https://private.{self.domain}/", self.name,
                  self.config.find('ApiKey').text, api_key, name)
