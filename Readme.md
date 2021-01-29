@@ -24,13 +24,14 @@ episode/movies/books downloads)
 
 ## Media download
 
-- The *arrs for media download management ([Radarr][3] (movies download and management), [Lidarr][4] (audio download and management), [Readarr][2] (books download and management) [bazarr][8] (Subtitles downloads), [sonarr][9] (series downloads and management)
-- Torrent management ([Jackett][6] (torrent tracker search management), [Transmission][7] (torrent downloads))
+- The \*arrs for media download management ([Radarr][3] for movies, [Lidarr][4] for music, [sonarr][9] for tv 
+- Torrent management ([Jackett][6] (torrent searches), [Transmission][7] (torrent downloads))
 
 ## Media management and playback
 
-- [kodi][12] (media player, tv-like)
-- [Jellyfin][13] (media player, android/web, integration with kodi available)
+- [ombi][21] Request movies, tv shows and music, integrates with the arrs and jellyfin
+- [kodi][12] Home Theather 
+- [Jellyfin][13] Complete Media system
 
 ## Cloud
 
@@ -69,3 +70,5 @@ See [usage documentation][11] for more.
 [12]: https://kodi.tv
 [13]: https://jellyfin.org
 [14]: https://pi-hole.net/
+[20]: https://github.com/containrrr/watchtower
+[21]: https://ombi.io
