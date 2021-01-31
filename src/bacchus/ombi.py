@@ -30,7 +30,7 @@ class Ombi(HomeServerApp):
         # Enable sonarr
         api_key = self.providers['Sonarr'].config.find('ApiKey').text
         requests.post(
-            "https://private.{self.domain}/ombi/api/v1/Settings/Sonarr", {
+            f"https://private.{self.domain}/ombi/api/v1/Settings/Sonarr", {
                 "enabled": True,
                 "apiKey": api_key,
                 "qualityProfile": "1",
@@ -39,7 +39,7 @@ class Ombi(HomeServerApp):
                 "rootPathAnime": None,
                 "ssl": True,
                 "subDir": "/radarr",
-                "ip": self.host,
+                "ip": self.domain,
                 "port": "443",
                 "addOnly": False,
                 "seasonFolders": False,
@@ -50,7 +50,7 @@ class Ombi(HomeServerApp):
         # Enable radarr
         api_key = self.providers['Radarr'].config.find('ApiKey').text
         requests.post(
-            "https://private.{self.domain}/ombi/api/v1/Settings/Radarr", {
+            f"https://private.{self.domain}/ombi/api/v1/Settings/Radarr", {
                 "enabled": True,
                 "apiKey": api_key,
                 "defaultQualityProfile": "1",
