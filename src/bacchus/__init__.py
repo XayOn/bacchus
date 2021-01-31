@@ -68,14 +68,18 @@ class HomeServerSetup:
         self.selected_providers = [a.__class__.__name__ for a in providers]
         self.selected_categories = categories
 
+        print('Waiting two minutes to start')
         sleep(60 * 2)
         compose.stop()
 
         for provider in providers:
+            print(f'Setting up {provider.__class__.__name__} first step')
             provider.setup_first_step()
 
         compose.start()
 
+        print('Waiting two minutes to start')
         sleep(60 * 2)
         for provider in providers:
+            print(f'Setting up {provider.__class__.__name__} second step')
             provider.setup_second_step()
