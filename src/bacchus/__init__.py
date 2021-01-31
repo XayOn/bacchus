@@ -7,6 +7,7 @@ from bacchus.lidarr import Lidarr
 from bacchus.radarr import Radarr
 from bacchus.dns import DNS
 from bacchus.sonarr import Sonarr
+from bacchus.ombi import Ombi
 
 from bacchus.nextcloud import NextCloud
 
@@ -16,14 +17,14 @@ from bacchus.openvpn import OpenVPN
 from bacchus.jellyfin import Jellyfin
 
 __all__ = [
-    DockerCompose, DNS, Lidarr, Radarr, Sonarr, NextCloud, Jackett,
-    Transmission, OpenVPN, Jellyfin
+    DockerCompose, DNS, Jackett, Transmission, Lidarr, Radarr, Sonarr,
+    Jellyfin, Ombi, NextCloud, OpenVPN
 ]
 
 CATEGORIES = {
     'base': [DNS, OpenVPN],
     'media_download': [Lidarr, Radarr, Sonarr, Transmission, Jackett],
-    'media_management': [Jellyfin],
+    'media_management': [Jellyfin, Ombi],
     'cloud': [NextCloud]
 }
 
