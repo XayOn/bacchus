@@ -5,7 +5,7 @@ services:
     command:
       - --api.insecure=true
       - --providers.docker=true
-      - --providers.docker.exposedbydefault=true
+      - --providers.docker.exposedbydefault=false
       - --entrypoints.websecure.address=:443
       - --certificatesresolvers.letsencrypt.acme.dnschallenge=true
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=gandiv5
@@ -69,6 +69,7 @@ services:
       - traefik.http.routers.kodi.tls.certresolver=letsencrypt
       - traefik.http.services.kodi.loadbalancer.server.port=8080
       - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
     env_file:
       - .env_general
   jackett:
@@ -83,6 +84,7 @@ services:
       - traefik.http.routers.jackett.tls.certresolver=letsencrypt
       - traefik.http.services.jackett.loadbalancer.server.port=9117
       - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
     env_file:
       - .env_general
   transmission:
@@ -97,6 +99,7 @@ services:
       - traefik.http.routers.transmission.tls.certresolver=letsencrypt
       - traefik.http.services.transmission.loadbalancer.server.port=9091
       - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
     env_file:
       - .env_general
   sonarr:
@@ -112,6 +115,7 @@ services:
       - traefik.http.routers.sonarr.tls.certresolver=letsencrypt
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
       - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
     env_file:
       - .env_general
   lidarr:
@@ -127,6 +131,7 @@ services:
       - traefik.http.routers.lidarr.tls.certresolver=letsencrypt
       - traefik.http.services.lidarr.loadbalancer.server.port=8686
       - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
     env_file:
       - .env_general
   readarr:
@@ -142,6 +147,7 @@ services:
       - traefik.http.routers.readarr.tls.certresolver=letsencrypt
       - traefik.http.services.readarr.loadbalancer.server.port=8787
       - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
     env_file:
       - .env_general
   radarr:
@@ -157,6 +163,7 @@ services:
       - traefik.http.routers.radarr.tls.certresolver=letsencrypt
       - traefik.http.services.radarr.loadbalancer.server.port=7878
       - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
     env_file:
       - .env_general
   jellyfin:
@@ -174,21 +181,23 @@ services:
       - traefik.http.routers.jellyfin.tls.certresolver=letsencrypt
       - traefik.http.services.jellyfin.loadbalancer.server.port=8096
       - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
     env_file:
       - .env_general
   ombi:
-    image: ghcr.io/linuxserver/ombi
+    image: ghcr.io/linuxserver/ombi:development
     restart: always 
     volumes:
       - ./data/ombi/:/config
-    environment:
-      - BASE_URL=/ombi
     labels:
       - traefik.http.routers.ombi.rule=Host(`private.HOST`) && PathPrefix(`/ombi`)
       - traefik.http.routers.ombi.tls=true
       - traefik.http.routers.ombi.tls.certresolver=letsencrypt
       - traefik.http.services.ombi.loadbalancer.server.port=3579
       - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+    environment:
+      - BASE_URL=/ombi
     env_file:
       - .env_general
   mariadb:
@@ -199,6 +208,7 @@ services:
     env_file: .env_mariadb
     labels:
       - com.centurylinklabs.watchtower.enable=true
+      - trafik.enable = false
     volumes:
       - ./data/mariadb:/var/lib/mysql
   redis:
@@ -207,6 +217,7 @@ services:
     depends_on:
       - watchtower
     labels:
+      - trafik.enable = false
       - com.centurylinklabs.watchtower.enable=true
     volumes:
       - ./data/redis:/data
@@ -226,6 +237,7 @@ services:
       - traefik.http.routers.ubooquity.tls.certresolver=letsencrypt
       - traefik.http.services.ubooquity.loadbalancer.server.port=2202
       - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
   nextcloud:
     image: nextcloud:latest
     restart: always
