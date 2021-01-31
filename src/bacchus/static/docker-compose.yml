@@ -65,6 +65,7 @@ services:
      - /etc/shadow:/etc/shadow:ro
     labels:
       - traefik.http.routers.kodi.rule=Host(`private.HOST`) && PathPrefix(`/kodi`)
+      - traefik.http.routers.kodi.rule=Host(`private.francostaveras.top`) && PathPrefix(`/jsonrpc`)
       - traefik.http.routers.kodi.tls=true
       - traefik.http.routers.kodi.tls.certresolver=letsencrypt
       - traefik.http.middlewares.kodi-stripprefix.stripprefix.prefixes=/kodi
