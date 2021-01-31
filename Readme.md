@@ -16,7 +16,10 @@ got bacchus installed trough your router.
 
 Ultimately, bacchus works around [NextCloud][1], adding custom links inside (as
 iframes) to external tools (like media management and automated
-episode/movies/books downloads)
+episode/movies/books downloads).
+
+The \*Arrs handle your tv/movie downloads, and jellyfin categorizes and serves
+the media to your phone/tablets/tv.
 
 ## :computer: What will I get?
 
@@ -24,13 +27,13 @@ episode/movies/books downloads)
 
 ## Media download
 
-- The \*arrs for media download management ([Radarr][3] for movies, [Lidarr][4] for music, [sonarr][9] for tv 
-- Torrent management ([Jackett][6] (torrent searches), [Transmission][7] (torrent downloads))
+- The \*arrs for media download management. [Radarr][3] for movies, [Lidarr][4] for music, [sonarr][9] for tv 
+- Torrent management [Jackett][6] for torrent searches and [Transmission][7] to download them. 
 
 ## Media management and playback
 
 - [ombi][21] Request movies, tv shows and music, integrates with the arrs and jellyfin
-- [kodi][12] Home Theather 
+- [kodi][12] Home Theather
 - [Jellyfin][13] Complete Media system
 
 ## Cloud
@@ -44,6 +47,7 @@ episode/movies/books downloads)
 - [Watchtower][20] (Manage docker updates)
 
 And links them inside nextcloud for a seamless user experience. 
+Bacchus sets up a set of default public trackers on jackett and the arrs.
 
 ## Install 
 
