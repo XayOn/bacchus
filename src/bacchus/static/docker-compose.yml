@@ -67,6 +67,8 @@ services:
       - traefik.http.routers.kodi.rule=Host(`private.HOST`) && PathPrefix(`/kodi`)
       - traefik.http.routers.kodi.tls=true
       - traefik.http.routers.kodi.tls.certresolver=letsencrypt
+      - traefik.http.middlewares.kodi-stripprefix.stripprefix.prefixes=/kodi
+      - traefik.http.routers.kodi.middlewares=kodi-stripprefix
       - traefik.http.services.kodi.loadbalancer.server.port=8080
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
