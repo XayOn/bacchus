@@ -36,7 +36,7 @@ class NextCloud(HomeServerApp):
         self.occ('config:system:set', 'overwritewebroot', '--value', '/')
         self.occ('config:system:set', 'overwriteprotocol', '--value', 'https')
         self.occ('config:system:set', 'trusted_domains', '0', '--value',
-                 f'private.{self.domain}')
+                 f'cloud.{self.domain}')
 
     def setup_apps(self):
         apps = ('ocsms', 'tasks', 'calendar', 'deck', 'contacts', 'side_menu',

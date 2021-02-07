@@ -28,4 +28,5 @@ class DNS(HomeServerApp):
         self.logger.debug(self.create_dns('public', public_ip))
         self.logger.debug('Finished public config')
         self.logger.debug(self.create_dns('private', private_ip))
+        self.logger.debug(self.create_dns('cloud', private_ip))
         self.logger.debug('Finished private config')

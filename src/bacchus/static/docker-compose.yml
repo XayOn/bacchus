@@ -242,7 +242,7 @@ services:
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
   nextcloud:
-    image: nextcloud:latest
+    image: nextcloud:21.0.0beta6-apache
     restart: always
     depends_on:
       - mariadb
@@ -250,7 +250,8 @@ services:
       - traefik
       - watchtower
     volumes:
-      - ./data/nextcloud/:/data
+      - ./data/media/nextcloud/config:/var/www/html/config/
+      - ./data/media/nextcloud/data/:/var/www/html/data/
     env_file:
       - .env_general
     labels:
@@ -259,7 +260,7 @@ services:
       - traefik.http.middlewares.nextcloud-caldav.redirectregex.regex=^https://(.*)/.well-known/(card|cal)dav
       - traefik.http.middlewares.nextcloud-caldav.redirectregex.replacement=https://$${1}/remote.php/dav/
       - traefik.http.routers.nextcloud.entrypoints=websecure
-      - traefik.http.routers.nextcloud.rule=Host(`private.HOST`)
+      - traefik.http.routers.nextcloud.rule=Host(`cloud.HOST`)
       - traefik.http.routers.nextcloud.middlewares=nextcloud-caldav@docker
       - traefik.http.routers.nextcloud.tls=true
       - traefik.http.routers.nextcloud.tls.certresolver=letsencrypt
