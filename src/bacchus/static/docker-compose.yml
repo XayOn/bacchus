@@ -211,13 +211,14 @@ services:
       - ./data/ombi/:/config
     labels:
       - traefik.http.routers.ombi.rule=Host(`private.HOST`) && PathPrefix(`/ombi`)
+      - traefik.http.routers.kodi.rule=Host(`private.HOST`) && Path(`/swagger/v1/swagger.json`)
+      - traefik.http.middlewares.ombi-stripprefix.stripprefix.prefixes=/ombi
+      - traefik.http.routers.ombi.middlewares=ombi-stripprefix
       - traefik.http.routers.ombi.tls=true
       - traefik.http.routers.ombi.tls.certresolver=letsencrypt
       - traefik.http.services.ombi.loadbalancer.server.port=3579
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
-    environment:
-      - BASE_URL=/ombi
     env_file:
       - .env_general
   mariadb:
