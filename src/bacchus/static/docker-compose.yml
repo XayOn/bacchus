@@ -2,6 +2,7 @@ version: "3.3"
 services:
   traefik:
     image: "traefik:v2.4"
+    restart: always
     command:
       - --api.insecure=true
       - --providers.docker=true
