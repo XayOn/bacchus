@@ -187,6 +187,22 @@ services:
       - traefik.enable=true
     env_file:
       - .env_general
+  organizr:
+    image: organizr/organizr
+    restart: always
+    volumes:
+      - ./data/organizr/:/config
+    environment:
+      - branch=v2-master
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.organizr.rule=Host(`private.HOST`)
+      - traefik.http.routers.organizr.tls=true
+      - traefik.http.routers.organizr.tls.certresolver=letsencrypt
+      - traefik.http.services.organizr.loadbalancer.server.port=80
+      - com.centurylinklabs.watchtower.enable=true
+    env_file:
+      - .env_general
   ombi:
     image: ghcr.io/linuxserver/ombi:development
     restart: always 
