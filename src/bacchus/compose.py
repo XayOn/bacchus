@@ -1,8 +1,7 @@
 import os
-import shutil
-import subprocess
 import uuid
-from pathlib import Path
+import shutil
+from subprocess import check_output
 
 from .base import HomeServerApp
 from .base import DOCKER_PATH
@@ -13,63 +12,45 @@ class DockerCompose(HomeServerApp):
     """Basic docker compose commands."""
     @property
     def env(self):
-        return {
-            **os.environ, 'COMPOSE_PROJECT_NAME': self.meta['project_name']
-        }
+        proj = self.meta['project_name']
+        return {**os.environ, 'COMPOSE_PROJECT_NAME': proj}
 
     def create_env_files(self):
         """Create environment files for docker copose"""
-        nextcloud_passwd = uuid.uuid4().hex
-
-        gen = f"PID={os.geteuid()}\nPUID={os.geteuid()}\nPGID={os.getegid()}"
-        gandi = f"GANDIV5_API_KEY={self.meta['dns_api_key']}"
-        nextcloud = f"""NEXTCLOUD_ADMIN_USER=admin
-NEXTCLOUD_ADMIN_PASSWORD={nextcloud_passwd}
-NEXTCLOUD_UPDATE=1"""
-
-        (DOCKER_PATH / '.env_general').write_text(gen)
-        (DOCKER_PATH / '.env_traefik').write_text(gandi)
-        (DOCKER_PATH / '.env_nextcloud').write_text(nextcloud)
-        (DOCKER_PATH / '.env_mariadb').write_text('')
+        (DOCKER_PATH / '.env').write_text(f"""NEXTCLOUD_ADMIN_USER=admin
+NEXTCLOUD_ADMIN_PASSWORD={uuid.uuid4().hex}
+NEXTCLOUD_UPDATE=1
+GANDIV5_API_KEY={self.meta['dns_api_key']}
+host={self.meta['host']}
+email={self.meta['email']}
+PID={os.geteuid()}
+PUID={os.geteuid()}
+PGID={os.getegid()}
+""")
 
     def copy_template(self):
-        compose = (TEMPLATES / 'docker-compose.yml').read_text()
-        compose = compose.replace('EMAIL', self.meta['email'])
-        compose = compose.replace('HOST', self.domain)
-        if not Path('/dev/dri').exists():
-            compose = compose.replace(
-                """ devices:
-      - /dev/dri:/dev/dri""", '')
-        (DOCKER_PATH / 'docker-compose.yml').write_text(compose)
+        shutil.copy(TEMPLATES / 'docker-compose.yml',
+                    DOCKER_PATH / 'docker-compose.yml')
+
+    def cmd(self, args):
+        """Start."""
+        args = ['docker-compose', *args]
+        return check_output(args, cwd=DOCKER_PATH, env=self.env)
 
     def start(self):
-        """Start."""
-        print(f'starting {self.meta["project_name"]}')
-        subprocess.check_output(
-            ['docker-compose', '-p', self.meta['project_name'], 'up', '-d'],
-            cwd=DOCKER_PATH,
-            env={**os.environ, **self.env})
+        return self.cmd(['up', '-d'])
 
     def stop(self):
         """Stop."""
-        subprocess.check_output(['docker-compose', 'stop'],
-                                cwd=DOCKER_PATH,
-                                env=self.env)
+        return self.cmd(['stop'])
 
     def get_service_id(self, name):
-        return subprocess.check_output(['docker-compose', 'ps', '-q', name],
-                                       cwd=DOCKER_PATH,
-                                       env=self.env).strip().decode()
+        return self.cmd(['ps', '-q', name])
 
     @property
     def services(self):
-        services = [
-            a.strip() for a in subprocess.check_output(
-                ['docker-compose', 'ps', '--services'],
-                cwd=DOCKER_PATH,
-                env=self.env).decode().splitlines()
-        ]
-        return services
+        out = self.cmd(['ps', '--services']).decode().splitlines()
+        return [a.strip() for a in out]
 
     def restart(self):
         self.stop()
