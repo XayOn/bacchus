@@ -1,5 +1,4 @@
 from pathlib import Path
-from time import sleep
 import logging
 
 TEMPLATES = Path(__file__).parent / 'static'

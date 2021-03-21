@@ -56,7 +56,9 @@ def send(url, arr_name, arr_api_key, jackett_api_key, provider):
     print(f'{url}{arr_name}/api/v3/indexer')
     return requests.post(
         f'{url}{arr_name}/api/v3/indexer',
-        headers={'X-Api-Key': arr_api_key},
+        headers={
+            'X-Api-Key': arr_api_key
+        },
         json=get_provider(
             f"{url}jackett/api/v2.0/indexers/{provider}/results/torznab/",
             jackett_api_key, provider)).text
@@ -92,5 +94,63 @@ class Arr(HomeServerApp):
 
         for name in (a.stem.lower() for a in indexer_files):
             print(f"Configuring {name} on {self.__class__.__name__}")
-            print(send(f"https://private.{self.domain}/", self.name,
-                  self.config.find('ApiKey').text, api_key, name))
+            print(
+                send(f"https://private.{self.domain}/", self.name,
+                     self.config.find('ApiKey').text, api_key, name))
+
+
+class Lidarr(Arr):
+    def settings(self, base_url, api_key):
+        cats = [
+            5010, 5030, 5040, 2000, 2010, 2020, 2030, 2035, 2040, 2045, 2050,
+            2060
+        ]
+        return {
+            "minimumSeeders": 1,
+            "requiredFlags": [],
+            "baseUrl": base_url,
+            "multiLanguages": [],
+            "apiKey": api_key,
+            "categories": cats,
+            "animeCategories": [],
+            "removeYear": False,
+            "searchByTitle": False,
+        }
+
+
+class Radarr(Arr):
+    def settings(self, base_url, api_key):
+        cats = [
+            5010, 5030, 5040, 2000, 2010, 2020, 2030, 2035, 2040, 2045, 2050,
+            2060
+        ]
+        return {
+            "minimumSeeders": 1,
+            "requiredFlags": [],
+            "baseUrl": base_url,
+            "multiLanguages": [],
+            "apiKey": api_key,
+            "categories": cats,
+            "animeCategories": [],
+            "removeYear": False,
+            "searchByTitle": False,
+        }
+
+
+class Sonarr(Arr):
+    def settings(self, base_url, api_key):
+        cats = [
+            5010, 5030, 5040, 2000, 2010, 2020, 2030, 2035, 2040, 2045, 2050,
+            2060
+        ]
+        return {
+            "minimumSeeders": 1,
+            "requiredFlags": [],
+            "baseUrl": base_url,
+            "multiLanguages": [],
+            "apiKey": api_key,
+            "categories": cats,
+            "animeCategories": [],
+            "removeYear": False,
+            "searchByTitle": False,
+        }

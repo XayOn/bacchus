@@ -17,8 +17,6 @@ class NextCloud(HomeServerApp):
         self.install()
         self.logger.debug('Setting up paths')
         self.setup_paths()
-        self.logger.debug('Installing external links apps')
-        self.install_external_links()
         self.logger.debug('Installing apps')
         self.setup_apps()
         self.logger.debug('Set up nextcloud')
@@ -39,51 +37,9 @@ class NextCloud(HomeServerApp):
                  f'cloud.{self.domain}')
 
     def setup_apps(self):
-        apps = ('ocsms', 'tasks', 'calendar', 'deck', 'contacts', 'side_menu',
-                'maps', 'breezedark')
+        apps = ('ocsms', 'tasks', 'calendar', 'deck', 'contacts', 'breezedark')
         for app in apps:
             self.occ('app:install', app)
-
-    def install_external_links(self):
-        """Install top links to all the rest of apps"""
-        self.occ('app:install', 'external')
-        self.occ(
-            'config:app:set', 'external', 'sites', '--value',
-            json.dumps({
-                "1": {
-                    "id": 1,
-                    "name": "Downloads management",
-                    "url": f"https://private.{self.domain}/ombi/",
-                    "lang": "",
-                    "type": "link",
-                    "device": "",
-                    "icon": "external.svg",
-                    "groups": [],
-                    "redirect": False
-                },
-                "2": {
-                    "id": 5,
-                    "name": "Media player",
-                    "url": f"https://private.{self.domain}/jellyfin/",
-                    "lang": "",
-                    "type": "link",
-                    "device": "",
-                    "icon": "external.svg",
-                    "groups": [],
-                    "redirect": False
-                },
-                "3": {
-                    "id": 2,
-                    "name": "Advanced download settings",
-                    "url": f"https://private.{self.domain}/heimdall/",
-                    "lang": "",
-                    "type": "link",
-                    "device": "",
-                    "icon": "external.svg",
-                    "groups": [],
-                    "redirect": False
-                }
-            }))
 
     def occ(self, *args, **kwargs):
         try:

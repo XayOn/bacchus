@@ -3,10 +3,8 @@ from time import sleep
 import docker
 from bacchus.compose import DockerCompose
 
-from bacchus.lidarr import Lidarr
-from bacchus.radarr import Radarr
+from bacchus.arr import Radarr, Lidarr, Sonarr
 from bacchus.dns import DNS
-from bacchus.sonarr import Sonarr
 from bacchus.ombi import Ombi
 
 from bacchus.nextcloud import NextCloud
@@ -15,6 +13,9 @@ from bacchus.jackett import Jackett
 from bacchus.transmission import Transmission
 from bacchus.openvpn import OpenVPN
 from bacchus.jellyfin import Jellyfin
+
+from cleo import Command
+from cleo import Application
 
 __all__ = [
     DockerCompose, DNS, Jackett, Transmission, Lidarr, Radarr, Sonarr,
@@ -83,3 +84,29 @@ class HomeServerSetup:
         for provider in providers:
             print(f'Setting up {provider.__class__.__name__} second step')
             provider.setup_second_step()
+
+
+class InstallCommand(Command):
+    """Installs bacchus
+
+    install
+        {--email=? : Your e-mail address}
+        {--domain=? : Domain (FQDN) on gandi.net}
+        {--dns=? : DNS Provider (gandi.net) API key}
+        {--iface=? : (Optional) Main interface name}
+        {--categories=? : (Optional) Set up specific categories}
+        {--provider=? : (Optional) Set up only one service}
+    """
+    def handle(self):
+        """Handle command"""
+        setup = HomeServerSetup(domain=self.option('domain'),
+                                email=self.option('email'),
+                                iface=self.option('iface'),
+                                dns_api_key=self.option('dns'))
+        setup.configure(self.option('provider'), self.option('categories'))
+
+
+def main():
+    application = Application()
+    application.add(InstallCommand())
+    application.run()
