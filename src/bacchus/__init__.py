@@ -13,5 +13,5 @@ __all__ = [Jackett, Transmission, Lidarr, Radarr, Sonarr, Jellyfin, Matrix]
 def main():
     for provider in __all__:
         getattr(provider(os.getenv('host')),
-                'setup_{os.getenv("step")}_step')()
+                f'setup_{os.getenv("step")}_step')()
     Path('/data/bacchus_install_{os.getenv("step")}').write_text('')

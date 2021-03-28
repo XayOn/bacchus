@@ -12,7 +12,7 @@ class HomeServerApp:
     def __init__(self, domain):
         self.service_name = self.__class__.__name__.lower()
         self.domain = domain
-        self.path = '/data' / self.service_name
+        self.path = Path(f'/data/{self.service_name}')
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.setLevel(logging.DEBUG)
 
