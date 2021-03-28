@@ -2,12 +2,11 @@ import os
 from pathlib import Path
 
 from bacchus.arr import Radarr, Lidarr, Sonarr
-from bacchus.nextcloud import NextCloud
 from bacchus.jackett import Jackett
 from bacchus.transmission import Transmission
 from bacchus.jellyfin import Jellyfin
 
-__all__ = [Jackett, Transmission, Lidarr, Radarr, Sonarr, Jellyfin, NextCloud]
+__all__ = [Jackett, Transmission, Lidarr, Radarr, Sonarr, Jellyfin]
 
 
 def main():

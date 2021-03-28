@@ -5,8 +5,6 @@ services:
     restart: never
     volumes:
       - "./data/:/data"
-    env_file:
-      - .env
   dns:
     image: lanalogj/lexicon
     restart: never 
@@ -48,8 +46,6 @@ services:
     volumes:
       - "./data/letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    env_file:
-      - .env
   wireguard:
     image: ghcr.io/linuxserver/wireguard
     container_name: wireguard
@@ -59,8 +55,6 @@ services:
     volumes:
       - ./data/wireguard:/config
       - /lib/modules:/lib/modules
-    env_file:
-      - .env
     ports:
       - 51820:51820/udp
     sysctls:
@@ -84,8 +78,6 @@ services:
       - 1.1.1.1
     cap_add:
       - NET_ADMIN
-    env_file:
-      - .env
     labels:
       - com.centurylinklabs.watchtower.enable=true
   protonmail:
@@ -93,8 +85,6 @@ services:
     restart: always
     volumes:
       - ./data/protonmail:/root
-    env_file:
-      - .env
   kodi:
     image: xayon/docker-kodi-beta:gbm
     restart: always
@@ -118,8 +108,6 @@ services:
       - traefik.enable=true
     ports:
       - 8080:8080
-    env_file:
-      - .env
   jackett:
     image: ghcr.io/linuxserver/jackett
     restart: always
@@ -133,8 +121,6 @@ services:
       - traefik.http.services.jackett.loadbalancer.server.port=9117
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
-    env_file:
-      - .env
   transmission:
     image: ghcr.io/linuxserver/transmission
     restart: always
@@ -148,8 +134,6 @@ services:
       - traefik.http.services.transmission.loadbalancer.server.port=9091
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
-    env_file:
-      - .env
   sonarr:
     image: ghcr.io/linuxserver/sonarr
     restart: always
@@ -164,8 +148,6 @@ services:
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
-    env_file:
-      - .env
   radarr:
     image: ghcr.io/linuxserver/radarr
     restart: always
@@ -180,8 +162,6 @@ services:
       - traefik.http.services.radarr.loadbalancer.server.port=7878
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
-    env_file:
-      - .env
   lidarr:
     image: ghcr.io/linuxserver/lidarr
     restart: always
@@ -196,8 +176,6 @@ services:
       - traefik.http.services.lidarr.loadbalancer.server.port=8686
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
-    env_file:
-      - .env
   readarr:
     image: hotio/readarr:nightly
     restart: always
@@ -212,8 +190,6 @@ services:
       - traefik.http.services.readarr.loadbalancer.server.port=8787
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
-    env_file:
-      - .env
   jellyfin:
     image: ghcr.io/linuxserver/jellyfin
     restart: always
@@ -232,8 +208,6 @@ services:
       - traefik.http.services.jellyfin.loadbalancer.server.port=8096
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
-    env_file:
-      - .env
   redis:
     image: redis:5
     restart: always
@@ -255,8 +229,6 @@ services:
     volumes:
       - ./data/nextcloud_data/config:/var/www/html/config/
       - ./data/nextcloud_data:/var/www/html/data/
-    env_file:
-      - .env
     labels:
       - traefik.enable=true
       - traefik.http.routers.nextcloud.entrypoints=websecure
@@ -274,8 +246,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --interval 86400
-    env_file:
-      - .env
   organizr:
     image: organizr/organizr
     restart: always
@@ -290,8 +260,6 @@ services:
       - traefik.http.routers.organizr.tls.certresolver=letsencrypt
       - traefik.http.services.organizr.loadbalancer.server.port=80
       - com.centurylinklabs.watchtower.enable=true
-    env_file:
-      - .env
   synapse:
     image: "matrixdotorg/synapse:latest"
     restart: "unless-stopped"
@@ -300,8 +268,6 @@ services:
       SYNAPSE_CONFIG_PATH: "/data/homeserver.yaml"
     volumes:
       - ./data/matrix/synapse:/data
-    env_file:
-      - .env
     labels:
       - traefik.http.middlewares.myCors.headers.accesscontrolallowmethods=GET,OPTIONS,PUT
       - traefik.http.middlewares.myCors.headers.accesscontrolalloworigin=*
@@ -320,8 +286,6 @@ services:
     volumes:
       - ./data/create_db.sh:/docker-entrypoint-initdb.d/20-create_db.sh
       - ./data/postgres/data/:/var/lib/postgresql/data
-    env_file:
-      - .env
   nginx_matrix:
     image: "nginx:latest"
     restart: "unless-stopped"
