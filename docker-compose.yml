@@ -336,8 +336,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./data/matrix/mautrix-whatsapp:/data
-    ports:
-      - 8080
     depends_on:
       - synapse
   mautrixtelegram:
@@ -345,8 +343,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./data/matrix/mautrix-telegram:/data
-    ports:
-      - 8080
     depends_on:
       - synapse
   mautrixfacebook:
@@ -354,8 +350,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./data/matrix/mautrix-facebook:/data
-    ports:
-      - 8080
     depends_on:
       - synapse
   mautrixinstagram:
@@ -363,7 +357,5 @@ services:
     restart: unless-stopped
     volumes:
       - ./data/matrix/mautrix-instagram:/data
-    ports:
-      - 8080
     depends_on:
       - synapse
