@@ -1,11 +1,9 @@
 import json
 from contextlib import suppress
 
-from functools import cached_property
 from .base import TEMPLATES, HomeServerApp
 
 import requests
-import xml.etree.ElementTree as ET
 
 PORTS = {'radarr': 7878, 'lidarr': 8686, 'sonarr': 8989}
 TR_CFG = {
@@ -59,6 +57,42 @@ TR_CFG = {
 }
 
 
+def get_maincfg(name):
+    port = PORTS[name]
+    return {
+        "bindAddress": "*",
+        "port": port,
+        "sslPort": port + 2020,
+        "enableSsl": False,
+        "launchBrowser": True,
+        "authenticationMethod": "none",
+        "analyticsEnabled": False,
+        "logLevel": "info",
+        "consoleLogLevel": "",
+        "branch": "master",
+        "apiKey": "e7e42d0aec804c36bde3072eb3f8d477",
+        "sslCertPath": "",
+        "sslCertPassword": "",
+        "urlBase": f"/{name}",
+        "updateAutomatically": False,
+        "updateMechanism": "docker",
+        "updateScriptPath": "",
+        "proxyEnabled": False,
+        "proxyType": "http",
+        "proxyHostname": "",
+        "proxyPort": 8080,
+        "proxyUsername": "",
+        "proxyPassword": "",
+        "proxyBypassFilter": "",
+        "proxyBypassLocalAddresses": True,
+        "certificateValidation": "disabled",
+        "backupFolder": "Backups",
+        "backupInterval": 7,
+        "backupRetention": 28,
+        "id": 1
+    }
+
+
 def get_provider(url, api_key, name):
     fields = [
         dict(name='baseUrl', value=url),
@@ -93,20 +127,7 @@ def get_provider(url, api_key, name):
 
 
 def send(arr_name, api, arr_api_key, jackett_api_key, provider):
-    """Create an indexer in an arr*
-
-    assumes arrs are available at http://arr:arr_port/
-
-    Arguments:
-
-        arr_name: Arr name (radarr, lidarr, sonarr)
-        arr_api_key: API key for the arr
-        jackett_api_key: Jackett api key
-        provider: Provider name (torrent site name)
-
-    Usage:
-        send("radarr", "f00asdf0123100", "1337x")
-    """
+    """Send a query against arr api."""
     url = f'http://{arr_name}:{PORTS[arr_name]}/api/v3/{api}'
     headers = {'X-Api-Key': arr_api_key}
     return requests.post(url, headers=headers, json=provider).text
@@ -114,40 +135,28 @@ def send(arr_name, api, arr_api_key, jackett_api_key, provider):
 
 class Arr(HomeServerApp):
     @property
-    def base_path(self):
-        return f'/{self.name}'
-
-    @property
-    def name(self):
-        return self.__class__.__name__.lower()
-
-    @property
-    def config_file(self):
-        return self.path / 'config.xml'
-
-    @cached_property
-    def config(self):
-        return ET.parse(str(self.config_file))
-
     def setup_first_step(self):
-        self.config.find('UrlBase').text = self.base_path
-        self.config.write(str(self.config_file))
-
-    def setup_second_step(self):
+        name = self.__class__.__name__.lower()
         cfg = (self.path / '..' / 'jackett' / 'Jackett' / 'ServerConfig.json')
-        api_key = json.loads(cfg.read_text())['APIKey']
+        japi_key = json.loads(cfg.read_text())['APIKey']
+        api_key = self.config.find('ApiKey').text
         indexer_files = (TEMPLATES / 'jackett' / 'Indexers').glob('*.json')
+
         print(f"Configuring indexers on {self.__class__.__name__}")
 
         for name in (a.stem.lower() for a in indexer_files):
             print(f"Configuring {name} on {self.__class__.__name__}")
+            # Setup each indexer
             with suppress(Exception):
                 jurl = (f'http://jackett:9117/api/v3'
                         f'/indexers/{name}/results/torznab/')
-                provider = get_provider(jurl, api_key, name)
-                send(self.name, 'indexer',
-                     self.config.find('ApiKey').text, provider)
-        send(self.name, 'downloadclient', self.config.find('ApiKey'), TR_CFG)
+                provider = get_provider(jurl, japi_key, name)
+                send(name, 'indexer', api_key, provider)
+        # Configure transmission
+        send(name, 'downloadclient', api_key, TR_CFG)
+
+        # Configure base path
+        send(name, 'general', api_key, get_maincfg(self.name))
 
 
 class Lidarr(Arr):
