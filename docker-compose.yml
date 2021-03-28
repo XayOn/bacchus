@@ -2,12 +2,12 @@ version: "3.3"
 services:
   bacchus:
     image: xayon/bacchus
-    restart: no
+    restart: "no"
     volumes:
       - "./data/:/data"
   dns:
     image: analogj/lexicon
-    restart: no
+    restart: "no"
     command: >
         lexicon $dns_provider provider create ${host} A $dns_provider_credentials --api-protocol rest --name public --content $public_ip &&
         lexicon $dns_provider provider create ${host} A $dns_provider_credentials --api-protocol rest --name private --content $private_ip &&
