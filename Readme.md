@@ -7,19 +7,12 @@ Bacchus helps you configure a set of self-hosted tools that would allow you to
 live without big corporations, while keeping your data secure. Save hours
 setting up your cloud and media services.
 
-All the services will only be available on your home network, a VPN server
-is setup and a client configuration file is automatically issued upon
+All the services will only be available on your home network, a wireguard
+server is setup and a client configuration file is automatically issued upon
 installation, so you only need to forward VPN port to the machine where you've
 got bacchus installed trough your router.
 
 ![](https://raw.githubusercontent.com/XayOn/bacchus/develop/docs/main.png)
-
-Ultimately, bacchus works around [NextCloud][1], adding custom links inside (as
-iframes) to external tools (like media management and automated
-episode/movies/books downloads).
-
-The \*Arrs handle your tv/movie downloads, and jellyfin categorizes and serves
-the media to your phone/tablets/tv.
 
 ## :computer: What will I get?
 
@@ -32,7 +25,6 @@ the media to your phone/tablets/tv.
 
 ## Media management and playback
 
-- [ombi][21] Request movies, tv shows and music, integrates with the arrs and jellyfin
 - [kodi][12] Home Theather
 - [Jellyfin][13] Complete Media system
 
@@ -42,20 +34,25 @@ the media to your phone/tablets/tv.
 
 ## Utilities
 
-- [OpenVPN][10] (to securely connect to your home server from otside)
+- [Wireguard][10] (to securely connect to your home server from otside)
 - [PiHole][14] (remove internet advertisings)
 - [Watchtower][20] (Manage docker updates)
+- [Organizr][21] (Main page)
+
+## Extras
+
+- Baccus sets up your domains and SSL for you, using traefik and lexicon
 
 And links them inside nextcloud for a seamless user experience. 
 Bacchus sets up a set of default public trackers on jackett and the arrs.
 
 ## Install 
 
-Bacchus is provided as a python executable, you can, for example, install it with pip as user:
+Bacchus has a two-stages installation, first, you need to create a custom .env file. 
+In a near future this will be automated. Have a look at docs/examples directory.
+Then, execute the install.sh script
 
-```bash
-pip install bacchus
-```
+It does not require any dependencies other than docker-compose and bash.
 
 See [usage documentation][11] for more.
 
