@@ -21,6 +21,3 @@ class HomeServerApp:
 
     def setup_second_step(self):
         """Setup after restart."""
-
-    def setup_third_step(self):
-        """Second restart, required for mautrix-*"""
