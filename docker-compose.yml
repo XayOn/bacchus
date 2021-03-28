@@ -268,6 +268,12 @@ services:
       SYNAPSE_CONFIG_PATH: "/data/homeserver.yaml"
     volumes:
       - ./data/matrix/synapse:/data
+      - ./data/matrix/signal-bridge:/data/signal/
+      - ./data/matrix/mautrix-whatsapp:/data/whatsapp/
+      - ./data/matrix/mautrix-telegram:/data/telegram/
+      - ./data/matrix/mautrix-facebook:/data/facebook/
+    ports:
+      - ./data/matrix/mautrix-instagram:/data
     labels:
       - traefik.http.middlewares.myCors.headers.accesscontrolallowmethods=GET,OPTIONS,PUT
       - traefik.http.middlewares.myCors.headers.accesscontrolalloworigin=*
@@ -315,10 +321,10 @@ services:
     image: dock.mau.dev/tulir/mautrix-signal
     restart: unless-stopped
     volumes:
-    - ./data/matrix/signal-bridge:/data
-    - ./data/matrix/signald:/signald
+      - ./data/matrix/signal-bridge:/data
+      - ./data/matrix/signald:/signald
     depends_on:
-    - signald
+      - signald
   signald:
     container_name: signald
     image: docker.io/finn/signald
