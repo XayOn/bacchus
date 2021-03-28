@@ -41,10 +41,8 @@ got bacchus installed trough your router.
 
 ## Extras
 
-- Baccus sets up your domains and SSL for you, using traefik and lexicon
-
-And links them inside nextcloud for a seamless user experience. 
-Bacchus sets up a set of default public trackers on jackett and the arrs.
+- Bacchus sets up your domains and SSL for you, using traefik and lexicon
+- Bacchus sets public trackers on all the arrs
 
 ## Install 
 
@@ -53,8 +51,6 @@ In a near future this will be automated. Have a look at docs/examples directory.
 Then, execute the install.sh script
 
 It does not require any dependencies other than docker-compose and bash.
-
-See [usage documentation][11] for more.
 
 
 [1]: https://github.com/nextcloud/nextcloud
@@ -66,10 +62,9 @@ See [usage documentation][11] for more.
 [7]: https://transmissionbt.com
 [8]: https://nextcloud.com
 [9]: https://sonarr.tv
-[10]: https://openvpn.net
-[11]: docs/usage.md
+[10]: https://www.wireguard.com/
 [12]: https://kodi.tv
 [13]: https://jellyfin.org
 [14]: https://pi-hole.net/
 [20]: https://github.com/containrrr/watchtower
-[21]: https://ombi.io
+[21]: https://organizr.app
