@@ -94,7 +94,7 @@ services:
      - /etc/group:/etc/group:ro
      - /etc/passwd:/etc/passwd:ro
      - /etc/shadow:/etc/shadow:ro
-     - ./kodi_matrix:/root
+     - ./data/kodi_matrix:/root
      - ./media:/media
     labels:
       - traefik.http.routers.kodi.rule=hostregexp(`{host:private.+}`) && PathPrefix(`/kodi`)

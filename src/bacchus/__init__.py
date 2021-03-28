@@ -3,10 +3,11 @@ from pathlib import Path
 
 from bacchus.arr import Radarr, Lidarr, Sonarr
 from bacchus.jackett import Jackett
+from bacchus.matrix import Matrix
 from bacchus.transmission import Transmission
 from bacchus.jellyfin import Jellyfin
 
-__all__ = [Jackett, Transmission, Lidarr, Radarr, Sonarr, Jellyfin]
+__all__ = [Jackett, Transmission, Lidarr, Radarr, Sonarr, Jellyfin, Matrix]
 
 
 def main():
