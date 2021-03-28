@@ -11,15 +11,10 @@ class NextCloud(HomeServerApp):
             f'Setting up admin password as "{self.password}", save it.')
 
     def setup_second_step(self):
-        self.logger.debug('Fixing directory permissions permissions')
         self.fix_permissions()
-        self.logger.debug('Installing nextcloud')
         self.install()
-        self.logger.debug('Setting up paths')
         self.setup_paths()
-        self.logger.debug('Installing apps')
         self.setup_apps()
-        self.logger.debug('Set up nextcloud')
 
     def fix_permissions(self):
         self.container.exec_run(['chown', '-R', 'www-data', '/data'],

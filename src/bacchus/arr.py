@@ -1,10 +1,12 @@
 import json
 
-from functools import lru_cache
+from functools import cached_property
 from .base import TEMPLATES, HomeServerApp
 
 import requests
 import xml.etree.ElementTree as ET
+
+PORTS = {'radarr': 7878, 'lidarr': 8686, 'sonarr': 8989}
 
 
 def get_provider(url, api_key, name):
@@ -40,28 +42,26 @@ def get_provider(url, api_key, name):
     }
 
 
-def send(url, arr_name, arr_api_key, jackett_api_key, provider):
+def send(arr_name, arr_api_key, jackett_api_key, provider):
     """Create an indexer in an arr*
+
+    assumes arrs are available at http://arr:arr_port/
 
     Arguments:
 
-        url: Base url containing both jackett and the arr*
-        provider: Provider name (torrent site name)
         arr_name: Arr name (radarr, lidarr, sonarr)
         arr_api_key: API key for the arr
+        jackett_api_key: Jackett api key
+        provider: Provider name (torrent site name)
 
     Usage:
-        send("https://private.foo.com/", "radarr", "f00asdf0123100", "1337x")
+        send("radarr", "f00asdf0123100", "1337x")
     """
-    print(f'{url}{arr_name}/api/v3/indexer')
-    return requests.post(
-        f'{url}{arr_name}/api/v3/indexer',
-        headers={
-            'X-Api-Key': arr_api_key
-        },
-        json=get_provider(
-            f"{url}jackett/api/v2.0/indexers/{provider}/results/torznab/",
-            jackett_api_key, provider)).text
+    url = f'http://{arr_name}:{PORTS[arr_name]}/api/v3/indexer'
+    jurl = f"http://jackett:9117/api/v2.0/indexers/{provider}/results/torznab/"
+    headers = {'X-Api-Key': arr_api_key}
+    provider = get_provider(jurl, jackett_api_key, provider)
+    return requests.post(url, headers=headers, json=provider).text
 
 
 class Arr(HomeServerApp):
@@ -77,8 +77,7 @@ class Arr(HomeServerApp):
     def config_file(self):
         return self.path / 'config.xml'
 
-    @property
-    @lru_cache()
+    @cached_property
     def config(self):
         return ET.parse(str(self.config_file))
 
@@ -87,16 +86,14 @@ class Arr(HomeServerApp):
         self.config.write(str(self.config_file))
 
     def setup_second_step(self):
-        api_key = json.loads((self.path / '..' / 'jackett' / 'Jackett' /
-                              'ServerConfig.json').read_text())['APIKey']
+        cfg = (self.path / '..' / 'jackett' / 'Jackett' / 'ServerConfig.json')
+        api_key = json.loads(cfg.read_text())['APIKey']
         indexer_files = (TEMPLATES / 'jackett' / 'Indexers').glob('*.json')
         print(f"Configuring indexers on {self.__class__.__name__}")
 
         for name in (a.stem.lower() for a in indexer_files):
             print(f"Configuring {name} on {self.__class__.__name__}")
-            print(
-                send(f"https://private.{self.domain}/", self.name,
-                     self.config.find('ApiKey').text, api_key, name))
+            send(self.name, self.config.find('ApiKey').text, api_key, name)
 
 
 class Lidarr(Arr):

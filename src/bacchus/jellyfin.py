@@ -1,4 +1,4 @@
-from functools import lru_cache
+from functools import cached_property
 import xml.etree.ElementTree as ET
 from .base import HomeServerApp
 
@@ -9,8 +9,7 @@ class Jellyfin(HomeServerApp):
     def config_file(self):
         return self.path / 'system.xml'
 
-    @property
-    @lru_cache()
+    @cached_property
     def config(self):
         return ET.parse(str(self.config_file))
 
