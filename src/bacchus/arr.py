@@ -8,6 +8,55 @@ import requests
 import xml.etree.ElementTree as ET
 
 PORTS = {'radarr': 7878, 'lidarr': 8686, 'sonarr': 8989}
+TR_CFG = {
+    "enable":
+    True,
+    "protocol":
+    "torrent",
+    "priority":
+    1,
+    "name":
+    "transmission",
+    "fields": [{
+        "name": "host",
+        "value": "transmission"
+    }, {
+        "name": "port",
+        "value": 9091
+    }, {
+        "name": "urlBase",
+        "value": "/transmission/"
+    }, {
+        "name": "username"
+    }, {
+        "name": "password"
+    }, {
+        "name": "tvCategory"
+    }, {
+        "name": "tvDirectory"
+    }, {
+        "name": "recentTvPriority",
+        "value": 0
+    }, {
+        "name": "olderTvPriority",
+        "value": 0
+    }, {
+        "name": "addPaused",
+        "value": False
+    }, {
+        "name": "useSsl",
+        "value": False
+    }],
+    "implementationName":
+    "Transmission",
+    "implementation":
+    "Transmission",
+    "configContract":
+    "TransmissionSettings",
+    "infoLink":
+    "https://wiki.servarr.com/Sonarr_Supported_DownloadClients",
+    "tags": []
+}
 
 
 def get_provider(url, api_key, name):
@@ -43,7 +92,7 @@ def get_provider(url, api_key, name):
     }
 
 
-def send(arr_name, arr_api_key, jackett_api_key, provider):
+def send(arr_name, api, arr_api_key, jackett_api_key, provider):
     """Create an indexer in an arr*
 
     assumes arrs are available at http://arr:arr_port/
@@ -58,10 +107,8 @@ def send(arr_name, arr_api_key, jackett_api_key, provider):
     Usage:
         send("radarr", "f00asdf0123100", "1337x")
     """
-    url = f'http://{arr_name}:{PORTS[arr_name]}/api/v3/indexer'
-    jurl = f"http://jackett:9117/api/v2.0/indexers/{provider}/results/torznab/"
+    url = f'http://{arr_name}:{PORTS[arr_name]}/api/v3/{api}'
     headers = {'X-Api-Key': arr_api_key}
-    provider = get_provider(jurl, jackett_api_key, provider)
     return requests.post(url, headers=headers, json=provider).text
 
 
@@ -95,7 +142,12 @@ class Arr(HomeServerApp):
         for name in (a.stem.lower() for a in indexer_files):
             print(f"Configuring {name} on {self.__class__.__name__}")
             with suppress(Exception):
-                send(self.name, self.config.find('ApiKey').text, api_key, name)
+                jurl = (f'http://jackett:9117/api/v3'
+                        f'/indexers/{name}/results/torznab/')
+                provider = get_provider(jurl, api_key, name)
+                send(self.name, 'indexer',
+                     self.config.find('ApiKey').text, provider)
+        send(self.name, 'downloadclient', self.config.find('ApiKey'), TR_CFG)
 
 
 class Lidarr(Arr):
