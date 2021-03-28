@@ -5,19 +5,14 @@ description = "Home Server solution based on docker"
 authors = ["David Francos <opensource@davidfrancos.net>"]
 packages = [{ include = "bacchus", from = "src" }]
 license = "MIT"
-include = ["src/bacchus/docker-compose.yml"]
+include = ["src/bacchus/static"]
 
 [tool.poetry.scripts]
 bacchus = 'bacchus.cli:main'
 
 [tool.poetry.dependencies]
-python = "^3.7"
-cleo = "^0.7.6"
-docker = "^4.1"
-dns-lexicon = "^3.3.17"
+python = "^3.9"
 requests = "^2.22.0"
-netifaces = "^0.10.9"
-jinja2 = "^2.11.2"
 
 [tool.poetry.dev-dependencies]
 netifaces = "^0.10.9"
