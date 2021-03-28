@@ -1,4 +1,5 @@
 import json
+from contextlib import suppress
 
 from functools import cached_property
 from .base import TEMPLATES, HomeServerApp
@@ -93,7 +94,8 @@ class Arr(HomeServerApp):
 
         for name in (a.stem.lower() for a in indexer_files):
             print(f"Configuring {name} on {self.__class__.__name__}")
-            send(self.name, self.config.find('ApiKey').text, api_key, name)
+            with suppress(Exception):
+                send(self.name, self.config.find('ApiKey').text, api_key, name)
 
 
 class Lidarr(Arr):
