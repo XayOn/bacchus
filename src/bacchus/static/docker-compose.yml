@@ -50,17 +50,22 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     env_file:
       - .env
-  openvpn:
-    image: kylemanna/openvpn
-    restart: always
+  wireguard:
+    image: ghcr.io/linuxserver/wireguard
+    container_name: wireguard
     cap_add:
       - NET_ADMIN
-    ports:
-       - "1194:1194/udp"
+      - SYS_MODULE
     volumes:
-      - ./data/openvpn/:/etc/openvpn
+      - ./data/wireguard:/config
+      - /lib/modules:/lib/modules
     env_file:
       - .env
+    ports:
+      - 51820:51820/udp
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: unless-stopped
     labels:
       - com.centurylinklabs.watchtower.enable=true
   pihole:
