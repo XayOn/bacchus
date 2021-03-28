@@ -6,7 +6,7 @@ services:
     volumes:
       - "./data/:/data"
   dns:
-    image: lanalogj/lexicon
+    image: analogj/lexicon
     restart: never 
     command: >
         lexicon $dns_provider provider create ${host} A $dns_provider_credentials --api-protocol rest --name public --content $public_ip &&
@@ -40,7 +40,7 @@ services:
       - --certificatesresolvers.letsencrypt.acme.email=${email}
       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt
-      - --entrypoints.websecure.http.tls.domains[0].main=${private.host}
+      - --entrypoints.websecure.http.tls.domains[0].main=private.${host}
     ports:
       - "443:443"
     volumes:
@@ -272,8 +272,7 @@ services:
       - ./data/matrix/mautrix-whatsapp:/data/whatsapp/
       - ./data/matrix/mautrix-telegram:/data/telegram/
       - ./data/matrix/mautrix-facebook:/data/facebook/
-    ports:
-      - ./data/matrix/mautrix-instagram:/data
+      - ./data/matrix/mautrix-instagram:/data/instagram/
     labels:
       - traefik.http.middlewares.myCors.headers.accesscontrolallowmethods=GET,OPTIONS,PUT
       - traefik.http.middlewares.myCors.headers.accesscontrolalloworigin=*

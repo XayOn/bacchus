@@ -18,6 +18,3 @@ class HomeServerApp:
 
     def setup_first_step(self):
         """Setup after first boot-and-wait"""
-
-    def setup_second_step(self):
-        """Setup after restart."""
