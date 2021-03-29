@@ -32,4 +32,4 @@ RUN ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 COPY --from=build $VIRTUAL_ENV $VIRTUAL_ENV
 COPY --from=build /app/ /app/
 
-ENTRYPOINT /opt/venv/bacchus 
+ENTRYPOINT /opt/venv/bin/bacchus 
