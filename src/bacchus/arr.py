@@ -1,4 +1,5 @@
 import json
+from lxml import etree
 from contextlib import suppress
 
 from .base import TEMPLATES, HomeServerApp
@@ -126,7 +127,7 @@ def get_provider(url, api_key, name):
     }
 
 
-def send(arr_name, api, arr_api_key, jackett_api_key, provider):
+def send(arr_name, api, arr_api_key, provider):
     """Send a query against arr api."""
     url = f'http://{arr_name}:{PORTS[arr_name]}/api/v3/{api}'
     headers = {'X-Api-Key': arr_api_key}
@@ -139,7 +140,8 @@ class Arr(HomeServerApp):
         name = self.__class__.__name__.lower()
         cfg = (self.path / '..' / 'jackett' / 'Jackett' / 'ServerConfig.json')
         japi_key = json.loads(cfg.read_text())['APIKey']
-        api_key = self.config.find('ApiKey').text
+        cfg = etree.fromstring((self.path / 'config.xml').read_text())
+        api_key = cfg.find('ApiKey').text
         indexer_files = (TEMPLATES / 'jackett' / 'Indexers').glob('*.json')
 
         print(f"Configuring indexers on {self.__class__.__name__}")

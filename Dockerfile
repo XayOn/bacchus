@@ -8,7 +8,8 @@ ENV PIP_NO_CACHE_DIR=off \
     POETRY_PATH=/opt/poetry \
     VIRTUAL_ENV=/opt/venv \
     POETRY_VERSION=1.1.4 \
-    PATH=$PATH:/root/.poetry/bin/
+    PATH=$PATH:/root/.poetry/bin/ \
+    step=first
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y git curl graphviz build-essential\
@@ -24,8 +25,8 @@ RUN poetry install --no-dev
 # RUN pip install .
 
 FROM python:3.9.1-slim
-ENV PATH="$VIRTUAL_ENV/bin:$PATH" \
-    VIRTUAL_ENV=/opt/venv
+ENV VIRTUAL_ENV=/opt/venv\
+    PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 

@@ -14,6 +14,7 @@ bacchus = 'bacchus:main'
 python = "^3.9"
 requests = "^2.22.0"
 PyYAML = "^5.4.1"
+lxml = "^4.6.3"
 
 [tool.poetry.dev-dependencies]
 netifaces = "^0.10.9"

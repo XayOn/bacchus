@@ -8,4 +8,4 @@ class Jellyfin(HomeServerApp):
     def setup_first_step(self):
         config = ET.parse(str(self.path / 'system.xml'))
         config.find('BaseUrl').text = '/jellyfin/'
-        config.write(str(self.config_file))
+        config.write(str(self.path / 'system.xml'))
