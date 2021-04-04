@@ -147,7 +147,7 @@ class Arr(HomeServerApp):
                 send(name, 'indexer', api_key, get_provider(japi_key, name_))
         # Configure transmission
         send(name, 'downloadclient', api_key, TR_CFG)
-        cfg.find('UrlBase').text = '/{name}'
+        cfg.find('UrlBase').text = f'/{name}'
         (self.path / 'config.xml').write_bytes(etree.tostring(cfg))
 
 
