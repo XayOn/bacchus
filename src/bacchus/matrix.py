@@ -14,7 +14,7 @@ class Matrix(HomeServerApp):
             '/data/facebook/registration.yaml'
             '/data/instagram/registration.yaml'
         ]
-        yaml.dump(config, self.path / 'synapse' / 'homeserver.yaml')
+        yaml.dump(config, (self.path / 'synapse' / 'homeserver.yaml').open())
         services = ('whatsapp', 'facebook', 'instagram', 'signal', 'telegram')
 
         for service in services:
@@ -26,4 +26,4 @@ class Matrix(HomeServerApp):
             h_cfg['appservice'][
                 'address'] = 'http://mautrix{service}:{PORTS["service"]}'
             h_cfg['appservice']['hostname'] = 'mautrix{service}'
-            yaml.dump(str(), h_cfg)
+            yaml.dump(h_cfg, (self.path / f'mautrix-{service}' / 'config.yaml').open())
