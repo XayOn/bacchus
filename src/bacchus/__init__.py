@@ -12,8 +12,11 @@ __all__ = [Jackett, Transmission, Lidarr, Radarr, Sonarr, Jellyfin, Matrix]
 
 
 def setup(provider):
-    return getattr(provider(os.getenv('host')),
-                   f'setup_{os.getenv("step")}_step')()
+    try:
+        return getattr(provider(os.getenv('host')),
+                       f'setup_{os.getenv("step")}_step')()
+    except Exception:
+        print(f"Could not configure {provider}")
 
 
 def main():

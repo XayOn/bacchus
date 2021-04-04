@@ -5,6 +5,9 @@ services:
     restart: "no"
     volumes:
       - "./data/:/data"
+    networks:
+      main:
+        ipv4_address: 172.29.0.99
   dns:
     image: analogj/lexicon
     restart: "no"

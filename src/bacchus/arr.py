@@ -146,19 +146,19 @@ class Arr(HomeServerApp):
 
         print(f"Configuring indexers on {self.__class__.__name__}")
 
-        for name in (a.stem.lower() for a in indexer_files):
-            print(f"Configuring {name} on {self.__class__.__name__}")
+        for name_ in (a.stem.lower() for a in indexer_files):
+            print(f"Configuring {name_} on {self.__class__.__name__}")
             # Setup each indexer
             with suppress(Exception):
                 jurl = (f'http://jackett:9117/api/v3'
                         f'/indexers/{name}/results/torznab/')
                 provider = get_provider(jurl, japi_key, name)
-                send(name, 'indexer', api_key, provider)
+                send(name_, 'indexer', api_key, provider)
         # Configure transmission
         send(name, 'downloadclient', api_key, TR_CFG)
 
         # Configure base path
-        send(name, 'general', api_key, get_maincfg(self.name))
+        send(name, 'general', api_key, get_maincfg(name))
 
 
 class Lidarr(Arr):
