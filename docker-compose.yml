@@ -8,19 +8,19 @@ services:
   dns:
     image: analogj/lexicon
     restart: "no"
-    command: >
-        lexicon $dns_provider provider create ${host} A $dns_provider_credentials --api-protocol rest --name public --content $public_ip &&
-        lexicon $dns_provider provider create ${host} A $dns_provider_credentials --api-protocol rest --name private --content $private_ip &&
-        lexicon $dns_provider provider create ${host} A $dns_provider_credentials --api-protocol rest --name cloud --content $private_ip &&
-        lexicon $dns_provider provider create ${host} A $dns_provider_credentials --api-protocol rest --name matrix --content $private_ip &&
-        lexicon $dns_provider provider create ${host} A $dns_provider_credentials --api-protocol rest --name riot --content $private_ip &&
-        lexicon $dns_provider provider create ${host} A $dns_provider_credentials --api-protocol rest --name synapse --content $private_ip
-
+    entrypoint: >
+        bash -c "
+        lexicon $dns_provider create ${host} A $dns_provider_credentials --name public --content $public_ip ;
+        lexicon $dns_provider create ${host} A $dns_provider_credentials --name vpn_private --content $private_ip ;
+        lexicon $dns_provider create ${host} A $dns_provider_credentials --name private --content 172.29.0.32 ;
+        lexicon $dns_provider create ${host} A $dns_provider_credentials --name cloud --content $private_ip ; 
+        lexicon $dns_provider create ${host} A $dns_provider_credentials --name matrix --content $private_ip ;
+        lexicon $dns_provider create ${host} A $dns_provider_credentials --name riot --content $private_ip ;
+        lexicon $dns_provider create ${host} A $dns_provider_credentials --name synapse --content $private_ip"
   traefik:
     image: "traefik:v2.4"
     depends_on:
       - dns
-
     restart: always
     labels:
       - traefik.enable=true
@@ -41,14 +41,17 @@ services:
       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt
       - --entrypoints.websecure.http.tls.domains[0].main=private.${host}
-    ports:
-      - "443:443"
     volumes:
       - "./data/letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      main:
+        ipv4_address: 172.29.0.32
+    env_file:
+      - .env
   wireguard:
     image: ghcr.io/linuxserver/wireguard
-    container_name: wireguard
+    restart: unless-stopped
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -59,32 +62,26 @@ services:
       - 51820:51820/udp
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
-    restart: unless-stopped
     labels:
       - com.centurylinklabs.watchtower.enable=true
+    networks:
+      main:
+        ipv4_address: 172.29.0.3
+    env_file: .env
   pihole:
     image: pihole/pihole:latest
     restart: always
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "67:67/udp"
     volumes:
       - './data/pihole/etc-pihole/:/etc/pihole/'
       - './data/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/'
     dns:
-      # TODO: Add unbounddns
-      - 127.0.0.1
-      - 1.1.1.1
-    cap_add:
-      - NET_ADMIN
+      - 208.67.220.220 
+      - 208.67.222.222
+    networks:
+      main:
+        ipv4_address: 172.29.0.4
     labels:
       - com.centurylinklabs.watchtower.enable=true
-  protonmail:
-    image: shenxn/protonmail-bridge
-    restart: always
-    volumes:
-      - ./data/protonmail:/root
   kodi:
     image: xayon/docker-kodi-beta:gbm
     restart: always
@@ -106,8 +103,9 @@ services:
       - traefik.http.services.kodi.loadbalancer.server.port=8080
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
-    ports:
-      - 8080:8080
+    networks:
+      main:
+        ipv4_address: 172.29.0.5
   jackett:
     image: ghcr.io/linuxserver/jackett
     restart: always
@@ -121,6 +119,9 @@ services:
       - traefik.http.services.jackett.loadbalancer.server.port=9117
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
+    networks:
+      main:
+        ipv4_address: 172.29.0.6
   transmission:
     image: ghcr.io/linuxserver/transmission
     restart: always
@@ -134,6 +135,9 @@ services:
       - traefik.http.services.transmission.loadbalancer.server.port=9091
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
+    networks:
+      main:
+        ipv4_address: 172.29.0.7
   sonarr:
     image: ghcr.io/linuxserver/sonarr
     restart: always
@@ -148,6 +152,9 @@ services:
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
+    networks:
+      main:
+        ipv4_address: 172.29.0.8
   radarr:
     image: ghcr.io/linuxserver/radarr
     restart: always
@@ -162,6 +169,9 @@ services:
       - traefik.http.services.radarr.loadbalancer.server.port=7878
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
+    networks:
+      main:
+        ipv4_address: 172.29.0.9
   lidarr:
     image: ghcr.io/linuxserver/lidarr
     restart: always
@@ -176,6 +186,9 @@ services:
       - traefik.http.services.lidarr.loadbalancer.server.port=8686
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
+    networks:
+      main:
+        ipv4_address: 172.29.0.10
   readarr:
     image: hotio/readarr:nightly
     restart: always
@@ -190,6 +203,9 @@ services:
       - traefik.http.services.readarr.loadbalancer.server.port=8787
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
+    networks:
+      main:
+        ipv4_address: 172.29.0.11
   jellyfin:
     image: ghcr.io/linuxserver/jellyfin
     restart: always
@@ -208,6 +224,9 @@ services:
       - traefik.http.services.jellyfin.loadbalancer.server.port=8096
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
+    networks:
+      main:
+        ipv4_address: 172.29.0.12
   redis:
     image: redis:5
     restart: always
@@ -218,6 +237,9 @@ services:
       - com.centurylinklabs.watchtower.enable=true
     volumes:
       - ./data/redis:/data
+    networks:
+      main:
+        ipv4_address: 172.29.0.13
   nextcloud:
     image: nextcloud:latest
     restart: always
@@ -239,13 +261,17 @@ services:
       - traefik.http.routers.nextcloud.tls=true
       - traefik.http.routers.nextcloud.tls.certresolver=letsencrypt
       - com.centurylinklabs.watchtower.enable=true
-    ports:
-      - 80:80
+    networks:
+      main:
+        ipv4_address: 172.29.0.14
   watchtower:
     image: containrrr/watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --interval 86400
+    networks:
+      main:
+        ipv4_address: 172.29.0.15
   organizr:
     image: organizr/organizr
     restart: always
@@ -260,6 +286,9 @@ services:
       - traefik.http.routers.organizr.tls.certresolver=letsencrypt
       - traefik.http.services.organizr.loadbalancer.server.port=80
       - com.centurylinklabs.watchtower.enable=true
+    networks:
+      main:
+        ipv4_address: 172.29.0.16
   synapse:
     image: "matrixdotorg/synapse:latest"
     restart: "unless-stopped"
@@ -284,6 +313,9 @@ services:
       - traefik.http.routers.synapse.rule=hostregexp(`{host:synapse.+}`)
       - traefik.http.routers.synapse.entrypoints=websecure
       - traefik.http.routers.synapse.tls.certresolver=letsencrypt
+    networks:
+      main:
+        ipv4_address: 172.29.0.17
   postgres:
     hostname: postgres
     image: postgres:11
@@ -291,13 +323,16 @@ services:
     volumes:
       - ./data/create_db.sh:/docker-entrypoint-initdb.d/20-create_db.sh
       - ./data/postgres/data/:/var/lib/postgresql/data
+    networks:
+      main:
+        ipv4_address: 172.29.0.18
   nginx_matrix:
     image: "nginx:latest"
     restart: "unless-stopped"
     depends_on:
     - synapse
     volumes:
-      - ./data/matrix/nginx/matrix.conf:/etc/nginx/conf.d/matrix.conf
+      - ./data/matrix/nginx/:/etc/nginx/conf.d/
       - ./data/matrix/nginx/www:/var/www/
     labels:
       - traefik.enable=true
@@ -305,6 +340,9 @@ services:
       - traefik.http.routers.matrix.rule=hostregexp(`{host:matrix.+}`)
       - traefik.http.routers.matrix.entrypoints=websecure
       - traefik.http.routers.matrix.tls.certresolver=letsencrypt
+    networks:
+      main:
+        ipv4_address: 172.29.0.19
   riot:
     restart: unless-stopped
     image: "bubuntux/element-web:latest"
@@ -316,6 +354,9 @@ services:
       - traefik.http.routers.riot.rule=hostregexp(`{host:riot.+}`)
       - traefik.http.routers.riot.entrypoints=websecure
       - traefik.http.routers.riot.tls.certresolver=letsencrypt
+    networks:
+      main:
+        ipv4_address: 172.29.0.20
   mautrix-signal:
     image: dock.mau.dev/tulir/mautrix-signal
     restart: unless-stopped
@@ -324,12 +365,18 @@ services:
       - ./data/matrix/signald:/signald
     depends_on:
       - signald
+    networks:
+      main:
+        ipv4_address: 172.29.0.21
   signald:
     container_name: signald
     image: docker.io/finn/signald
     restart: unless-stopped
     volumes:
     - ./data/matrix/signald:/signald
+    networks:
+      main:
+        ipv4_address: 172.29.0.22
   mautrixwhatsapp:
     image: dock.mau.dev/tulir/mautrix-whatsapp:latest
     restart: unless-stopped
@@ -337,6 +384,9 @@ services:
       - ./data/matrix/mautrix-whatsapp:/data
     depends_on:
       - synapse
+    networks:
+      main:
+        ipv4_address: 172.29.0.23
   mautrixtelegram:
     image: dock.mau.dev/tulir/mautrix-telegram:latest
     restart: unless-stopped
@@ -344,6 +394,9 @@ services:
       - ./data/matrix/mautrix-telegram:/data
     depends_on:
       - synapse
+    networks:
+      main:
+        ipv4_address: 172.29.0.24
   mautrixfacebook:
     image: dock.mau.dev/tulir/mautrix-facebook:latest
     restart: unless-stopped
@@ -351,6 +404,9 @@ services:
       - ./data/matrix/mautrix-facebook:/data
     depends_on:
       - synapse
+    networks:
+      main:
+        ipv4_address: 172.29.0.25
   mautrixinstagram:
     image: dock.mau.dev/tulir/mautrix-instagram:latest
     restart: unless-stopped
@@ -358,3 +414,12 @@ services:
       - ./data/matrix/mautrix-instagram:/data
     depends_on:
       - synapse
+    networks:
+      main:
+        ipv4_address: 172.29.0.26
+networks:
+  main:
+    ipam:
+      driver: default 
+      config:
+        - subnet: 172.29.0.0/24
