@@ -1,102 +1,154 @@
 import json
+from lxml import etree
+from contextlib import suppress
 
-from functools import lru_cache
 from .base import TEMPLATES, HomeServerApp
 
 import requests
-import xml.etree.ElementTree as ET
+
+PORTS = {'radarr': 7878, 'lidarr': 8686, 'sonarr': 8989}
+TR_CFG = {
+    "enable":
+    True,
+    "protocol":
+    "torrent",
+    "priority":
+    1,
+    "name":
+    "transmission",
+    "fields": [{
+        "name": "host",
+        "value": "transmission"
+    }, {
+        "name": "port",
+        "value": 9091
+    }, {
+        "name": "urlBase",
+        "value": "/transmission/"
+    }, {
+        "name": "username"
+    }, {
+        "name": "password"
+    }, {
+        "name": "tvCategory"
+    }, {
+        "name": "tvDirectory"
+    }, {
+        "name": "recentTvPriority",
+        "value": 0
+    }, {
+        "name": "olderTvPriority",
+        "value": 0
+    }, {
+        "name": "addPaused",
+        "value": False
+    }, {
+        "name": "useSsl",
+        "value": False
+    }],
+    "implementationName":
+    "Transmission",
+    "implementation":
+    "Transmission",
+    "configContract":
+    "TransmissionSettings",
+    "infoLink":
+    "https://wiki.servarr.com/Sonarr_Supported_DownloadClients",
+    "tags": []
+}
 
 
-def get_provider(url, api_key, name):
-    fields = [
-        dict(name='baseUrl', value=url),
-        dict(name="apiPath", value="/api"),
-        dict(name="multiLanguages", value=[]),
-        dict(name="apiKey", value=api_key),
-        dict(name="categories",
-             value=[2000, 2010, 2020, 2030, 2035, 2040, 2045, 2050, 2060]),
-        dict(name="additionalParameters"),
-        dict(name="removeYear", value=False),
-        dict(name="minimumSeeders", value=1),
-        dict(name="seedCriteria.seedRatio"),
-        dict(name="seedCriteria.seedTime"),
-        dict(name="requiredFlags", value=[]),
-    ]
+def get_provider(api_key, name):
     return {
-        "enableRss": True,
-        "enableAutomaticSearch": True,
-        "enableInteractiveSearch": True,
-        "supportsRss": True,
-        "supportsSearch": True,
-        "protocol": "torrent",
-        "priority": 25,
-        "name": name,
-        "fields": fields,
-        "implementationName": "Torznab",
-        "implementation": "Torznab",
-        "configContract": "TorznabSettings",
-        "infoLink": "https://wiki.servarr.com/Radarr_Supported_torznab",
+        "enableRss":
+        True,
+        "enableAutomaticSearch":
+        True,
+        "enableInteractiveSearch":
+        True,
+        "supportsRss":
+        True,
+        "supportsSearch":
+        True,
+        "protocol":
+        "torrent",
+        "priority":
+        25,
+        "name":
+        name,
+        "fields": [{
+            "name":
+            "baseUrl",
+            "value":
+            f"http://jackett:9117/api/v2.0/indexers/{name}/results/torznab/"
+        }, {
+            "name": "apiPath",
+            "value": "/api"
+        }, {
+            "name": "multiLanguages",
+            "value": []
+        }, {
+            "name": "apiKey",
+            "value": api_key
+        }, {
+            "name":
+            "categories",
+            "value": [2000, 2010, 2020, 2030, 2035, 2040, 2045, 2050, 2060]
+        }, {
+            "name": "additionalParameters"
+        }, {
+            "name": "removeYear",
+            "value": False
+        }, {
+            "name": "minimumSeeders",
+            "value": 1
+        }, {
+            "name": "seedCriteria.seedRatio"
+        }, {
+            "name": "seedCriteria.seedTime"
+        }, {
+            "name": "requiredFlags",
+            "value": []
+        }],
+        "implementationName":
+        "Torznab",
+        "implementation":
+        "Torznab",
+        "configContract":
+        "TorznabSettings",
+        "infoLink":
+        "https://wiki.servarr.com/Radarr_Supported_torznab",
         "tags": []
     }
 
 
-def send(url, arr_name, arr_api_key, jackett_api_key, provider):
-    """Create an indexer in an arr*
-
-    Arguments:
-
-        url: Base url containing both jackett and the arr*
-        provider: Provider name (torrent site name)
-        arr_name: Arr name (radarr, lidarr, sonarr)
-        arr_api_key: API key for the arr
-
-    Usage:
-        send("https://private.foo.com/", "radarr", "f00asdf0123100", "1337x")
-    """
-    print(f'{url}{arr_name}/api/v3/indexer')
-    return requests.post(
-        f'{url}{arr_name}/api/v3/indexer',
-        headers={
-            'X-Api-Key': arr_api_key
-        },
-        json=get_provider(
-            f"{url}jackett/api/v2.0/indexers/{provider}/results/torznab/",
-            jackett_api_key, provider)).text
+def send(arr_name, api, arr_api_key, provider):
+    """Send a query against arr api."""
+    url = f'http://{arr_name}:{PORTS[arr_name]}/api/v3/{api}'
+    headers = {'X-Api-Key': arr_api_key}
+    print(requests.post(url, headers=headers, json=provider).text)
 
 
 class Arr(HomeServerApp):
-    @property
-    def base_path(self):
-        return f'/{self.name}'
-
-    @property
-    def name(self):
-        return self.__class__.__name__.lower()
-
-    @property
-    def config_file(self):
-        return self.path / 'config.xml'
-
-    @property
-    @lru_cache()
-    def config(self):
-        return ET.parse(str(self.config_file))
-
     def setup_first_step(self):
-        self.config.find('UrlBase').text = self.base_path
-        self.config.write(str(self.config_file))
-
-    def setup_second_step(self):
-        api_key = json.loads((self.path / '..' / 'jackett' / 'Jackett' /
-                              'ServerConfig.json').read_text())['APIKey']
+        name = self.__class__.__name__.lower()
+        cfg = (self.path / '..' / 'jackett' / 'Jackett' / 'ServerConfig.json')
+        japi_key = json.loads(cfg.read_text())['APIKey']
+        cfg = etree.fromstring((self.path / 'config.xml').read_text())
+        api_key = cfg.find('ApiKey').text
         indexer_files = (TEMPLATES / 'jackett' / 'Indexers').glob('*.json')
+
         print(f"Configuring indexers on {self.__class__.__name__}")
 
-        for name in (a.stem.lower() for a in indexer_files):
-            print(f"Configuring {name} on {self.__class__.__name__}")
-            print(
-                send(f"https://private.{self.domain}/", self.name,
-                     self.config.find('ApiKey').text, api_key, name))
+        for name_ in (a.stem.lower() for a in indexer_files):
+            print(f"Configuring {name_} on {self.__class__.__name__}")
+            # Setup each indexer
+            with suppress(Exception):
+                send(name, 'indexer', api_key, get_provider(japi_key, name_))
+        # Configure transmission
+        send(name, 'downloadclient', api_key, TR_CFG)
+        cfg.find('UrlBase').text = f'/{name}'
+        (self.path / 'config.xml').write_bytes(etree.tostring(cfg))
 
 
 class Lidarr(Arr):

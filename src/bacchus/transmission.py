@@ -6,4 +6,5 @@ class Transmission(HomeServerApp):
     def setup_first_step(self):
         cfg = json.load((self.path / 'config' / 'settings.json').open())
         cfg['rpc-whitelist-enabled'] = False
-        json.dump(cfg, (self.path / 'config' / 'settings.json').open('w'))
+        with open(cfg, 'w') as fileo:
+            json.dump(cfg, fileo)
