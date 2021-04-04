@@ -58,35 +58,66 @@ TR_CFG = {
 }
 
 
-def get_provider(url, api_key, name):
-    fields = [
-        dict(name='baseUrl', value=url),
-        dict(name="apiPath", value="/api"),
-        dict(name="multiLanguages", value=[]),
-        dict(name="apiKey", value=api_key),
-        dict(name="categories",
-             value=[2000, 2010, 2020, 2030, 2035, 2040, 2045, 2050, 2060]),
-        dict(name="additionalParameters"),
-        dict(name="removeYear", value=False),
-        dict(name="minimumSeeders", value=1),
-        dict(name="seedCriteria.seedRatio"),
-        dict(name="seedCriteria.seedTime"),
-        dict(name="requiredFlags", value=[]),
-    ]
+def get_provider(api_key, name):
     return {
-        "enableRss": True,
-        "enableAutomaticSearch": True,
-        "enableInteractiveSearch": True,
-        "supportsRss": True,
-        "supportsSearch": True,
-        "protocol": "torrent",
-        "priority": 25,
-        "name": name,
-        "fields": fields,
-        "implementationName": "Torznab",
-        "implementation": "Torznab",
-        "configContract": "TorznabSettings",
-        "infoLink": "https://wiki.servarr.com/Radarr_Supported_torznab",
+        "enableRss":
+        True,
+        "enableAutomaticSearch":
+        True,
+        "enableInteractiveSearch":
+        True,
+        "supportsRss":
+        True,
+        "supportsSearch":
+        True,
+        "protocol":
+        "torrent",
+        "priority":
+        25,
+        "name":
+        name,
+        "fields": [{
+            "name":
+            "baseUrl",
+            "value":
+            f"http://jackett:9117/api/v2.0/indexers/{name}/results/torznab/"
+        }, {
+            "name": "apiPath",
+            "value": "/api"
+        }, {
+            "name": "multiLanguages",
+            "value": []
+        }, {
+            "name": "apiKey",
+            "value": api_key
+        }, {
+            "name":
+            "categories",
+            "value": [2000, 2010, 2020, 2030, 2035, 2040, 2045, 2050, 2060]
+        }, {
+            "name": "additionalParameters"
+        }, {
+            "name": "removeYear",
+            "value": False
+        }, {
+            "name": "minimumSeeders",
+            "value": 1
+        }, {
+            "name": "seedCriteria.seedRatio"
+        }, {
+            "name": "seedCriteria.seedTime"
+        }, {
+            "name": "requiredFlags",
+            "value": []
+        }],
+        "implementationName":
+        "Torznab",
+        "implementation":
+        "Torznab",
+        "configContract":
+        "TorznabSettings",
+        "infoLink":
+        "https://wiki.servarr.com/Radarr_Supported_torznab",
         "tags": []
     }
 
@@ -95,7 +126,7 @@ def send(arr_name, api, arr_api_key, provider):
     """Send a query against arr api."""
     url = f'http://{arr_name}:{PORTS[arr_name]}/api/v3/{api}'
     headers = {'X-Api-Key': arr_api_key}
-    return requests.post(url, headers=headers, json=provider).text
+    print(requests.post(url, headers=headers, json=provider).text)
 
 
 class Arr(HomeServerApp):
@@ -113,12 +144,9 @@ class Arr(HomeServerApp):
             print(f"Configuring {name_} on {self.__class__.__name__}")
             # Setup each indexer
             with suppress(Exception):
-                jurl = (f'http://jackett:9117/api/v3'
-                        f'/indexers/{name_}/results/torznab/')
-                provider = get_provider(jurl, japi_key, name)
-                print(send(name, 'indexer', api_key, provider))
+                send(name, 'indexer', api_key, get_provider(japi_key, name_))
         # Configure transmission
-        print(send(name, 'downloadclient', api_key, TR_CFG))
+        send(name, 'downloadclient', api_key, TR_CFG)
         cfg.find('UrlBase').text = '/{name}'
         (self.path / 'config.xml').write_bytes(etree.tostring(cfg))
 
