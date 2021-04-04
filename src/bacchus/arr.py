@@ -58,42 +58,6 @@ TR_CFG = {
 }
 
 
-def get_maincfg(name):
-    port = PORTS[name]
-    return {
-        "bindAddress": "*",
-        "port": port,
-        "sslPort": port + 2020,
-        "enableSsl": False,
-        "launchBrowser": True,
-        "authenticationMethod": "none",
-        "analyticsEnabled": False,
-        "logLevel": "info",
-        "consoleLogLevel": "",
-        "branch": "master",
-        "apiKey": "e7e42d0aec804c36bde3072eb3f8d477",
-        "sslCertPath": "",
-        "sslCertPassword": "",
-        "urlBase": f"/{name}",
-        "updateAutomatically": False,
-        "updateMechanism": "docker",
-        "updateScriptPath": "",
-        "proxyEnabled": False,
-        "proxyType": "http",
-        "proxyHostname": "",
-        "proxyPort": 8080,
-        "proxyUsername": "",
-        "proxyPassword": "",
-        "proxyBypassFilter": "",
-        "proxyBypassLocalAddresses": True,
-        "certificateValidation": "disabled",
-        "backupFolder": "Backups",
-        "backupInterval": 7,
-        "backupRetention": 28,
-        "id": 1
-    }
-
-
 def get_provider(url, api_key, name):
     fields = [
         dict(name='baseUrl', value=url),
@@ -135,7 +99,6 @@ def send(arr_name, api, arr_api_key, provider):
 
 
 class Arr(HomeServerApp):
-    @property
     def setup_first_step(self):
         name = self.__class__.__name__.lower()
         cfg = (self.path / '..' / 'jackett' / 'Jackett' / 'ServerConfig.json')
@@ -151,14 +114,13 @@ class Arr(HomeServerApp):
             # Setup each indexer
             with suppress(Exception):
                 jurl = (f'http://jackett:9117/api/v3'
-                        f'/indexers/{name}/results/torznab/')
+                        f'/indexers/{name_}/results/torznab/')
                 provider = get_provider(jurl, japi_key, name)
-                send(name_, 'indexer', api_key, provider)
+                print(send(name, 'indexer', api_key, provider))
         # Configure transmission
-        send(name, 'downloadclient', api_key, TR_CFG)
-
-        # Configure base path
-        send(name, 'general', api_key, get_maincfg(name))
+        print(send(name, 'downloadclient', api_key, TR_CFG))
+        cfg.find('UrlBase').text = '/{name}'
+        (self.path / 'config.xml').write_bytes(etree.tostring(cfg))
 
 
 class Lidarr(Arr):

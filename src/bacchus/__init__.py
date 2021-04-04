@@ -15,8 +15,9 @@ def setup(provider):
     try:
         return getattr(provider(os.getenv('host')),
                        f'setup_{os.getenv("step")}_step')()
-    except Exception:
-        print(f"Could not configure {provider}")
+    except Exception as err:
+        print(f"Could not configure {provider}: {err}")
+        raise
 
 
 def main():
