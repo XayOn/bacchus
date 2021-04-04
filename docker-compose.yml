@@ -8,6 +8,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.99
+    env_file: .env
   dns:
     image: analogj/lexicon
     restart: "no"
@@ -20,6 +21,7 @@ services:
         lexicon $dns_provider create ${host} A $dns_provider_credentials --name matrix --content $private_ip ;
         lexicon $dns_provider create ${host} A $dns_provider_credentials --name riot --content $private_ip ;
         lexicon $dns_provider create ${host} A $dns_provider_credentials --name synapse --content $private_ip"
+    env_file: .env
   traefik:
     image: "traefik:v2.4"
     depends_on:
@@ -44,14 +46,17 @@ services:
       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt
       - --entrypoints.websecure.http.tls.domains[0].main=private.${host}
+      - --entrypoints.websecure.http.tls.domains[1].main=matrix.${host}
+      - --entrypoints.websecure.http.tls.domains[2].main=cloud.${host}
+      - --entrypoints.websecure.http.tls.domains[3].main=synapse.${host}
+      - --entrypoints.websecure.http.tls.domains[4].main=riot.${host}
     volumes:
       - "./data/letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
       main:
         ipv4_address: 172.29.0.32
-    env_file:
-      - .env
+    env_file: .env
   wireguard:
     image: ghcr.io/linuxserver/wireguard
     restart: unless-stopped
@@ -85,6 +90,7 @@ services:
         ipv4_address: 172.29.0.4
     labels:
       - com.centurylinklabs.watchtower.enable=true
+    env_file: .env
   kodi:
     image: xayon/docker-kodi-beta:gbm
     restart: always
@@ -109,6 +115,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.5
+    env_file: .env
   jackett:
     image: ghcr.io/linuxserver/jackett
     restart: always
@@ -125,6 +132,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.6
+    env_file: .env
   transmission:
     image: ghcr.io/linuxserver/transmission
     restart: always
@@ -141,6 +149,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.7
+    env_file: .env
   sonarr:
     image: ghcr.io/linuxserver/sonarr
     restart: always
@@ -158,6 +167,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.8
+    env_file: .env
   radarr:
     image: ghcr.io/linuxserver/radarr
     restart: always
@@ -175,6 +185,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.9
+    env_file: .env
   lidarr:
     image: ghcr.io/linuxserver/lidarr
     restart: always
@@ -192,6 +203,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.10
+    env_file: .env
   readarr:
     image: hotio/readarr:nightly
     restart: always
@@ -209,6 +221,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.11
+    env_file: .env
   jellyfin:
     image: ghcr.io/linuxserver/jellyfin
     restart: always
@@ -230,6 +243,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.12
+    env_file: .env
   redis:
     image: redis:5
     restart: always
@@ -243,6 +257,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.13
+    env_file: .env
   nextcloud:
     image: nextcloud:latest
     restart: always
@@ -267,6 +282,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.14
+    env_file: .env
   watchtower:
     image: containrrr/watchtower
     volumes:
@@ -292,12 +308,16 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.16
+    env_file: .env
   synapse:
     image: "matrixdotorg/synapse:latest"
     restart: "unless-stopped"
-    environment:
-      SYNAPSE_CONFIG_DIR: "/data"
-      SYNAPSE_CONFIG_PATH: "/data/homeserver.yaml"
+    entrypoint: >
+        bash -c "[ -e /data/homeserver.yaml ] && /start.py || { 
+            /start.py generate; 
+            echo -e '\nenable_registration=true >> /data/homeserver.yaml;
+            /start.py; 
+            }"
     volumes:
       - ./data/matrix/synapse:/data
       - ./data/matrix/signal-bridge:/data/signal/
@@ -319,6 +339,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.17
+    env_file: .env
   postgres:
     hostname: postgres
     image: postgres:11
@@ -334,9 +355,8 @@ services:
     restart: "unless-stopped"
     depends_on:
     - synapse
-    volumes:
-      - ./data/matrix/nginx/:/etc/nginx/conf.d/
-      - ./data/matrix/nginx/www:/var/www/
+    entrypoint: >
+      bash -c "[[ -e /etc/nginx/matrix.conf ]] && /docker-entrypoint.sh nginx -g 'daemon off;' || mkdir -p /var/www/.well-known/matrix/; { echo -e 'server {\n  listen         8080 default_server;\n  server_name    matrix.${host};\n\n # Traefik -> nginx -> synapse\n location /_matrix {\n    proxy_pass http://synapse:8008;\n    proxy_set_header X-Forwarded-For $$remote_addr;\n    client_max_body_size 128m;\n  }\n\n  location /.well-known/matrix/ {\n    root /var/www/;\n    default_type application/json;\n    add_header Access-Control-Allow-Origin  *;\n  }\n}\n' > /etc/nginx/conf.d/matrix.conf; echo '{\"m.homeserver\": {\"base_url\": \"https://matrix.${host}\"}}' > /var/www/.well-known/matrix/client; echo '{\"m.server\": \"synapse.${host}:443\"}' >/var/www/.well-known/matrix/server; /docker-entrypoint.sh nginx -g 'daemon off;'; }"
     labels:
       - traefik.enable=true
       - traefik.http.services.matrix.loadbalancer.server.port=80
@@ -346,6 +366,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.19
+    env_file: .env
   riot:
     restart: unless-stopped
     image: "bubuntux/element-web:latest"
@@ -360,6 +381,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.20
+    env_file: .env
   mautrix-signal:
     image: dock.mau.dev/tulir/mautrix-signal
     restart: unless-stopped
@@ -380,6 +402,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.22
+    env_file: .env
   mautrixwhatsapp:
     image: dock.mau.dev/tulir/mautrix-whatsapp:latest
     restart: unless-stopped
@@ -390,6 +413,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.23
+    env_file: .env
   mautrixtelegram:
     image: dock.mau.dev/tulir/mautrix-telegram:latest
     restart: unless-stopped
@@ -400,6 +424,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.24
+    env_file: .env
   mautrixfacebook:
     image: dock.mau.dev/tulir/mautrix-facebook:latest
     restart: unless-stopped
@@ -410,6 +435,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.25
+    env_file: .env
   mautrixinstagram:
     image: dock.mau.dev/tulir/mautrix-instagram:latest
     restart: unless-stopped
@@ -420,6 +446,7 @@ services:
     networks:
       main:
         ipv4_address: 172.29.0.26
+    env_file: .env
 networks:
   main:
     ipam:
