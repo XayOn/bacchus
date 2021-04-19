@@ -320,8 +320,8 @@ services:
             }"
     volumes:
       - ./data/matrix/synapse:/data
-      - ./data/matrix/signal-bridge:/data/signal/
       - ./data/matrix/mautrix-whatsapp:/data/whatsapp/
+      - ./data/matrix/mautrix-signal:/data/signal/
       - ./data/matrix/mautrix-telegram:/data/telegram/
       - ./data/matrix/mautrix-facebook:/data/facebook/
       - ./data/matrix/mautrix-instagram:/data/instagram/
@@ -386,7 +386,7 @@ services:
     image: dock.mau.dev/tulir/mautrix-signal
     restart: unless-stopped
     volumes:
-      - ./data/matrix/signal-bridge:/data
+      - ./data/matrix/mautrix-signal:/data
       - ./data/matrix/signald:/signald
     depends_on:
       - signald
