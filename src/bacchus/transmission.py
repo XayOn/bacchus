@@ -4,7 +4,7 @@ from .base import HomeServerApp
 
 class Transmission(HomeServerApp):
     def setup_first_step(self):
-        cfg = json.load((self.path / 'config' / 'settings.json').open())
+        cfile = self.path / 'config' / 'settings.json'
+        cfg = json.load(cfile.open())
         cfg['rpc-whitelist-enabled'] = False
-        with open(cfg, 'w') as fileo:
-            json.dump(cfg, fileo)
+        json.dump(cfg, cfile.open('w'))
