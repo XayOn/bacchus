@@ -1,8 +1,7 @@
 import json
-from lxml import etree
 from contextlib import suppress
-
-from .base import TEMPLATES, HomeServerApp
+from lxml import etree
+from .base import HomeServerApp
 
 import requests
 
@@ -58,70 +57,6 @@ TR_CFG = {
 }
 
 
-def get_provider(api_key, name):
-    return {
-        "enableRss":
-        True,
-        "enableAutomaticSearch":
-        True,
-        "enableInteractiveSearch":
-        True,
-        "supportsRss":
-        True,
-        "supportsSearch":
-        True,
-        "protocol":
-        "torrent",
-        "priority":
-        25,
-        "name":
-        name,
-        "fields": [{
-            "name":
-            "baseUrl",
-            "value":
-            f"http://jackett:9117/api/v2.0/indexers/{name}/results/torznab/"
-        }, {
-            "name": "apiPath",
-            "value": "/api"
-        }, {
-            "name": "multiLanguages",
-            "value": []
-        }, {
-            "name": "apiKey",
-            "value": api_key
-        }, {
-            "name":
-            "categories",
-            "value": [2000, 2010, 2020, 2030, 2035, 2040, 2045, 2050, 2060]
-        }, {
-            "name": "additionalParameters"
-        }, {
-            "name": "removeYear",
-            "value": False
-        }, {
-            "name": "minimumSeeders",
-            "value": 1
-        }, {
-            "name": "seedCriteria.seedRatio"
-        }, {
-            "name": "seedCriteria.seedTime"
-        }, {
-            "name": "requiredFlags",
-            "value": []
-        }],
-        "implementationName":
-        "Torznab",
-        "implementation":
-        "Torznab",
-        "configContract":
-        "TorznabSettings",
-        "infoLink":
-        "https://wiki.servarr.com/Radarr_Supported_torznab",
-        "tags": []
-    }
-
-
 def send(arr_name, api, arr_api_key, provider):
     """Send a query against arr api."""
     url = f'http://{arr_name}:{PORTS[arr_name]}/api/v3/{api}'
@@ -134,75 +69,23 @@ class Arr(HomeServerApp):
         name = self.__class__.__name__.lower()
         cfg = (self.path / '..' / 'jackett' / 'Jackett' / 'ServerConfig.json')
         japi_key = json.loads(cfg.read_text())['APIKey']
-        cfg = etree.fromstring((self.path / 'config.xml').read_text())
-        api_key = cfg.find('ApiKey').text
-        indexer_files = (TEMPLATES / 'jackett' / 'Indexers').glob('*.json')
-
-        print(f"Configuring indexers on {self.__class__.__name__}")
-
-        for name_ in (a.stem.lower() for a in indexer_files):
-            print(f"Configuring {name_} on {self.__class__.__name__}")
-            # Setup each indexer
+        keys = {}
+        for arr in ('radarr', 'lidarr', 'sonarr'):
+            cfg = etree.fromstring(
+                (self.path / '..' / arr / 'config.xml').read_text())
+            cfg.find('UrlBase').text = f'/{name}'
+            (self.path / '..' / arr / 'config.xml').write_bytes(
+                etree.tostring(cfg))
+            keys[arr] = cfg.find('ApiKey').text
             with suppress(Exception):
-                send(name, 'indexer', api_key, get_provider(japi_key, name_))
-        # Configure transmission
-        send(name, 'downloadclient', api_key, TR_CFG)
-        cfg.find('UrlBase').text = f'/{name}'
-        (self.path / 'config.xml').write_bytes(etree.tostring(cfg))
-
-
-class Lidarr(Arr):
-    def settings(self, base_url, api_key):
-        cats = [
-            5010, 5030, 5040, 2000, 2010, 2020, 2030, 2035, 2040, 2045, 2050,
-            2060
-        ]
-        return {
-            "minimumSeeders": 1,
-            "requiredFlags": [],
-            "baseUrl": base_url,
-            "multiLanguages": [],
-            "apiKey": api_key,
-            "categories": cats,
-            "animeCategories": [],
-            "removeYear": False,
-            "searchByTitle": False,
-        }
-
-
-class Radarr(Arr):
-    def settings(self, base_url, api_key):
-        cats = [
-            5010, 5030, 5040, 2000, 2010, 2020, 2030, 2035, 2040, 2045, 2050,
-            2060
-        ]
-        return {
-            "minimumSeeders": 1,
-            "requiredFlags": [],
-            "baseUrl": base_url,
-            "multiLanguages": [],
-            "apiKey": api_key,
-            "categories": cats,
-            "animeCategories": [],
-            "removeYear": False,
-            "searchByTitle": False,
-        }
-
-
-class Sonarr(Arr):
-    def settings(self, base_url, api_key):
-        cats = [
-            5010, 5030, 5040, 2000, 2010, 2020, 2030, 2035, 2040, 2045, 2050,
-            2060
-        ]
-        return {
-            "minimumSeeders": 1,
-            "requiredFlags": [],
-            "baseUrl": base_url,
-            "multiLanguages": [],
-            "apiKey": api_key,
-            "categories": cats,
-            "animeCategories": [],
-            "removeYear": False,
-            "searchByTitle": False,
-        }
+                send(arr, 'downloadclient', keys[arr], TR_CFG)
+        (self.path / '..' / '.env_jackett_sync').write_text(f"""
+APIKEY={japi_key}
+URL=http://jackett:9117
+SONARR_URL=http://sonarr:8989
+SONARR_KEY={keys['sonarr']}
+RADARR_URL=http://radarr:7878
+RADARR_KEY={keys['radarr']}
+LIDARR_URL=http://lidarr:8686
+LIDARR_KEY={keys['lidarr']}
+""")

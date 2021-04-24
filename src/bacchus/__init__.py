@@ -2,17 +2,21 @@ import os
 import multiprocessing
 from pathlib import Path
 
-from bacchus.arr import Radarr, Lidarr, Sonarr
+from bacchus.arr import Arr
 from bacchus.jackett import Jackett
 from bacchus.matrix import Matrix
 from bacchus.transmission import Transmission
 from bacchus.jellyfin import Jellyfin
+from bacchus.organizr import Organizr
 
-__all__ = [Jackett, Transmission, Lidarr, Radarr, Sonarr, Jellyfin, Matrix]
+__all__ = [
+    Jackett, Transmission, Arr, Jellyfin, Matrix, Organizr
+]
 
 
 def setup(provider):
     try:
+        print(f"Setting up {provider.__class__.__name__}_{os.getenv('step')}")
         return getattr(provider(os.getenv('host')),
                        f'setup_{os.getenv("step")}_step')()
     except Exception as err:

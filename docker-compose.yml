@@ -6,7 +6,7 @@ services:
     volumes:
       - "./data/:/data"
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.99
     env_file: .env
   dns:
@@ -54,7 +54,7 @@ services:
       - "./data/letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.32
     env_file: .env
   wireguard:
@@ -73,7 +73,7 @@ services:
     labels:
       - com.centurylinklabs.watchtower.enable=true
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.3
     env_file: .env
   pihole:
@@ -86,7 +86,7 @@ services:
       - 208.67.220.220 
       - 208.67.222.222
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.4
     labels:
       - com.centurylinklabs.watchtower.enable=true
@@ -113,7 +113,7 @@ services:
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.5
     env_file: .env
   jackett:
@@ -130,7 +130,7 @@ services:
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.6
     env_file: .env
   transmission:
@@ -147,7 +147,7 @@ services:
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.7
     env_file: .env
   sonarr:
@@ -165,7 +165,7 @@ services:
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.8
     env_file: .env
   radarr:
@@ -183,7 +183,7 @@ services:
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.9
     env_file: .env
   lidarr:
@@ -201,27 +201,18 @@ services:
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.10
     env_file: .env
-  readarr:
-    image: hotio/readarr:nightly
-    restart: always
-    volumes:
-      - ./data/readarr:/config
-      - ./media/books:/books
-      - ./downloads/:/downloads
-    labels:
-      - traefik.http.routers.readarr.rule=hostregexp(`{host:private.+}`) && PathPrefix(`/readarr`)
-      - traefik.http.routers.readarr.tls=true
-      - traefik.http.routers.readarr.tls.certresolver=letsencrypt
-      - traefik.http.services.readarr.loadbalancer.server.port=8787
-      - com.centurylinklabs.watchtower.enable=true
-      - traefik.enable=true
+  jackett_sync:
+    image: m00nwatcher/jackett-sync
+    env_file: data/.env_jackettsync
+    depends_on: 
+      - bacchus
+    restart: never
     networks:
-      main:
-        ipv4_address: 172.29.0.11
-    env_file: .env
+      default:
+        ipv4_address: 172.29.0.100
   jellyfin:
     image: ghcr.io/linuxserver/jellyfin
     restart: always
@@ -241,7 +232,7 @@ services:
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.12
     env_file: .env
   redis:
@@ -255,7 +246,7 @@ services:
     volumes:
       - ./data/redis:/data
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.13
     env_file: .env
   nextcloud:
@@ -280,7 +271,7 @@ services:
       - traefik.http.routers.nextcloud.tls.certresolver=letsencrypt
       - com.centurylinklabs.watchtower.enable=true
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.14
     env_file: .env
   watchtower:
@@ -289,7 +280,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --interval 86400
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.15
   organizr:
     image: organizr/organizr
@@ -306,7 +297,7 @@ services:
       - traefik.http.services.organizr.loadbalancer.server.port=80
       - com.centurylinklabs.watchtower.enable=true
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.16
     env_file: .env
   synapse:
@@ -337,7 +328,7 @@ services:
       - traefik.http.routers.synapse.entrypoints=websecure
       - traefik.http.routers.synapse.tls.certresolver=letsencrypt
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.17
     env_file: .env
   postgres:
@@ -348,7 +339,7 @@ services:
       - ./data/create_db.sh:/docker-entrypoint-initdb.d/20-create_db.sh
       - ./data/postgres/data/:/var/lib/postgresql/data
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.18
   nginx_matrix:
     image: "nginx:latest"
@@ -364,7 +355,7 @@ services:
       - traefik.http.routers.matrix.entrypoints=websecure
       - traefik.http.routers.matrix.tls.certresolver=letsencrypt
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.19
     env_file: .env
   riot:
@@ -379,7 +370,7 @@ services:
       - traefik.http.routers.riot.entrypoints=websecure
       - traefik.http.routers.riot.tls.certresolver=letsencrypt
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.20
     env_file: .env
   mautrix-signal:
@@ -391,7 +382,7 @@ services:
     depends_on:
       - signald
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.21
   signald:
     container_name: signald
@@ -400,7 +391,7 @@ services:
     volumes:
     - ./data/matrix/signald:/signald
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.22
     env_file: .env
   mautrixwhatsapp:
@@ -411,7 +402,7 @@ services:
     depends_on:
       - synapse
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.23
     env_file: .env
   mautrixtelegram:
@@ -422,7 +413,7 @@ services:
     depends_on:
       - synapse
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.24
     env_file: .env
   mautrixfacebook:
@@ -433,7 +424,7 @@ services:
     depends_on:
       - synapse
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.25
     env_file: .env
   mautrixinstagram:
@@ -444,11 +435,11 @@ services:
     depends_on:
       - synapse
     networks:
-      main:
+      default:
         ipv4_address: 172.29.0.26
     env_file: .env
 networks:
-  main:
+  default:
     ipam:
       driver: default 
       config:
