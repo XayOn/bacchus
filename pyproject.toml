@@ -9,7 +9,6 @@ include = ["src/bacchus/static"]
 
 [tool.poetry.scripts]
 bacchus = 'bacchus:main'
-bacchus_web = 'bacchus.web:main'
 
 [tool.poetry.dependencies]
 python = "^3.9"
