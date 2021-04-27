@@ -1,9 +1,12 @@
 import json
+import logging
+import time
 from contextlib import suppress
 from lxml import etree
 from .base import HomeServerApp
-
 import requests
+
+logging.basicConfig(level=logging.DEBUG)
 
 PORTS = {'radarr': 7878, 'lidarr': 8686, 'sonarr': 8989}
 TR_CFG = {
@@ -61,19 +64,25 @@ def send(arr_name, api, arr_api_key, provider):
     """Send a query against arr api."""
     url = f'http://{arr_name}:{PORTS[arr_name]}/api/v3/{api}'
     headers = {'X-Api-Key': arr_api_key}
-    print(requests.post(url, headers=headers, json=provider).text)
+    logging.debug(requests.post(url, headers=headers, json=provider).text)
 
 
 class Arr(HomeServerApp):
     def setup_first_step(self):
-        name = self.__class__.__name__.lower()
         cfg = (self.path / '..' / 'jackett' / 'Jackett' / 'ServerConfig.json')
+        while not cfg.exists():
+            logging.info(f"Waiting for {cfg}")
+            time.sleep(1)
         japi_key = json.loads(cfg.read_text())['APIKey']
         keys = {}
         for arr in ('radarr', 'lidarr', 'sonarr'):
-            cfg = etree.fromstring(
-                (self.path / '..' / arr / 'config.xml').read_text())
-            cfg.find('UrlBase').text = f'/{name}'
+            cfile = (self.path / '..' / arr / 'config.xml')
+            cfg = etree.fromstring(cfile.read_text())
+            while not cfile.exists():
+                logging.info(f"Waiting for {cfile}")
+                time.sleep(1)
+            cfg.find('UrlBase').text = f'/{arr}'
+            logging.info(etree.tostring(cfg))
             (self.path / '..' / arr / 'config.xml').write_bytes(
                 etree.tostring(cfg))
             keys[arr] = cfg.find('ApiKey').text

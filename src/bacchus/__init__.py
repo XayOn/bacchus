@@ -1,5 +1,6 @@
 import os
 import multiprocessing
+import logging
 from pathlib import Path
 
 from bacchus.arr import Arr
@@ -9,27 +10,38 @@ from bacchus.transmission import Transmission
 from bacchus.jellyfin import Jellyfin
 from bacchus.organizr import Organizr
 
-__all__ = [
-    Jackett, Transmission, Arr, Jellyfin, Matrix, Organizr
-]
+from loguru import logger
+
+__all__ = [Jackett, Transmission, Arr, Jellyfin, Matrix, Organizr]
 
 
 def setup(provider):
+    """Setup a provider with some environment variables"""
     try:
-        print(f"Setting up {provider.__class__.__name__}_{os.getenv('step')}")
+        logger.info(f"Setting up {provider.__name__}_{os.getenv('step')}")
         return getattr(provider(os.getenv('host')),
-                       f'setup_{os.getenv("step")}_step')()
+                       f'setup_{os.getenv("step", "first")}_step')()
     except Exception as err:
-        print(f"Could not configure {provider}: {err}")
+        logger.exception(f"Could not configure {provider}: {err}")
         raise
 
 
 def main():
+    """Wait 60 seconds for each provider to finish.
+
+    Should not take that long! Terminate otherwise
+    Parallelize providers configuration
+    """
+    step_path = Path(f'/data/bacchus_install_{os.getenv("step", "first")}')
+    if step_path.exists():
+        logger.info(
+            'Already executed. Deleted installfile if you want to reinstall')
+        return
     for provider in __all__:
         pro = multiprocessing.Process(target=setup, args=(provider, ))
         pro.start()
-        pro.join(10)
+        pro.join(60)
         if pro.is_alive():
             pro.terminate()
             pro.join()
-    Path(f'/data/bacchus_install_{os.getenv("step")}').write_text('')
+    step_path.write_text('')

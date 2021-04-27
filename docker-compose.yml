@@ -206,7 +206,7 @@ services:
     env_file: .env
   jackett_sync:
     image: m00nwatcher/jackett-sync
-    env_file: data/.env_jackettsync
+    env_file: data/.env_jackett_sync
     depends_on: 
       - bacchus
     restart: never
@@ -304,14 +304,17 @@ services:
     image: "matrixdotorg/synapse:latest"
     restart: "unless-stopped"
     entrypoint: >
-        bash -c "[ -e /data/homeserver.yaml ] && /start.py || { 
-            /start.py generate; 
-            echo -e '\nenable_registration=true >> /data/homeserver.yaml;
-            /start.py; 
-            }"
+        bash -c "[ -e /data/homeserver.yaml ] && /start.py || {
+            /start.py generate;
+            grep enable_registration: true /data/homeserver.yaml || {
+                echo -e '\nenable_registration: true' >> /data/homeserver.yaml;
+            };
+            /start.py;
+        }"
+
     volumes:
       - ./data/matrix/synapse:/data
-      - ./data/matrix/signal-bridge:/data/signal/
+      - ./data/matrix/mautrix-signal:/data/signal/
       - ./data/matrix/mautrix-whatsapp:/data/whatsapp/
       - ./data/matrix/mautrix-telegram:/data/telegram/
       - ./data/matrix/mautrix-facebook:/data/facebook/
@@ -341,6 +344,7 @@ services:
     networks:
       default:
         ipv4_address: 172.29.0.18
+    env_file: .env
   nginx_matrix:
     image: "nginx:latest"
     restart: "unless-stopped"
@@ -350,7 +354,7 @@ services:
       bash -c "[[ -e /etc/nginx/matrix.conf ]] && /docker-entrypoint.sh nginx -g 'daemon off;' || mkdir -p /var/www/.well-known/matrix/; { echo -e 'server {\n  listen         8080 default_server;\n  server_name    matrix.${host};\n\n # Traefik -> nginx -> synapse\n location /_matrix {\n    proxy_pass http://synapse:8008;\n    proxy_set_header X-Forwarded-For $$remote_addr;\n    client_max_body_size 128m;\n  }\n\n  location /.well-known/matrix/ {\n    root /var/www/;\n    default_type application/json;\n    add_header Access-Control-Allow-Origin  *;\n  }\n}\n' > /etc/nginx/conf.d/matrix.conf; echo '{\"m.homeserver\": {\"base_url\": \"https://matrix.${host}\"}}' > /var/www/.well-known/matrix/client; echo '{\"m.server\": \"synapse.${host}:443\"}' >/var/www/.well-known/matrix/server; /docker-entrypoint.sh nginx -g 'daemon off;'; }"
     labels:
       - traefik.enable=true
-      - traefik.http.services.matrix.loadbalancer.server.port=80
+      - traefik.http.services.matrix.loadbalancer.server.port=8080
       - traefik.http.routers.matrix.rule=hostregexp(`{host:matrix.+}`)
       - traefik.http.routers.matrix.entrypoints=websecure
       - traefik.http.routers.matrix.tls.certresolver=letsencrypt
@@ -377,7 +381,7 @@ services:
     image: dock.mau.dev/tulir/mautrix-signal
     restart: unless-stopped
     volumes:
-      - ./data/matrix/signal-bridge:/data
+      - ./data/matrix/mautrix-signal:/data
       - ./data/matrix/signald:/signald
     depends_on:
       - signald
