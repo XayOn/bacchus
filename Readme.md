@@ -82,19 +82,19 @@ to your bacchus machine.
 
 ## Features
 
-[X] Docker-compose based
-[X] Configure domains automatically
-[X] Configure SSL
-[X] Setup wireguard with a client
-[X] Setup postgresql
-[X] Setup nextcloud automatically
-[X] Setup KODI
-[X] Setup the arrs with jackett, and sync the providers
-[X] Setup traefik with all the services configured as subdomains
-[X] Configure element.io riot and matrix
-[ ] Auto-configure organizr with all the services 
-[ ] Auto-configure mautrix clients
-[ ] Setup transmission-daemon client on the arrs
+- [X] Docker-compose based
+- [X] Configure domains automatically
+- [X] Configure SSL
+- [X] Setup wireguard with a client
+- [X] Setup postgresql
+- [X] Setup nextcloud automatically
+- [X] Setup KODI
+- [X] Setup the arrs with jackett, and sync the providers
+- [X] Setup traefik with all the services configured as subdomains
+- [X] Configure element.io riot and matrix
+- [ ] Auto-configure organizr with all the services 
+- [ ] Auto-configure mautrix clients
+- [ ] Setup transmission-daemon client on the arrs
 
 
 [1]: https://github.com/nextcloud/nextcloud
