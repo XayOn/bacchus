@@ -1,6 +1,5 @@
 import os
 import multiprocessing
-import logging
 from pathlib import Path
 
 from bacchus.arr import Arr
