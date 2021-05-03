@@ -314,8 +314,8 @@ services:
 
     volumes:
       - ./data/matrix/synapse:/data
-      - ./data/matrix/mautrix-signal:/data/signal/
       - ./data/matrix/mautrix-whatsapp:/data/whatsapp/
+      - ./data/matrix/mautrix-signal:/data/signal/
       - ./data/matrix/mautrix-telegram:/data/telegram/
       - ./data/matrix/mautrix-facebook:/data/facebook/
       - ./data/matrix/mautrix-instagram:/data/instagram/
