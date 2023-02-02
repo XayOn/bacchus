@@ -15,7 +15,7 @@ services:
       - traefik.http.routers.wiki.tls.certresolver=letsencrypt
       - traefik.http.services.wiki.loadbalancer.server.port=80
       - com.centurylinklabs.watchtower.enable=true
-    command: "cheatography.com_en_all_2022-03.zim edu.gcfglobal.org_en_all_2021-12.zim khan-academy-videos_en_algebra_2021-03.zim khan-academy-videos_en_chemistry_2021-04.zim khan-academy-videos_en_cosmology-and-astronomy_2021-04.zim khan-academy-videos_en_trigonometry-high-school-math-khan-academy_2021-03.zim openstreetmap-wiki_en_all_maxi_2021-03.zim ted_en_business_2022-01.zim ted_en_design_2022-01.zim ted_en_entertainment_2022-08.zim ted_en_global_issues_2022-01.zim ted_en_science_2022-01.zim wikihow_en_maxi_2022-01.zim wikipedia_en_all_maxi.zim"
+    command: "openstreetmap-wiki_en_all_maxi_2021-03.zim wikihow_en_maxi_2022-01.zim wikipedia_en_all_maxi.zim"
     networks:
       default:
         ipv4_address: 172.29.0.202

@@ -15,4 +15,4 @@ RUN apt-get update &&\
 
 COPY install.sh /
 
-ENTRYPOINT bacchus
+ENTRYPOINT /install.sh
