@@ -1,0 +1,53 @@
+version: "3.3"
+services:
+  mqtt:
+    restart: unless-stopped
+    image: eclipse-mosquitto:latest
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - .docker_data/mosquitto/config:/mosquitto/config
+    networks:
+      default:
+        ipv4_address: 172.29.3.1
+
+  homeassistant:
+    image: lscr.io/linuxserver/homeassistant
+    depends_on:
+    - mqtt 
+    env_file:
+      - .env
+    volumes:
+      - .docker_data/ha:/config
+      - .docker_data/ha/home:/root
+      - .docker_data/ha:/data/homeassistant/
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/run/docker.sock
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
+    privileged: true
+    restart: unless-stopped
+    labels:
+      - "traefik.http.middlewares.myCors.headers.accesscontrolallowmethods=GET,OPTIONS,PUT"   
+      - "traefik.http.middlewares.myCors.headers.accesscontrolalloworigin=*"
+      - "traefik.http.middlewares.myCors.headers.accesscontrolmaxage=100"   
+      - "traefik.http.middlewares.myCors.headers.addvaryheader=true"
+      - "traefik.http.routers.homeassistant.middlewares=myCors@docker"
+      - "traefik.http.services.homeassistant.loadbalancer.server.port=8123"
+      - "traefik.http.routers.homeassistant.rule=hostregexp(`{host:homeassistant.+}`)"
+      - "traefik.http.routers.homeassistant.entrypoints=websecure"
+      - "traefik.http.routers.homeassistant.tls=true"
+      - traefik.http.routers.homeassistant.tls.certresolver=letsencrypt
+      - "traefik.enable=true"
+    networks:
+      default:
+        ipv4_address: 172.29.3.2
+
+networks:
+  default:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.29.0.0/24
+
+

@@ -3,15 +3,13 @@ import multiprocessing
 from pathlib import Path
 
 from bacchus.arr import Arr
-from bacchus.jackett import Jackett
 from bacchus.matrix import Matrix
 from bacchus.transmission import Transmission
 from bacchus.jellyfin import Jellyfin
-from bacchus.organizr import Organizr
 
 from loguru import logger
 
-__all__ = [Jackett, Transmission, Arr, Jellyfin, Matrix, Organizr]
+__all__ = [Transmission, Arr, Jellyfin, Matrix]
 
 
 def setup(provider):
@@ -26,16 +24,7 @@ def setup(provider):
 
 
 def main():
-    """Wait 60 seconds for each provider to finish.
-
-    Should not take that long! Terminate otherwise
-    Parallelize providers configuration
-    """
-    step_path = Path(f'/data/bacchus_install_{os.getenv("step", "first")}')
-    if step_path.exists():
-        logger.info(
-            'Already executed. Deleted installfile if you want to reinstall')
-        return
+    """Setup configurations."""
     for provider in __all__:
         pro = multiprocessing.Process(target=setup, args=(provider, ))
         pro.start()

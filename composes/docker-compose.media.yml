@@ -1,0 +1,183 @@
+version: "3.3"
+services:
+  transmission:
+    image: ghcr.io/linuxserver/transmission
+    restart: always
+    volumes:
+      - .docker_data/transmission/config:/config
+      - /media/downloads:/downloads
+      - /media/:/media/
+    labels:
+      - traefik.http.routers.transmission.rule=hostregexp(`{host:private.+}`) && PathPrefix(`/transmission`)
+      - traefik.http.routers.transmission.tls=true
+      - traefik.http.routers.transmission.tls.certresolver=letsencrypt
+      - traefik.http.services.transmission.loadbalancer.server.port=9091
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+    env_file:
+      - .env
+    networks:
+      default:
+        ipv4_address: 172.29.0.91
+  prowlarr:
+    image: ghcr.io/linuxserver/prowlarr:develop
+    restart: always
+    volumes:
+      - /home/xayon/.docker_data/prowlarr:/config
+      - /media/xayon/6tb-3/downloads/complete:/downloads
+    labels:
+      - traefik.http.routers.prowlarr.rule=host(`private.__HOST__`) && PathPrefix(`/prowlarr`)
+      - traefik.http.routers.prowlarr.tls=true
+      - traefik.http.routers.prowlarr.tls.certresolver=letsencrypt
+      - traefik.http.services.prowlarr.loadbalancer.server.port=9696
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+    env_file:
+      - .env
+    networks:
+      default:
+        ipv4_address: 172.29.0.90
+  sonarr:
+    image: ghcr.io/linuxserver/sonarr
+    restart: always
+    volumes:
+      - /home/xayon/.docker_data/sonarr:/config
+      - /media/xayon/6tb-3/tv:/tv
+      - /media/xayon/6tb-3/downloads/:/downloads
+      - /media/xayon/:/media/xayon/
+    labels:
+      - traefik.http.routers.sonarr.rule=hostregexp(`{host:private.+}`) && PathPrefix(`/sonarr`)
+      - traefik.http.routers.sonarr.tls=true
+      - traefik.http.routers.sonarr.tls.certresolver=letsencrypt
+      - traefik.http.services.sonarr.loadbalancer.server.port=8989
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+    env_file:
+      - .env
+    networks:
+      default:
+        ipv4_address: 172.29.0.89
+  radarr:
+    image: ghcr.io/linuxserver/radarr
+    restart: always
+    volumes:
+      - .docker_data/radarr:/config
+      - /media/movies:/movies
+      - /media/downloads/:/downloads
+      - /media/:/media/
+    labels:
+      - traefik.http.routers.radarr.rule=hostregexp(`{host:private.+}`) && PathPrefix(`/radarr`)
+      - traefik.http.routers.radarr.tls=true
+      - traefik.http.routers.radarr.tls.certresolver=letsencrypt
+      - traefik.http.services.radarr.loadbalancer.server.port=7878
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+    env_file:
+      - .env
+    networks:
+      default:
+        ipv4_address: 172.29.0.88
+  lidarr:
+    image: ghcr.io/linuxserver/lidarr
+    restart: unless-stopped 
+    volumes:
+      - .docker_data/lidarr:/config
+      - /media/music:/music
+      - /media/downloads/:/downloads
+    labels:
+      - traefik.http.routers.lidarr.rule=hostregexp(`{host:private.+}`) && PathPrefix(`/lidarr`)
+      - traefik.http.routers.lidarr.tls=true
+      - traefik.http.routers.lidarr.tls.certresolver=letsencrypt
+      - traefik.http.services.lidarr.loadbalancer.server.port=8686
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+    env_file:
+      - .env
+    networks:
+      default:
+        ipv4_address: 172.29.0.87
+  readarr:
+    image: hotio/readarr:nightly
+    restart: always
+    volumes:
+      - .docker_data/readarr:/config
+      - /media/books:/books
+      - /media/downloads/:/downloads
+    labels:
+      - traefik.http.routers.readarr.rule=hostregexp(`{host:private.+}`) && PathPrefix(`/readarr`)
+      - traefik.http.routers.readarr.tls=true
+      - traefik.http.routers.readarr.tls.certresolver=letsencrypt
+      - traefik.http.services.readarr.loadbalancer.server.port=8787
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+    env_file:
+      - .env
+    networks:
+      default:
+        ipv4_address: 172.29.0.81
+  jellyfin:
+    image: jellyfin/jellyfin:unstable
+    restart: always 
+    volumes:
+      - .docker_data/jellyfin:/config
+      - /media/:/media/
+    devices:
+      - /dev/dri:/dev/dri 
+    labels:
+      - traefik.http.routers.jellyfin.rule=hostregexp(`{host:private.+}`) && PathPrefix(`/jellyfin`)
+      - traefik.http.routers.jellyfin.tls=true
+      - traefik.http.routers.jellyfin.tls.certresolver=letsencrypt
+      - traefik.http.services.jellyfin.loadbalancer.server.port=8096
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+    env_file:
+      - .env
+    networks:
+      default:
+        ipv4_address: 172.29.0.80
+  bazarr:
+    image: ghcr.io/linuxserver/bazarr
+    restart: always
+    volumes:
+      - .docker_data/bazarr:/config
+      - /media/tv:/tv
+      - /media/downloads/:/downloads
+      - /media/:/media/
+    labels:
+      - traefik.http.routers.bazarr.rule=hostregexp(`{host:private.+}`) && PathPrefix(`/bazarr`)
+      - traefik.http.routers.bazarr.tls=true
+      - traefik.http.routers.bazarr.tls.certresolver=letsencrypt
+      - traefik.http.services.bazarr.loadbalancer.server.port=6767
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+    env_file:
+      - .env
+    networks:
+      default:
+        ipv4_address: 172.29.0.82
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    volumes:
+       - .docker_data/jellyseer:/app/config
+    restart: unless-stopped
+    env_file:
+      - .env
+    labels:
+      - traefik.http.routers.jellyseerr.rule=hostregexp(`{host:jellyseerr.+}`)
+      - traefik.http.routers.jellyseerr.tls=true
+      - traefik.http.routers.jellyseerr.tls.certresolver=letsencrypt
+      - traefik.http.services.jellyseerr.loadbalancer.server.port=5055
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+    networks:
+      default:
+        ipv4_address: 172.29.0.83
+
+networks:
+  default:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.29.0.0/24
+
+

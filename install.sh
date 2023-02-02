@@ -1,7 +1,7 @@
 #!/bin/bash
 
-[[ $# == 5 ]] || {
-    echo "Usage: $0 user password host email gandiv5_api_key"; exit 1
+[[ $# == 3 ]] || {
+    echo "Usage: $0 host email gandiv5_api_key"; exit 1
 }
 
 mkdir data
@@ -9,14 +9,16 @@ touch data/.env_jackett_sync
 touch data/create_db.sh 
 
 ip=$(curl ifconfig.co)
+nextcloud_admin_password=$(pwgen -c -n -1 -s 30)
+nextcloud_admin_user=admin
 
 cat << EOL >.env
-NEXTCLOUD_ADMIN_USER=$1
-NEXTCLOUD_ADMIN_PASSWORD=$2
-host=$3
-email=$4
+NEXTCLOUD_ADMIN_USER=${nextcloud_admin_password}
+NEXTCLOUD_ADMIN_PASSWORD=${nextcloud_admin_user}
+host=$1
+email=$2
+GANDIV5_API_KEY=$3
 public_ip=$ip
-GANDIV5_API_KEY=$5
 
 dns_provider=gandiv5
 dns_provider_credentials=--api-protocol rest --auth-token ${GANDIV5_API_KEY} 
@@ -48,5 +50,9 @@ SYNAPSE_SERVER_NAME=\${host}
 EOL
 
 
-#step=web_env docker run xayon/bacchus
-docker-compose -pbacchus up -d
+cp -r composes ~/.bacchus/composes/
+sed -i s/__HOST__/$host/g ~/.bacchus/composes/*.yml
+a=$(echo ~/.bacchus/composes/*.yml); docker-compose -f ${a// / -f } up
+a=$(echo ~/.bacchus/composes/*.yml); docker-compose -f ${a// / -f } down
+bacchus install
+a=$(echo ~/.bacchus/composes/*.yml); docker-compose -f ${a// / -f } up

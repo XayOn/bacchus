@@ -1,0 +1,63 @@
+version: "3.3"
+services:
+  wiki:
+    image: kiwix/kiwix-serve:latest
+    restart: always
+    volumes:
+      - /media/other:/data
+    env_file:
+      - .env
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.wiki.entrypoints=websecure
+      - traefik.http.routers.wiki.rule=Host(`wiki.__HOST__`)
+      - traefik.http.routers.wiki.tls=true
+      - traefik.http.routers.wiki.tls.certresolver=letsencrypt
+      - traefik.http.services.wiki.loadbalancer.server.port=80
+      - com.centurylinklabs.watchtower.enable=true
+    command: "cheatography.com_en_all_2022-03.zim edu.gcfglobal.org_en_all_2021-12.zim khan-academy-videos_en_algebra_2021-03.zim khan-academy-videos_en_chemistry_2021-04.zim khan-academy-videos_en_cosmology-and-astronomy_2021-04.zim khan-academy-videos_en_trigonometry-high-school-math-khan-academy_2021-03.zim openstreetmap-wiki_en_all_maxi_2021-03.zim ted_en_business_2022-01.zim ted_en_design_2022-01.zim ted_en_entertainment_2022-08.zim ted_en_global_issues_2022-01.zim ted_en_science_2022-01.zim wikihow_en_maxi_2022-01.zim wikipedia_en_all_maxi.zim"
+    networks:
+      default:
+        ipv4_address: 172.29.0.202
+
+  search:
+    image: searxng/searxng:latest
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    environment:
+      - SEARXNG_BASE_URL=https://search.__HOST__/
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+    restart: always
+    env_file:
+      - .env
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.search.entrypoints=websecure
+      - traefik.http.routers.search.rule=Host(`search.__HOST__`)
+      - traefik.http.routers.search.tls=true
+      - traefik.http.routers.search.tls.certresolver=letsencrypt
+      - traefik.http.services.search.loadbalancer.server.port=8080
+      - com.centurylinklabs.watchtower.enable=true
+    networks:
+      default:
+        ipv4_address: 172.29.0.203
+
+networks:
+  default:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.29.0.0/24
+
+

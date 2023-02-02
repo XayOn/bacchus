@@ -1,0 +1,55 @@
+version: "3.3"
+services:
+  selfoss:
+    image:  rsprta/selfoss
+    restart: always
+    volumes:
+      - .docker_data/swfd/:/selfoss/data
+    labels:
+      - traefik.http.routers.selfoss.rule=hostregexp(`{host:rss.+}`)
+      - traefik.http.routers.selfoss.tls=true
+      - traefik.http.routers.selfoss.tls.certresolver=letsencrypt
+      - traefik.http.services.selfoss.loadbalancer.server.port=8888
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+    networks:
+      default:
+        ipv4_address: 172.29.0.101
+  nextcloud:
+    image: nextcloud:latest
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+      - traefik
+      - watchtower
+    volumes:
+      - .docker_data/nextcloud_data/config:/var/www/html/config/
+      - .docker_data/nextcloud_data:/var/www/html/data/
+      - /media/:/media/
+    env_file:
+      - .env
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.nextcloud.entrypoints=websecure
+      - "traefik.http.middlewares.testHeader.headers.sslredirect=true"
+      - "traefik.http.middlewares.testHeader.headers.customresponseheaders.Content-Security-Policy=frame-ancestors https:"
+      - traefik.http.routers.nextcloud.middlewares=testHeader@docker
+      - traefik.http.routers.nextcloud.rule=hostregexp(`{host:cloud.+}`)
+      - traefik.http.routers.nextcloud.tls=true
+      - traefik.http.routers.nextcloud.tls.certresolver=letsencrypt
+      - com.centurylinklabs.watchtower.enable=true
+    ports:
+      - 80:80
+    networks:
+      default:
+        ipv4_address: 172.29.5.2
+
+networks:
+  default:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.29.0.0/24
+
+

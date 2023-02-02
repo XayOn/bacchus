@@ -1,36 +1,18 @@
-FROM python:3.9.1-slim as build
+FROM python:3.11-slim
 
 WORKDIR /app
 
 ENV PIP_NO_CACHE_DIR=off \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
-    POETRY_PATH=/opt/poetry \
     VIRTUAL_ENV=/opt/venv \
-    POETRY_VERSION=1.1.4 \
-    PATH=$PATH:/root/.poetry/bin/ \
     step=first
 
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y git curl graphviz build-essential\
-    && python -m venv $VIRTUAL_ENV \
-    && curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python \ 
-    && poetry config virtualenvs.create false \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update &&\
+    pip install hatch &&\
+    hatch build &&\
+    pip install build/*
 
-COPY pyproject.toml ./
-RUN poetry install --no-dev --no-root
-COPY . ./ 
-RUN poetry install --no-dev
-# RUN pip install .
+COPY install.sh /
 
-FROM python:3.9.1-slim
-ENV VIRTUAL_ENV=/opt/venv\
-    PATH="$VIRTUAL_ENV/bin:$PATH"
-
-RUN ln -sf /usr/share/zoneinfo/UTC /etc/localtime
-
-COPY --from=build $VIRTUAL_ENV $VIRTUAL_ENV
-COPY --from=build /app/ /app/
-
-ENTRYPOINT /opt/venv/bin/bacchus 
+ENTRYPOINT bacchus

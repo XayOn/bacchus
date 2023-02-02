@@ -1,0 +1,36 @@
+version: "3.3"
+services:
+  postgres:
+    hostname: postgres
+    image: postgres:11
+    restart: always
+    volumes:
+      - .docker_data/create_db.sh:/docker-entrypoint-initdb.d/20-create_db.sh
+      - .docker_data/postgres/data/:/var/lib/postgresql/data
+    env_file:
+      - .env
+    networks:
+      default:
+        ipv4_address: 172.29.0.232
+  redis:
+    image: redis:5
+    restart: always
+    depends_on:
+      - watchtower
+    labels:
+      - trafik.enable = false
+      - com.centurylinklabs.watchtower.enable=true
+    volumes:
+      - .docker_data/redis:/data
+    networks:
+      default:
+        ipv4_address: 172.29.0.231
+
+networks:
+  default:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.29.0.0/24
+
+

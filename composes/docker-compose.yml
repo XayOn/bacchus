@@ -1,0 +1,150 @@
+version: "3.3"
+services:
+  traefik:
+    image: "traefik:v2.4"
+    restart: always
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.middlewares.limit.buffering.maxRequestBodyBytes=10000000000
+      - traefik.http.middlewares.limit.buffering.maxResponseBodyBytes=10000000000
+      - traefik.http.middlewares.limit.buffering.retryExpression=IsNetworkError() && Attempts() < 2
+      - traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto = https
+    command:
+      - --api.insecure=true
+      - --api.dashboard=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge=true
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=gandiv5
+      - --certificatesresolvers.letsencrypt.acme.email=${email}
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --entrypoints.websecure.http.tls.certResolver=letsencrypt
+      - --entrypoints.websecure.http.tls.domains[0].main=${host}
+    ports:
+      - "443:443"
+    volumes:
+      - ".docker_data/letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    env_file:
+      - .env
+    networks:
+      default:
+        ipv4_address: 172.29.0.23
+  wg-easy:
+    image: weejewel/wg-easy
+    volumes:
+      - .docker_data/wireguard/:/etc/wireguard
+    environment:
+      - UID=0
+      - PID=0
+    ports:
+      - "51820:51820/udp"
+      - "51821:51821/tcp"
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
+    env_file:
+      - .env
+    networks:
+      default:
+        ipv4_address: 172.29.0.90
+    labels:
+      - traefik.http.routers.wg-easy.rule=hostregexp(`{host:vpn.+}`)
+      - traefik.http.routers.wg-easy.tls=true
+      - traefik.http.routers.wg-easy.tls.certresolver=letsencrypt
+      - traefik.http.services.wg-easy.loadbalancer.server.port=51821
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true 
+  webssh:
+    image: snsyzb/webssh
+    restart: unless-stopped
+    networks:
+      default:
+        ipv4_address: 172.29.6.3
+    labels:
+      - traefik.http.routers.webssh.rule=hostregexp(`{host:ssh.+}`)
+      - traefik.http.routers.webssh.tls=true
+      - traefik.http.routers.webssh.tls.certresolver=letsencrypt
+      - traefik.http.services.webssh.loadbalancer.server.port=8080
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true 
+    env_file:
+      - .env
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 86400
+    env_file:
+      - .env
+    networks:
+      default:
+        ipv4_address: 172.29.6.4
+  adguardhome:
+    image: adguard/adguardhome
+    restart: always
+    labels:
+      - traefik.http.routers.adguardhome.rule=hostregexp(`{host:adguard.+}`)
+      - traefik.http.routers.adguardhome.tls=true
+      - traefik.http.routers.adguardhome.tls.certresolver=letsencrypt
+      - traefik.http.services.adguardhome.loadbalancer.server.port=80
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+    env_file:
+      - .env
+    volumes:
+      - .docker_data/adguard/conf:/opt/adguardhome/conf
+      - .docker_data/adguard/work:/opt/adguardhome/work
+    networks:
+      default:
+        ipv4_address: 172.29.6.5
+  homarr:
+    image: ghcr.io/ajnart/homarr:latest
+    restart: always
+    labels:
+      - traefik.http.routers.private.rule=Host(`private.__HOST__`) && PathPrefix(`/`)
+      - traefik.http.routers.homarr.tls=true
+      - traefik.http.routers.homarr.tls.certresolver=letsencrypt
+      - traefik.http.services.homarr.loadbalancer.server.port=7575
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+    env_file:
+      - .env
+    volumes:
+      - .docker_data/homarr/config:/app/data/configs
+      - .docker_data/homarr/icons:/app/public/icons
+      - /var/run/docker.sock:/var/run/docker.sock 
+    networks:
+      default:
+        ipv4_address: 172.29.0.176
+
+  dash:
+    image: mauricenino/dashdot:latest
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - /:/mnt/host:ro
+    labels:
+      - traefik.http.routers.private.rule=hostregexp(`{host:dashboard.+}`)
+      - traefik.http.routers.dash.tls=true
+      - traefik.http.routers.dash.tls.certresolver=letsencrypt
+      - traefik.http.services.dash.loadbalancer.server.port=3001
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+    networks:
+      default:
+        ipv4_address: 172.29.6.7
+networks:
+  default:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.29.0.0/24
+
+

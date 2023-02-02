@@ -1,0 +1,182 @@
+version: "3.3"
+services:
+  mautrix-twitter:
+    image: dock.mau.dev/mautrix/twitter
+    restart: unless-stopped
+    volumes:
+      - ".docker_data/matrix/twitter/:/data"
+    env_file:
+      - .env
+    networks:
+      default:
+        ipv4_address: 172.29.0.154
+
+  mautrix-googlechat:
+    image: dock.mau.dev/mautrix/googlechat
+    restart: unless-stopped
+    volumes:
+      - ".docker_data/matrix/google/:/data"
+    env_file:
+      - .env
+    networks:
+      default:
+        ipv4_address: 172.29.0.158
+
+
+  mautrix-slack:
+    image: dock.mau.dev/mautrix/slack
+    restart: unless-stopped
+    volumes:
+      - ".docker_data/matrix/slack/:/data"
+    env_file:
+      - .env
+    networks:
+      default:
+        ipv4_address: 172.29.0.155
+  synapse:
+    image: "matrixdotorg/synapse:latest"
+    restart: "unless-stopped"
+    volumes:
+      - ".docker_data/matrix/synapse/:/data"
+    env_file:
+      - .env
+    labels:
+      - "traefik.http.middlewares.myCors.headers.accesscontrolallowmethods=GET,OPTIONS,PUT"   
+      - "traefik.http.middlewares.myCors.headers.accesscontrolalloworigin=*"
+      - "traefik.http.middlewares.myCors.headers.accesscontrolmaxage=100"   
+      - "traefik.http.middlewares.myCors.headers.addvaryheader=true"
+      - "traefik.http.routers.synapse.middlewares=myCors@docker"
+      - "traefik.enable=true"
+      - "traefik.http.services.synapse.loadbalancer.server.port=8008"
+      - "traefik.http.routers.synapse.rule=hostregexp(`{host:synapse.+}`)"
+      - "traefik.http.routers.synapse.entrypoints=websecure"
+    networks:
+      default:
+        ipv4_address: 172.29.0.50
+  riot:
+    restart: unless-stopped
+    image: vectorim/element-web 
+    volumes:
+      - ".docker_data/matrix/riot/config.json:/app/config.json:ro"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.riot.loadbalancer.server.port=80"
+      - "traefik.http.routers.riot.rule=hostregex(`riot.+`)"
+      - "traefik.http.routers.riot.entrypoints=websecure"
+      - "traefik.http.routers.riot.tls.certresolver=letsencrypt"
+    networks:
+      default:
+        ipv4_address: 172.29.0.42
+  matrix-linkedin:
+    image: ghcr.io/beeper/linkedin
+    restart: unless-stopped
+    environment:
+      - UID=0
+      - GID=0
+    volumes:
+      - .docker_data/matrix/matrix-linkedin:/data
+    networks:
+      default:
+        ipv4_address: 172.29.0.43
+  mautrix-signal:
+    image: dock.mau.dev/mautrix/signal
+    restart: unless-stopped
+    volumes:
+      - .docker_data/matrix/signal-bridge:/data
+      - .docker_data/matrix/signald:/signald
+    depends_on:
+    - signald
+    networks:
+      default:
+        ipv4_address: 172.29.0.44
+  signald:
+    image: docker.io/finn/signald
+    restart: unless-stopped
+    volumes: 
+    - .docker_data/matrix/signald:/signald
+    networks:
+      default:
+        ipv4_address: 172.29.0.145
+  mautrixwhatsapp:
+    image: dock.mau.dev/mautrix/whatsapp:latest
+    restart: unless-stopped
+    volumes:
+      - .docker_data/matrix/mautrix-whatsapp:/data
+    depends_on:
+      - synapse
+    networks:
+      default:
+        ipv4_address: 172.29.0.46
+  mautrixtelegram:
+    image: dock.mau.dev/mautrix/telegram:latest
+    restart: unless-stopped
+    volumes:
+      - .docker_data/matrix/mautrix-telegram:/data
+    depends_on:
+      - synapse
+    networks:
+      default:
+        ipv4_address: 172.29.0.47
+
+  mautrixfacebook:
+    image: dock.mau.dev/mautrix/facebook:latest
+    restart: unless-stopped
+    volumes:
+      - .docker_data/matrix/mautrix-facebook:/data
+    depends_on:
+      - synapse
+    networks:
+      default:
+        ipv4_address: 172.29.0.148
+  mautrixinstagram:
+    image: dock.mau.dev/mautrix/instagram:latest
+    restart: unless-stopped
+    volumes:
+      - .docker_data/matrix/mautrix-instagram:/data
+    depends_on:
+      - synapse
+    networks:
+      default:
+        ipv4_address: 172.29.0.149
+
+  maubot:
+    image: dock.mau.dev/maubot/maubot
+    restart: unless-stopped
+    volumes:
+      - .docker_data/matrix/mautrix-bot:/data
+    depends_on:
+      - synapse
+    networks:
+      default:
+        ipv4_address: 172.29.0.151
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.maubot.loadbalancer.server.port=29316"
+      - "traefik.http.routers.maubot.rule=hostregexp(`{host:matrix.+}`) && PathPrefix(`/_matrix/maubot`)" 
+      - "traefik.http.routers.maubot.entrypoints=websecure"
+      - "traefik.http.routers.maubot.tls.certresolver=letsencrypt"
+
+  nginx_matrix:
+    image: "nginx:latest"
+    restart: "unless-stopped"
+    depends_on:
+    - synapse 
+    volumes:
+      - ".docker_data/matrix/nginx/matrix.conf:/etc/nginx/conf.d/matrix.conf"
+      - ".docker_data/matrix/nginx/www:/var/www/"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.matrix.loadbalancer.server.port=80"
+      - "traefik.http.routers.matrix.rule=hostregexp(`{host:matrix.+}`)"
+      - "traefik.http.routers.matrix.entrypoints=websecure"
+      - "traefik.http.routers.matrix.tls=true"
+      - "traefik.http.routers.matrix.tls.certresolver=letsencrypt"
+    networks:
+      default:
+        ipv4_address: 172.29.0.150
+networks:
+  default:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.29.0.0/24
